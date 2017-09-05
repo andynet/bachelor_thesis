@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import sys
-import time
 import multiprocessing
 
 
@@ -46,8 +45,13 @@ def load_lines(file):
     return lines
 
 
-def get_comparison(gene_pairs, genes, phages, phage1):
+def get_comparison(phage1):
 
+    global gene_pairs
+    global genes
+    global phages
+
+    phage1 = phage1.strip()
     phage1_genes = get_phage_genes(phage1, genes)
     out = open(phage1 + '.sim', 'w')
 
@@ -68,7 +72,10 @@ def get_comparison(gene_pairs, genes, phages, phage1):
                     break
 
         union = len(phage1_genes) + len(phage2_genes) - intersection
-        similarity = intersection/union
+        try:
+            similarity = intersection/union
+        except ZeroDivisionError:
+            similarity = -1
 
         print(phage1, phage2, union, intersection, similarity)
         header += '\t' + phage2
@@ -79,6 +86,16 @@ def get_comparison(gene_pairs, genes, phages, phage1):
     out.close()
 
 
+def init(gene_pairs_pointer, genes_pointer, phages_pointer):
+    global gene_pairs
+    global genes
+    global phages
+
+    gene_pairs = gene_pairs_pointer
+    genes = genes_pointer
+    phages = phages_pointer
+
+
 # <editor-fold desc="main">
 if len(sys.argv) != 6:
     print('Usage:', sys.argv[0], '<gene_pairs> <genes.conversion> <phages_list> <start> <end>')
@@ -87,26 +104,7 @@ if len(sys.argv) != 6:
 gene_pairs = load_gene_pairs(sys.argv[1])
 genes = load_lines(sys.argv[2])
 phages = load_lines(sys.argv[3])
-start = int(sys.argv[4])
-end = int(sys.argv[5])
 
-for i in range(start, end):
-
-    phage = phages[i].strip()
-
-    while multiprocessing.active_children() >= multiprocessing.cpu_count():
-        time.sleep(10)
-
-    process = multiprocessing.Process(target=get_comparison, args=(gene_pairs, genes, phages, phage))
-    process.start()
-
-
-# def f(x):
-#     return x*x
-#
-# if __name__ == '__main__':
-#     pool = multiprocessing.Pool()
-#     result = pool.apply_async(f, [10])    # evaluate "f(10)" asynchronously
-#     print result.get(timeout=1)           # prints "100" unless your computer is *very* slow
-#     print pool.map(f, range(10))          # prints "[0, 1, 4,..., 81]"
+pool = multiprocessing.Pool(initializer=init, initargs=(gene_pairs, genes, phages))
+pool.map(get_comparison, phages[int(sys.argv[4]):int(sys.argv[5])])
 # </editor-fold>

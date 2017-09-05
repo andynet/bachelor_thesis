@@ -13,7 +13,7 @@ cat *.genes.conversion > all.genes.conversion
 
 prokka --force --kingdom Viruses ./deduplicated.genomes.fasta
 
-./parse_prokka_output.py
+./extract_prokka_genes.py ./deduplicated.prokka
 
 # crocoblast
 blastp  -query ./prokka_genes.fasta \
@@ -22,5 +22,6 @@ blastp  -query ./prokka_genes.fasta \
         -outfmt "6 qseqid sseqid score pident ppos"     \
         -num_threads 16
 
-./create_similarity_matrix.py ./prokka_genes.blast
+./create_similarity_matrix.py CrocoBlast/final_result PROKKA.genes.conversion deduplicated.genomes.list 0 1000
+
 ./make_PCA.py
