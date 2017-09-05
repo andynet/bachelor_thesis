@@ -72,7 +72,11 @@ def get_comparison(phage_number):
                     break
 
         union = len(phage1_genes) + len(phage2_genes) - intersection
-        similarity = intersection/union
+
+        try:
+            similarity = intersection/union
+        except ZeroDivisionError:
+            similarity = None
 
         # print(phage1, phage2, union, intersection, similarity)
         # header += '\t' + phage2
@@ -93,7 +97,7 @@ def init(gene_pairs_pointer, genes_pointer, phages_pointer):
     phages = phages_pointer
 
 
-# <editor-fold desc="main">
+# <editor-fold desc="start processes">
 if len(sys.argv) != 6:
     print('Usage:', sys.argv[0], '<gene_pairs> <genes.conversion> <phages_list> <start> <end>')
     exit()
