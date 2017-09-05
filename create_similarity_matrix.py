@@ -45,20 +45,20 @@ def load_lines(file):
     return lines
 
 
-def get_comparison(phage1):
+def get_comparison(phage_number):
 
     global gene_pairs
     global genes
     global phages
 
-    phage1 = phage1.strip()
+    phage1 = phages[phage_number].strip()
     phage1_genes = get_phage_genes(phage1, genes)
     out = open(phage1 + '.sim', 'w')
 
-    header = 'name'
-    body = phage1
+    header = 'name' + 'phage' * phage_number
+    body = phage1 + '\t' * phage_number
 
-    for i in range(len(phages)):
+    for i in range(phage_number, len(phages)):
 
         phage2 = phages[i].strip()
         phage2_genes = get_phage_genes(phage2, genes)
@@ -72,16 +72,13 @@ def get_comparison(phage1):
                     break
 
         union = len(phage1_genes) + len(phage2_genes) - intersection
-        try:
-            similarity = intersection/union
-        except ZeroDivisionError:
-            similarity = -1
+        similarity = intersection/union
 
-        print(phage1, phage2, union, intersection, similarity)
-        header += '\t' + phage2
+        # print(phage1, phage2, union, intersection, similarity)
+        # header += '\t' + phage2
         body += '\t' + str(similarity)
 
-    out.write(header + '\n')
+    # out.write(header + '\n')
     out.write(body + '\n')
     out.close()
 
@@ -104,7 +101,9 @@ if len(sys.argv) != 6:
 gene_pairs = load_gene_pairs(sys.argv[1])
 genes = load_lines(sys.argv[2])
 phages = load_lines(sys.argv[3])
+start = int(sys.argv[4])
+stop = min(int(sys.argv[5]), len(phages))
 
-pool = multiprocessing.Pool(initializer=init, initargs=(gene_pairs, genes, phages))
-pool.map(get_comparison, phages[int(sys.argv[4]):int(sys.argv[5])])
+pool = multiprocessing.Pool(16, initializer=init, initargs=(gene_pairs, genes, phages))
+pool.map(get_comparison, range(start, stop))
 # </editor-fold>
