@@ -57,5 +57,9 @@ less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../
                                  ../../data/PROKKA_2017-08-31.genes.conversion \
                                  ../../data/deduplicated.genomes.list
 
+mkdir ../../data/similarities/
+mv *.sim ../../data/similarities/
+
+marge_sim_files.py ../../data/similarities/*.sim
 # TODO: merge_sim_files.py
 # TODO: make_PCA.py
