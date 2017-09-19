@@ -61,5 +61,7 @@ mkdir ../../data/similarities/
 mv *.sim ../../data/similarities/
 
 marge_sim_files.py ../../data/similarities/*.sim
-# TODO: merge_sim_files.py
+
+mv matrix.tsv ../../data/matrix_170919.tsv
+
 # TODO: make_PCA.py
