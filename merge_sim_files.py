@@ -10,9 +10,13 @@ for sim_file in sys.argv[1:]:
     sim.close()
 
 matrix = np.zeros((len(merged), len(merged)))
+phage_list = []
 no_genes = set()
+
 for i in range(len(merged)):
     data = merged[i].split('\t')[1:]
+    name = merged[i].split('\t')[0]
+    phage_list.append(name)
     for j in range(i, len(data)):
         value = data[j]
         if value == 'None':
@@ -28,5 +32,10 @@ no_genes = sorted(list(no_genes))
 for i, no_gene in enumerate(no_genes):
     matrix = np.delete(matrix, no_gene-i, axis=0)
     matrix = np.delete(matrix, no_gene-i, axis=1)
+    phage_list.pop(no_gene-i)
 
 np.savetxt('matrix.tsv', matrix)
+
+phage_list_out = open('phage_list.txt', 'w')
+phage_list_out.writelines("%s\n" % phage for phage in phage_list)
+phage_list_out.close()
