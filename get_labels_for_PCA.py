@@ -3,7 +3,7 @@
 import sys
 
 if len(sys.argv) != 4:
-    print('Usage:', sys.argv[0], '<phage_list.txt> <genomes.conversion> <marked_hosts>')
+    print('Usage:', sys.argv[0], '<phage_list.txt> <genomes.conversion> <searched>')
     exit()
 
 with open(sys.argv[1]) as f:
@@ -12,8 +12,7 @@ with open(sys.argv[1]) as f:
 with open(sys.argv[2]) as f:
     lines = f.readlines()
 
-with open(sys.argv[3]) as f:
-    marked_hosts = f.readlines()
+searched_term = sys.argv[3]
 
 for phage in phages:
     phage = phage.strip()
@@ -33,12 +32,10 @@ for phage in phages:
     # print(phage)
     # print(list(set(hosts)))
 
-    color = None
-    for i in range(len(marked_hosts)):
-        if marked_hosts[i].strip() in hosts:
-            color = i
+    host_line = ';'.join(list(set(hosts)))
+    if searched_term in host_line:
+        color = 0
+    else:
+        color = 1
 
-    if color is None:
-        color = len(marked_hosts)
-
-    print('{}\t{}'.format(phage, color))
+    print('{}\t{}\t{}'.format(phage, color, host_line))
