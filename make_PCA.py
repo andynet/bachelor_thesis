@@ -14,15 +14,23 @@ def load_labels(labels_file):
         lines = f.readlines()
 
     labels = []
+    y = []
     for line in lines:
-        labels.append(int(line.strip()))
+        labels.append(line.strip())
+        y.append(int(line.split('\t')[1].strip()))
 
-    return labels
+    return labels, y
 
 
-# def onpick(event):      # type:matplotlib.backend_bases.
-#
-#     print('you pressed', event.button, event.xdata, event.ydata, event.artist, event.ind)
+labels, y = load_labels(sys.argv[2])
+
+
+def on_pick(event):      # type:matplotlib.backend_bases.
+    global labels
+    print('you pressed', event.ind)
+    for ind in event.ind:
+        print(labels[ind])
+
 
 
 if len(sys.argv) != 3:
@@ -30,7 +38,6 @@ if len(sys.argv) != 3:
     exit()
 
 data = pd.read_csv(sys.argv[1], sep='\t', header=None)
-y = load_labels(sys.argv[2])
 color_map = plt.cm.get_cmap('Set1')
 # print(y)
 
@@ -65,6 +72,35 @@ ax.scatter(X_reduced[:, 0], X_reduced[:, 1], c=y, cmap=color_map, edgecolor='k',
 #                 arrowprops=dict(arrowstyle='->')
 #                 )
 
+### toto funguje
+# #!/usr/bin/python3
+# """
+# compute the mean and stddev of 100 data sets and plot mean vs stddev.
+# When you click on one of the mu, sigma points, plot the raw data from
+# the dataset that generated the mean and stddev
+# """
+# import numpy as np
+# import matplotlib.pyplot as plt
+#
+# xs = [1,2,3,4,5]
+# ys = [1,2,3,4,5]
+# label = ['a', 'b', 'c', 'd', 'e']
+#
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+# ax.set_title('click on point to plot time series')
+# line, = ax.plot(xs, ys, 'o', picker=5)  # 5 points tolerance
+#
+# def on_pick(event):
+#     global label
+#     thisline = event.artist
+#     xdata, ydata = thisline.get_data()
+#     ind = event.ind
+#     print('on pick line:', label[ind[0]])
+#
+cid = fig.canvas.mpl_connect('pick_event', on_pick)
+#
+# plt.show()
 
 plt.show()
 exit()
