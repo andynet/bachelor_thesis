@@ -53,6 +53,9 @@ crocoblast -run
 
 less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../data/deduplicated.genomes.list
 
+# mcl
+# ./create_pairs_from_mcl_output
+
 ./parallelize_matrix_creation.py ../../data/CrocoBLAST_2/complete_assembled_output \
                                  ../../data/PROKKA_2017-08-31.genes.conversion \
                                  ../../data/deduplicated.genomes.list
