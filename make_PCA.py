@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 
 def load_labels(labels_file):
@@ -38,7 +39,7 @@ if len(sys.argv) != 3:
 
 data = pd.read_csv(sys.argv[1], sep='\t', header=None)
 labels, y = load_labels(sys.argv[2])
-color_map = plt.cm.get_cmap('Set1')
+color_map = mpl.colors.ListedColormap([[0.5, 0.5, 0.5], [0.95, 0.95, 0.95], [1.0, 0.0, 0.0]])
 
 fig = plt.figure()
 X_reduced = PCA(18).fit_transform(data)

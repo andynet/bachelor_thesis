@@ -29,13 +29,15 @@ for phage in phages:
             if host2 != 'NO_DATA':
                 hosts.append(host2)
 
-    # print(phage)
-    # print(list(set(hosts)))
-
-    host_line = ';'.join(list(set(hosts)))
-    if searched_term in host_line:
-        color = 0
+    if len(hosts) != 0:
+        host_line = ';'.join(list(set(hosts)))
     else:
+        host_line = 'NO_HOST'
+
+    color = 0
+    if host_line == 'NO_HOST':
         color = 1
+    if searched_term in host_line:
+        color = 2
 
     print('{}\t{}\t{}'.format(phage, color, host_line))
