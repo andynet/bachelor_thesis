@@ -64,4 +64,4 @@ marge_sim_files.py ../../data/similarities/*.sim
 
 mv matrix.tsv ../../data/matrix_170919.tsv
 
-# TODO: make_PCA.py
+./create_plot.sh "Escherichia"    # use string in which you are interested
