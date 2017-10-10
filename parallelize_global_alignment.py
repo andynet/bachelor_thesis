@@ -13,10 +13,10 @@ original_fasta = sys.argv[1]
 tmp_dir = sys.argv[2]
 
 fa_list = list(SeqIO.parse(original_fasta, 'fasta'))
-max_records = 10    # len(fa_list)  # TODO: is it possible to run at once?
+max_records = len(fa_list)
 step = 25
 
-for record_num in range(0, max_records):
+for record_num in range(0, 5):     # with range(0, max_records) needs around 2TB data on disk
 
     gene_out = '{}/gene_{}.fasta'.format(tmp_dir, record_num)
 
@@ -25,14 +25,14 @@ for record_num in range(0, max_records):
 
         command1 = 'less {} | tail -n {} > {}'.format(original_fasta, (max_records-record_num)*2, genes_out)
         subprocess.call(command1, shell=True)
-        print(command1)
+        # print(command1)
 
     command2 = 'less {} | head -n {} | tail -n 2 > {}'.format(genes_out, (record_num % step + 1)*2, gene_out)
     subprocess.call(command2, shell=True)
-    print(command2)
+    # print(command2)
 
-    needle_out = '{}/{}_to_{}-{}.needle'.format(tmp_dir, record_num, record_num - (record_num % step), max_records-1)
-    needle_tsv_out = '{}/{}_to_{}-{}.needle.tsv'.format(tmp_dir, record_num, record_num - (record_num % step), max_records-1)
+    needle_out = '{}/{:0>6}_to_{}-{}.needle'.format(tmp_dir, record_num, record_num - (record_num % step), max_records-1)
+    needle_tsv_out = '{}/{:0>6}_to_{}-{}.needle.tsv'.format(tmp_dir, record_num, record_num - (record_num % step), max_records-1)
 
     needle_command = 'needle -asequence {} ' \
                      '       -bsequence {} ' \
@@ -48,7 +48,7 @@ for record_num in range(0, max_records):
     qsub_command = 'echo "{}; {}; {};" | qsub -l thr=1 -cwd -N glal{}'.format(needle_command, parse_needle_command,
                                                                               save_space_command, record_num)
     subprocess.call(qsub_command, shell=True)
-    print(qsub_command)
+    # print(qsub_command)
 
 
 
