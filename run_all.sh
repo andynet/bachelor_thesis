@@ -32,29 +32,35 @@ mv ./PROKKA_08302017/ /data/projects/kimona/data/
 mv ./PROKKA_2017-08-31.genes.fasta ../../data/
 mv ./PROKKA_2017-08-31.genes.conversion ../../data/
 
-crocoblast -add_database \
-                --sequence_file \
-                    protein \
-                    ../../data/PROKKA_2017-08-31.genes.fasta \
-                    PROKKA_2017-08-31.genes.fasta \
-                    /data/projects/kimona/crocoblast/
+./parallelize_global_alignment.py ../../data/PROKKA_2017-08-31.genes.fasta
 
-crocoblast -add_to_queue \
-                blastp \
-                PROKKA_2017-08-31.genes.fasta \
-                ../../data/PROKKA_2017-08-31.genes.fasta \
-                /data/projects/kimona/data/ \
-                --blast_options \
-                    -outfmt 6 \
-                    -max_target_seqs 1000000 \
-                    -max_hsps 1
+# <editor-fold desc='crocoblast-legacy'>
+# crocoblast -add_database \
+#                --sequence_file \
+#                    protein \
+#                    ../../data/PROKKA_2017-08-31.genes.fasta \
+#                    PROKKA_2017-08-31.genes.fasta \
+#                    /data/projects/kimona/crocoblast/
+#
+# crocoblast -add_to_queue \
+#                blastp \
+#                PROKKA_2017-08-31.genes.fasta \
+#                ../../data/PROKKA_2017-08-31.genes.fasta \
+#                /data/projects/kimona/data/ \
+#                --blast_options \
+#                    -outfmt 6 \
+#                    -max_target_seqs 1000000 \
+#                    -max_hsps 1
+#
+# crocoblast -run
+# </editor-fold>
 
-crocoblast -run
+
+# ./prepare_data_for_mcl.py ../../data/CrocoBLAST_2/complete_assembled_output
+# mcl --abc ../../data/weights.abc -o ../../data/clusters.clstr -I 1.2     # -I should be from 1.2 (biggest clusters) to 5.0
+# ./create_pairs_from_mcl_output.py ../../data/clusters.clstr ../../data/pairs.txt
 
 less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../data/deduplicated.genomes.list
-
-# mcl
-# ./create_pairs_from_mcl_output
 
 ./parallelize_matrix_creation.py ../../data/CrocoBLAST_2/complete_assembled_output \
                                  ../../data/PROKKA_2017-08-31.genes.conversion \
