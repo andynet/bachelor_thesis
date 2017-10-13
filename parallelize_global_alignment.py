@@ -38,7 +38,10 @@ for record_num in range(0, 5):     # with range(0, max_records) needs around 2TB
                      '       -bsequence {} ' \
                      '       -outfile {}   ' \
                      '       -gapopen 10.0 ' \
-                     '       -gapextend 0.5'.format(gene_out, genes_out, needle_out)
+                     '       -gapextend 0.5' \
+                     '       -endweight Y  ' \
+                     '       -endopen 10.0 ' \
+                     '       -endextend 0.5'.format(gene_out, genes_out, needle_out)
 
     parse_needle_command = './parse_needle.py {} {}'.format(needle_out, needle_tsv_out)
 

@@ -30,8 +30,9 @@ for line in needle:
 
     if line[0:9] == '# Score: ':
         score = line[9:].strip()
-        record = '{}\t{}\t{}\t{}\t{}\t{}\t{}\t{:.4f}\n'.format(first_ID, second_ID, length, identity,
-                                                               similarity, gaps, score, float(score)/float(length))
+
+    if float(score) > 0.0:
+        record = '{}\t{}\t{}\n'.format(first_ID, second_ID, score)
         out.write(record)
 
 needle.close()
