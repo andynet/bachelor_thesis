@@ -2,5 +2,5 @@
 
 SEARCH=$1
 
-./get_labels_for_PCA.py ./phage_list.txt ../../data/deduplicated.genomes.conversion "$SEARCH" > labels.txt
-./make_PCA.py ../../data/matrix_170921_tabs.tsv ./labels.txt
+./get_labels_for_PCA.py ../../data/phage_list.txt ../../data/deduplicated.genomes.conversion "$SEARCH" > ../../data/labels.txt
+./make_PCA.py ../../data/matrix_170921_tabs.tsv ../../data/labels.txt

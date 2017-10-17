@@ -8,13 +8,14 @@ if len(sys.argv) != 3:
     print('Usage:', sys.argv[0], '<genes.fasta> <tmp_dir>')
     exit()
 
+script_dir = '/'.join(sys.argv[0].split('/')[0:-1])
 original_fasta = sys.argv[1]
 tmp_dir = sys.argv[2]
 
 fa_list = list(SeqIO.parse(original_fasta, 'fasta'))
 max_records = len(fa_list)
 
-for record_num in range(0, max_records):     # with range(0, max_records) needs around 2TB data on disk
+for record_num in range(0, 10):     # with range(0, max_records) needs around 2TB data on disk
 
     gene_out = '{}/gene_{}.fasta'.format(tmp_dir, record_num)
     genes_out = '{}/genes_{}-{}.fasta'.format(tmp_dir, record_num, max_records-1)
@@ -34,12 +35,12 @@ for record_num in range(0, max_records):     # with range(0, max_records) needs 
                      '       -endopen 10.0 ' \
                      '       -endextend 0.5'.format(gene_out, genes_out, needle_out)
 
-    parse_needle_command = './parse_needle.py {} {}'.format(needle_out, needle_tsv_out)
+    parse_needle_command = '{}/parse_needle.py {} {}'.format(script_dir, needle_out, needle_tsv_out)
     save_space_command = 'gzip {}; rm {} {} {}'.format(needle_tsv_out, gene_out, genes_out, needle_out)
 
     qsub_command = 'echo "{}; {}; {}; {}; {};" ' \
-                   '| qsub -l thr=1 -cwd -N glal{}'.format(command1, command2, needle_command, parse_needle_command,
-                                                           save_space_command, record_num)
+                   '| qsub -l thr=1 -cwd -N ga{}'.format(command1, command2, needle_command, parse_needle_command,
+                                                              save_space_command, record_num)
     subprocess.call(qsub_command, shell=True)
 
 
