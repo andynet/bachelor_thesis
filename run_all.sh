@@ -32,7 +32,11 @@ mv ./PROKKA_08302017/ /data/projects/kimona/data/
 mv ./PROKKA_2017-08-31.genes.fasta ../../data/
 mv ./PROKKA_2017-08-31.genes.conversion ../../data/
 
-./parallelize_global_alignment.py ../../data/PROKKA_2017-08-31.genes.fasta
+for NUM in $(seq 1 -0.01 0.6); do
+    cd-hit -c ${NUM} -d 0 -g 1 -i ../PROKKA_2017-08-31.genes.fasta -o genes_${NUM} -T 10;
+done;
+
+./parallelize_global_alignment.py ../../data/cd-hit/genes_1.00 ../../data/global_alignment_tmp
 
 # <editor-fold desc='crocoblast-legacy'>
 # crocoblast -add_database \
@@ -60,11 +64,22 @@ mv ./PROKKA_2017-08-31.genes.conversion ../../data/
 # mcl --abc ../../data/weights.abc -o ../../data/clusters.clstr -I 1.2     # -I should be from 1.2 (biggest clusters) to 5.0
 # ./create_pairs_from_mcl_output.py ../../data/clusters.clstr ../../data/pairs.txt
 
+cat ../../data/global_alignment_tmp/*.tsv.gz > all.tsv.gz
+gunzip all.tsv.gz
+mcl --abc all.tsv -o ../../data/clusters.clstr -I 1.2
+
+./expand_clusters ../../data/clusters.clstr ../../data/cd-hit/genes_1.00.clstr > ../../data/complete_clusters
+./create_pairs_from_clusters ../../data/complete_clusters > ../../data/pairs
+
 less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../data/deduplicated.genomes.list
 
-./parallelize_matrix_creation.py ../../data/CrocoBLAST_2/complete_assembled_output \
+# ./parallelize_matrix_creation.py ../../data/CrocoBLAST_2/complete_assembled_output \
+#                                  ../../data/PROKKA_2017-08-31.genes.conversion \
+#                                  ../../data/deduplicated.genomes.list
+
+./parallelize_matrix_creation.py ../../data/pairs \
                                  ../../data/PROKKA_2017-08-31.genes.conversion \
-                                 ../../data/deduplicated.genomes.list
+                                 ../../deduplicated.genomes.list
 
 mkdir ../../data/similarities/
 mv *.sim ../../data/similarities/
