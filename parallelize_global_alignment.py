@@ -15,7 +15,7 @@ tmp_dir = sys.argv[2]
 fa_list = list(SeqIO.parse(original_fasta, 'fasta'))
 max_records = len(fa_list)
 
-for record_num in range(0, 10):     # with range(0, max_records) needs around 2TB data on disk
+for record_num in range(0, max_records):     # with range(0, max_records) needs around 2TB data on disk
 
     gene_out = '{}/gene_{}.fasta'.format(tmp_dir, record_num)
     genes_out = '{}/genes_{}-{}.fasta'.format(tmp_dir, record_num, max_records-1)
