@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import sys
-import argparse
 import subprocess
 from Bio import SeqIO
 
@@ -14,25 +13,17 @@ tmp_dir = sys.argv[2]
 
 fa_list = list(SeqIO.parse(original_fasta, 'fasta'))
 max_records = len(fa_list)
-step = 25
 
-for record_num in range(0, 5):     # with range(0, max_records) needs around 2TB data on disk
+for record_num in range(0, max_records):     # with range(0, max_records) needs around 2TB data on disk
 
     gene_out = '{}/gene_{}.fasta'.format(tmp_dir, record_num)
+    genes_out = '{}/genes_{}-{}.fasta'.format(tmp_dir, record_num, max_records-1)
 
-    if record_num % step == 0:
-        genes_out = '{}/genes_{}-{}.fasta'.format(tmp_dir, record_num, max_records-1)
+    command1 = 'less {} | tail -n {} > {}'.format(original_fasta, (max_records-record_num)*2, genes_out)
+    command2 = 'less {} | head -n {} > {}'.format(genes_out, 2, gene_out)
 
-        command1 = 'less {} | tail -n {} > {}'.format(original_fasta, (max_records-record_num)*2, genes_out)
-        subprocess.call(command1, shell=True)
-        # print(command1)
-
-    command2 = 'less {} | head -n {} | tail -n 2 > {}'.format(genes_out, (record_num % step + 1)*2, gene_out)
-    subprocess.call(command2, shell=True)
-    # print(command2)
-
-    needle_out = '{}/{:0>6}_to_{}-{}.needle'.format(tmp_dir, record_num, record_num - (record_num % step), max_records-1)
-    needle_tsv_out = '{}/{:0>6}_to_{}-{}.needle.tsv'.format(tmp_dir, record_num, record_num - (record_num % step), max_records-1)
+    needle_out = '{}/{:0>6}_to_{}-{}.needle'.format(tmp_dir, record_num, record_num, max_records-1)
+    needle_tsv_out = '{}/{:0>6}_to_{}-{}.needle.tsv'.format(tmp_dir, record_num, record_num, max_records-1)
 
     needle_command = 'needle -asequence {} ' \
                      '       -bsequence {} ' \
@@ -44,14 +35,12 @@ for record_num in range(0, 5):     # with range(0, max_records) needs around 2TB
                      '       -endextend 0.5'.format(gene_out, genes_out, needle_out)
 
     parse_needle_command = './parse_needle.py {} {}'.format(needle_out, needle_tsv_out)
+    save_space_command = 'gzip {}; rm {} {} {}'.format(needle_tsv_out, gene_out, genes_out, needle_out)
 
-    save_space_command = 'gzip {}; rm {}; rm {}; touch {}/completed_{}'.format(needle_tsv_out, needle_out,
-                                                                               gene_out, tmp_dir, record_num)
-
-    qsub_command = 'echo "{}; {}; {};" | qsub -l thr=1 -cwd -N glal{}'.format(needle_command, parse_needle_command,
-                                                                              save_space_command, record_num)
+    qsub_command = 'echo "{}; {}; {}; {}; {};" ' \
+                   '| qsub -l thr=1 -cwd -N glal{}'.format(command1, command2, needle_command, parse_needle_command,
+                                                           save_space_command, record_num)
     subprocess.call(qsub_command, shell=True)
-    # print(qsub_command)
 
 
 
