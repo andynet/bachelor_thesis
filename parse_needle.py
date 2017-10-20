@@ -8,30 +8,21 @@ if len(sys.argv) != 3:
     exit()
 
 out = open(sys.argv[2], 'w')
-needle = open(sys.argv[1])
 
-first_ID = None
-second_ID = None
+with open(sys.argv[1]) as f:
+    lines = f.readlines()
 
-for line in needle:
+for line in lines:
 
-    if line[0:5] == '# 1: ':
-        first_ID = line[5:].strip()
+    if line == '\n':
+        break
 
-    if line[0:5] == '# 2: ':
-        second_ID = line[5:].strip()
+    first_ID = line.split()[0]
+    second_ID = line.split()[1]
+    score = line.split()[3].strip().strip('()')
 
-    if line[0:9] == '# Score: ':
-        score = line[9:].strip()
+    if float(score) > 0.0:        # use -math.inf to record all
+        record = '{}\t{}\t{}\n'.format(first_ID, second_ID, score)
+        out.write(record)
 
-        assert first_ID is not None, "First_ID is None"
-        assert second_ID is not None, "Second_ID is None"
-
-        if float(score) > 0.0:        # use -math.inf to record all
-            record = '{}\t{}\t{}\n'.format(first_ID, second_ID, score)
-            out.write(record)
-            second_ID = None
-            first_ID = None
-
-needle.close()
 out.close()

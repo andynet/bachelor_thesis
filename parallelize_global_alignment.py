@@ -15,7 +15,7 @@ tmp_dir = sys.argv[2]
 fa_list = list(SeqIO.parse(original_fasta, 'fasta'))
 max_records = len(fa_list)
 
-for record_num in range(0, max_records):     # with range(0, max_records) needs around 2TB data on disk
+for record_num in range(18010, max_records):     # with range(0, max_records) needs around 2TB data on disk
 
     gene_out = '{}/gene_{}.fasta'.format(tmp_dir, record_num)
     genes_out = '{}/genes_{}-{}.fasta'.format(tmp_dir, record_num, max_records-1)
@@ -33,7 +33,8 @@ for record_num in range(0, max_records):     # with range(0, max_records) needs 
                      '       -gapextend 0.5' \
                      '       -endweight Y  ' \
                      '       -endopen 10.0 ' \
-                     '       -endextend 0.5'.format(gene_out, genes_out, needle_out)
+                     '       -endextend 0.5' \
+                     '       -aformat score'.format(gene_out, genes_out, needle_out)
 
     parse_needle_command = '{}/parse_needle.py {} {}'.format(script_dir, needle_out, needle_tsv_out)
     save_space_command = 'gzip {}; rm {} {} {}'.format(needle_tsv_out, gene_out, genes_out, needle_out)
