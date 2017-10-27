@@ -5,7 +5,7 @@
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage[hidelinks,breaklinks]{hyperref}
-\usepackage[slovak]{babel} % vypnite pre prace v anglictine
+% \usepackage[slovak]{babel} % vypnite pre prace v anglictine
 \linespread{1.25} % hodnota 1.25 by mala zodpovedat 1.5 riadkovaniu
 
 % -------------------
@@ -132,12 +132,12 @@ Supervisor: & \mfskolitel \\
 % -------------------
 % --- Abstrakt - Anglicky 
 % -------------------
-\newpage 
+\newpage
+
 \section*{Abstract}
 
 Abstract in the English language (translation of the abstract in the
 Slovak language).
-
 
 \paragraph*{Keywords:} 
 
@@ -199,16 +199,11 @@ zavedené v práci, okrem tých, ktoré sú všeobecne známe.
 
 \mainmatter
 
-
-\input uvod.tex 
-
-\input kapitola.tex
-
-\input latex.tex
-
-\input lorem.tex
-
-\input zaver.tex
+\input introduction.tex
+\input chapter1.tex
+\input chapter2.tex
+\input chapter3.tex
+\input conclusion.tex
 
 % -------------------
 % --- Bibliografia
@@ -223,8 +218,8 @@ zavedené v práci, okrem tých, ktoré sú všeobecne známe.
 \nocite{}
 \clearpage
 
-%\bibliographystyle{plain}
-%\bibliography{literature}
+\bibliographystyle{plain}
+\bibliography{literature}
 
 %Prípadne môžete napísať literatúru priamo tu
 %\begin{thebibliography}{5}
