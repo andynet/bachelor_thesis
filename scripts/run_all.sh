@@ -32,36 +32,43 @@ mv ./PROKKA_08302017/ /data/projects/kimona/data/
 mv ./PROKKA_2017-08-31.genes.fasta ../../data/
 mv ./PROKKA_2017-08-31.genes.conversion ../../data/
 
-for NUM in $(seq 1 -0.01 0.6); do
-    cd-hit -c ${NUM} -d 0 -g 1 -i ../PROKKA_2017-08-31.genes.fasta -o genes_${NUM} -T 10;
-done;
+# for NUM in $(seq 1 -0.01 0.6); do
+#     cd-hit -c ${NUM} -d 0 -g 1 -i ../PROKKA_2017-08-31.genes.fasta -o genes_${NUM} -T 10;
+# done;
 
-./parallelize_global_alignment.py ../../data/cd-hit/genes_1.00 ../../data/global_alignment_tmp
+# ./parallelize_global_alignment.py ../../data/cd-hit/genes_1.00 ../../data/global_alignment_tmp
 
-# <editor-fold desc='crocoblast-legacy'>
-# crocoblast -add_database \
-#                --sequence_file \
-#                    protein \
-#                    ../../data/PROKKA_2017-08-31.genes.fasta \
-#                    PROKKA_2017-08-31.genes.fasta \
-#                    /data/projects/kimona/crocoblast/
-#
-# crocoblast -add_to_queue \
-#                blastp \
-#                PROKKA_2017-08-31.genes.fasta \
-#                ../../data/PROKKA_2017-08-31.genes.fasta \
-#                /data/projects/kimona/data/ \
-#                --blast_options \
-#                    -outfmt 6 \
-#                    -max_target_seqs 1000000 \
-#                    -max_hsps 1
-#
-# crocoblast -run
-# </editor-fold>
+crocoblast -add_database \
+                --sequence_file \
+                    protein \
+                    ../../data/PROKKA_2017-08-31.genes.fasta \
+                    PROKKA_2017-08-31.genes.fasta \
+                    /data/projects/kimona/crocoblast/
+
+crocoblast -add_to_queue \
+                blastp \
+                PROKKA_2017-08-31.genes.fasta \
+                ../../data/PROKKA_2017-08-31.genes.fasta \
+                /data/projects/kimona/data/ \
+                --blast_options \
+                    -outfmt 6 \
+                    -max_target_seqs 1000000 \
+                    -max_hsps 1
+
+crocoblast -run
+
+cd ../../data/global_alignment
+
+# next step around 11 hours on 160 cores
+../../scripts/bachelor_thesis/scripts/parallelize_global_alignment_from_blast.py \
+                    ../data/CrocoBLAST_2/complete_assembled_output \
+                    ../data/03-annotation/PROKKA_2017-08-31.genes.fasta \
+                    ../data/global_alignment
 
 
 # ./prepare_data_for_mcl.py ../../data/CrocoBLAST_2/complete_assembled_output
-# mcl --abc ../../data/weights.abc -o ../../data/clusters.clstr -I 1.2     # -I should be from 1.2 (biggest clusters) to 5.0
+# Example: mcl 00001.abc --abc -o 00001.abc.clstr -I 1.2
+# mcl ../../data/weights.abc --abc -o ../../data/clusters.clstr -I 1.2     # -I should be from 1.2 (biggest clusters) to 5.0
 # ./create_pairs_from_mcl_output.py ../../data/clusters.clstr ../../data/pairs.txt
 
 cat ../../data/global_alignment_tmp/*.tsv.gz > all.tsv.gz
