@@ -75,8 +75,8 @@ cat ../../data/global_alignment_tmp/*.tsv.gz > all.tsv.gz
 gunzip all.tsv.gz
 mcl --abc all.tsv -o ../../data/clusters.clstr -I 1.2
 
-./expand_clusters ../../data/clusters.clstr ../../data/cd-hit/genes_1.00.clstr > ../../data/complete_clusters
-./create_pairs_from_clusters ../../data/complete_clusters > ../../data/pairs
+# ./expand_clusters ../../data/clusters.clstr ../../data/cd-hit/genes_1.00.clstr > ../../data/complete_clusters
+# ./create_pairs_from_clusters ../../data/complete_clusters > ../../data/pairs
 
 less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../data/deduplicated.genomes.list
 
@@ -84,14 +84,19 @@ less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../
 #                                  ../../data/PROKKA_2017-08-31.genes.conversion \
 #                                  ../../data/deduplicated.genomes.list
 
-./parallelize_matrix_creation.py ../../data/pairs \
-                                 ../../data/PROKKA_2017-08-31.genes.conversion \
-                                 ../../deduplicated.genomes.list
+# this is for the first iteration
+# ./parallelize_matrix_creation.py ../../data/pairs \
+#                                  ../../data/PROKKA_2017-08-31.genes.conversion \
+#                                  ../../deduplicated.genomes.list
 
-mkdir ../../data/similarities/
-mv *.sim ../../data/similarities/
+./create_matrix_from_mcl.py ../../data/03-annotation/PROKKA_2017-08-31.genes.conversion \
+                            ../../data/mcl/complete_records.abc.clstr \
+                            ../../data/phage_list.txt        # ../../data/deduplicated.genomes.list
 
-marge_sim_files.py ../../data/similarities/*.sim
+# first iteration
+# mkdir ../../data/similarities/
+# mv *.sim ../../data/similarities/
+# marge_sim_files.py ../../data/similarities/*.sim
 
 mv matrix.tsv ../../data/matrix_170919.tsv
 
