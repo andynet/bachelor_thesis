@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # TODO: parallelize for 160 cores
+#
 
 import sys
 
@@ -27,8 +28,8 @@ def get_phage_genes(phage, genes):
 
     return result
 
-if len(sys.argv) != 4:
-    print('Usage', sys.argv[0], '<PROKKA.genes.conversion> <complete_output.clstr> <phage_list>')
+if len(sys.argv) != 6:
+    print('Usage', sys.argv[0], '<PROKKA.genes.conversion> <complete_output.clstr> <phage_list> <start> <end>')
     exit()
 
 with open(sys.argv[1]) as f:
@@ -36,12 +37,16 @@ with open(sys.argv[1]) as f:
 
 with open(sys.argv[2]) as f:
     lines = f.readlines()
+    number_of_clusters = len(lines)
     genes_to_clusters = get_genes_to_clusters(lines)
 
 with open(sys.argv[3]) as f:
     phage_list = f.readlines()
 
-for phage in phage_list[0:100]:
+start = int(sys.argv[4])
+end = int(sys.argv[5])
+
+for phage in phage_list[start:end]:
 
     phage = phage.strip()
     genes = get_phage_genes(phage, genes_conv)
@@ -51,7 +56,7 @@ for phage in phage_list[0:100]:
         active_clusters.add(genes_to_clusters[gene])
 
     vector = []
-    for i in range(0, 25000):
+    for i in range(0, number_of_clusters):
         if 'cluster{}'.format(i) in active_clusters:
             vector.append('1')
         else:
