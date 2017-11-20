@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# TODO: finish
 # NOT USED IN MAIN PIPELINE
 
 import sys
