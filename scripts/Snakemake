@@ -1,105 +1,83 @@
+data_dir = config['data_dir']
+script_dir = config['script_dir']
 
+date = config['date']
 
-rule ncbi_download:
+DATABASES = ['ncbi', 'phagedb', 'viralzone']
+TYPES = ['genomes', 'genes']
+FORMATS = ['fasta', 'conversion']
+
+rule download:
     input:
     output:
-        '{data_dir}/001_NCBI.genes.conversion',
-        '{data_dir}/001_NCBI.genes.fasta',
-        '{data_dir}/001_NCBI.genomes.conversion',
-        '{data_dir}/001_NCBI.genomes.fasta'
+        '{data_dir}_{date}/001_{database}.{type}.{format}',
     shell:
         '''
-        {script_dir}/download_from_ncbi.py
-        '''
-
-rule phagedb_download:
-    input:
-    output:
-        '{data_dir}/001_phagedb.genes.conversion',
-        '{data_dir}/001_phagedb.genes.fasta',
-        '{data_dir}/001_phagedb.genomes.conversion',
-        '{data_dir}/001_phagedb.genomes.fasta'
-    shell:
-        '''
-        {script_dir}/download_from_phagedb.py
-        '''
-
-rule viralzone_download:
-    input:
-    output:
-        '{data_dir}/001_viralzone.genes.conversion',
-        '{data_dir}/001_viralzone.genes.fasta',
-        '{data_dir}/001_viralzone.genomes.conversion',
-        '{data_dir}/001_viralzone.genomes.fasta'
-    shell:
-        '''
-        {script_dir}/download_from_viralzone.py
+        {script_dir}/download_from_{database}.py
         '''
 
 rule merge:
     input:
-        '.genomes.fasta',
-        '.genomes.conversion',
-        '.genes.fasta',
-        '.genes.conversion'
+        expand('{data_dir}_{date}/001_{database}.{type}.{format}', database=DATABASES, type=TYPES, format=FORMATS),
     output:
-        '{data_dir}/002_all.genomes.fasta',
-        '{data_dir}/002_all.genomes.conversion',
-        '{data_dir}/002_all.genes.fasta',
-        '{data_dir}/002_all.genes.conversion'
+        '{data_dir}_{date}/002_all.{type}.{format}',
     shell:
         '''
-        cat
+        cat {data_dir}_{date}/001_{database}.{type}.{format} > {data_dir}_{date}/002_all.{type}.{format}
         '''
 
-rule deduplicate:
-
-rule find_genes:
-
-rule extract_genes:
-
-rule blast_genes_to_genes:
-
-rule align_globally_blast_searches:
-# next step around 11 hours on 160 cores
-../../scripts/bachelor_thesis/scripts/parallelize_global_alignment_from_blast.py \
-                    ../data/CrocoBLAST_2/complete_assembled_output \
-                    ../data/03-annotation/PROKKA_2017-08-31.genes.fasta \
-                    ../data/global_alignment
-
-
-# ./prepare_data_for_mcl.py ../../data/CrocoBLAST_2/complete_assembled_output
-# Example: mcl 00001.abc --abc -o 00001.abc.clstr -I 1.2
-# mcl ../../data/weights.abc --abc -o ../../data/clusters.clstr -I 1.2     # -I should be from 1.2 (biggest clusters) to 5.0
-# ./create_pairs_from_mcl_output.py ../../data/clusters.clstr ../../data/pairs.txt
-
-cat ../../data/global_alignment_tmp/*.tsv.gz > all.tsv.gz
-gunzip all.tsv.gz
-mcl --abc all.tsv -o ../../data/clusters.clstr -I 1.2
-
-# ./expand_clusters ../../data/clusters.clstr ../../data/cd-hit/genes_1.00.clstr > ../../data/complete_clusters
-# ./create_pairs_from_clusters ../../data/complete_clusters > ../../data/pairs
-
-less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../data/deduplicated.genomes.list
-
-# ./parallelize_matrix_creation.py ../../data/CrocoBLAST_2/complete_assembled_output \
-#                                  ../../data/PROKKA_2017-08-31.genes.conversion \
-#                                  ../../data/deduplicated.genomes.list
-
-# this is for the first iteration
-# ./parallelize_matrix_creation.py ../../data/pairs \
-#                                  ../../data/PROKKA_2017-08-31.genes.conversion \
-#                                  ../../deduplicated.genomes.list
-
-./create_matrix_from_mcl.py ../../data/03-annotation/PROKKA_2017-08-31.genes.conversion \
-                            ../../data/mcl/complete_records.abc.clstr \
-                            ../../data/phage_list.txt        # ../../data/deduplicated.genomes.list
-
-# first iteration
-# mkdir ../../data/similarities/
-# mv *.sim ../../data/similarities/
-# marge_sim_files.py ../../data/similarities/*.sim
-
-mv matrix.tsv ../../data/matrix_170919.tsv
-
-./create_plot.sh "Escherichia"    # use string in which you are interested
+#
+#rule deduplicate:
+#    input:
+#    output:
+#    shell:
+#
+#rule find_genes:
+#
+#rule extract_genes:
+#
+#rule blast_genes_to_genes:
+#
+#rule align_globally_blast_searches:
+## next step around 11 hours on 160 cores
+#../../scripts/bachelor_thesis/scripts/parallelize_global_alignment_from_blast.py \
+#                    ../data/CrocoBLAST_2/complete_assembled_output \
+#                    ../data/03-annotation/PROKKA_2017-08-31.genes.fasta \
+#                    ../data/global_alignment
+#
+#
+## ./prepare_data_for_mcl.py ../../data/CrocoBLAST_2/complete_assembled_output
+## Example: mcl 00001.abc --abc -o 00001.abc.clstr -I 1.2
+## mcl ../../data/weights.abc --abc -o ../../data/clusters.clstr -I 1.2     # -I should be from 1.2 (biggest clusters) to 5.0
+## ./create_pairs_from_mcl_output.py ../../data/clusters.clstr ../../data/pairs.txt
+#
+#cat ../../data/global_alignment_tmp/*.tsv.gz > all.tsv.gz
+#gunzip all.tsv.gz
+#mcl --abc all.tsv -o ../../data/clusters.clstr -I 1.2
+#
+## ./expand_clusters ../../data/clusters.clstr ../../data/cd-hit/genes_1.00.clstr > ../../data/complete_clusters
+## ./create_pairs_from_clusters ../../data/complete_clusters > ../../data/pairs
+#
+#less ../../data/deduplicated.genomes.conversion | cut -f1 | sort | uniq > ../../data/deduplicated.genomes.list
+#
+## ./parallelize_matrix_creation.py ../../data/CrocoBLAST_2/complete_assembled_output \
+##                                  ../../data/PROKKA_2017-08-31.genes.conversion \
+##                                  ../../data/deduplicated.genomes.list
+#
+## this is for the first iteration
+## ./parallelize_matrix_creation.py ../../data/pairs \
+##                                  ../../data/PROKKA_2017-08-31.genes.conversion \
+##                                  ../../deduplicated.genomes.list
+#
+#./create_matrix_from_mcl.py ../../data/03-annotation/PROKKA_2017-08-31.genes.conversion \
+#                            ../../data/mcl/complete_records.abc.clstr \
+#                            ../../data/phage_list.txt        # ../../data/deduplicated.genomes.list
+#
+## first iteration
+## mkdir ../../data/similarities/
+## mv *.sim ../../data/similarities/
+## marge_sim_files.py ../../data/similarities/*.sim
+#
+#mv matrix.tsv ../../data/matrix_170919.tsv
+#
+#./create_plot.sh "Escherichia"    # use string in which you are interested
