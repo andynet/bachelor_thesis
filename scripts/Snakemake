@@ -1,31 +1,41 @@
-data_dir = config['data_dir']
-script_dir = config['script_dir']
+data_dir = '/data/projects/kimona/data'
+script_dir = '/data/projects/kimona/scripts/bachelor_thesis/scripts'
 
-date = config['date']
+date = '171127'
 
 DATABASES = ['ncbi', 'phagedb', 'viralzone']
 TYPES = ['genomes', 'genes']
 FORMATS = ['fasta', 'conversion']
 
+rule run:
+    input:
+        expand('{data_dir}_{date}/001_{database}.{type}.{format}',
+                data_dir=data_dir, date=date, database=DATABASES, type=TYPES, format=FORMATS)
+#        '/data/projects/kimona/data_171127/001_ncbi.genes.fasta'
+
 rule download:
     input:
     output:
-        '{data_dir}_{date}/001_{database}.{type}.{format}',
+        '{data_dir}_{date}/001_{database}.genomes.fasta',
+        '{data_dir}_{date}/001_{database}.genomes.conversion',
+        '{data_dir}_{date}/001_{database}.genes.fasta',
+        '{data_dir}_{date}/001_{database}.genes.conversion'
+    params:
+        script_dir=script_dir
     shell:
         '''
-        {script_dir}/download_from_{database}.py
+        {params.script_dir}/download_from_{wildcards.database}.py
         '''
 
-rule merge:
-    input:
-        expand('{data_dir}_{date}/001_{database}.{type}.{format}', database=DATABASES, type=TYPES, format=FORMATS),
-    output:
-        '{data_dir}_{date}/002_all.{type}.{format}',
-    shell:
-        '''
-        cat {data_dir}_{date}/001_{database}.{type}.{format} > {data_dir}_{date}/002_all.{type}.{format}
-        '''
-
+#rule merge:
+#    input:
+#        expand('{data_dir}_{date}/001_{database}.{type}.{format}', database=DATABASES, type=TYPES, format=FORMATS),
+#    output:
+#        '{data_dir}_{date}/002_all.{type}.{format}',
+#    shell:
+#        '''
+#        cat {data_dir}_{date}/001_{database}.{type}.{format} > {data_dir}_{date}/002_all.{type}.{format}
+#        '''
 #
 #rule deduplicate:
 #    input:
@@ -39,7 +49,6 @@ rule merge:
 #rule blast_genes_to_genes:
 #
 #rule align_globally_blast_searches:
-## next step around 11 hours on 160 cores
 #../../scripts/bachelor_thesis/scripts/parallelize_global_alignment_from_blast.py \
 #                    ../data/CrocoBLAST_2/complete_assembled_output \
 #                    ../data/03-annotation/PROKKA_2017-08-31.genes.fasta \
