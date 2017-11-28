@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-import datetime
+from Bio.SeqRecord import SeqRecord
 from Bio import Entrez
 from Bio import SeqIO
-from Bio.SeqRecord import SeqRecord
+import sys
 
 
 def safe_get_qualifier(feature, key, default_value='NO_DATA'):
@@ -13,13 +13,17 @@ def safe_get_qualifier(feature, key, default_value='NO_DATA'):
         return default_value
 
 
-genomes_output_file = 'viralzone_' + str(datetime.date.today()) + '.genomes.fasta'
-genomes_conversion_file = 'viralzone_' + str(datetime.date.today()) + '.genomes.conversion'
+if len(sys.argv) != 2:
+    print('Usage:', sys.argv, '<dir>')
+    exit()
+
+genomes_output_file = '{}/001_viralzone.genomes.fasta'.format(sys.argv[1])
+genomes_conversion_file = '{}/001_viralzone.genomes.conversion'.format(sys.argv[1])
 genomes_output = open(genomes_output_file, 'w')
 genomes_conversion = open(genomes_conversion_file, 'w')
 
-genes_output_file = 'viralzone_' + str(datetime.date.today()) + '.genes.fasta'
-genes_conversion_file = 'viralzone_' + str(datetime.date.today()) + '.genes.conversion'
+genes_output_file = '{}/001_viralzone.genes.fasta'.format(sys.argv[1])
+genes_conversion_file = '{}/001_viralzone.genes.conversion'.format(sys.argv[1])
 genes_output = open(genes_output_file, 'w')
 genes_conversion = open(genes_conversion_file, 'w')
 

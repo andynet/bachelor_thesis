@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from Bio import SeqIO
-import datetime
 import requests
 import time
 import json
@@ -62,13 +61,17 @@ def get_host(genome):
         return ascii('{} {} {}'.format(genus, species, strain))
 
 
-genomes_output_file = 'phagesdb_' + str(datetime.date.today()) + '.genomes.fasta'
-genomes_conversion_file = 'phagesdb_' + str(datetime.date.today()) + '.genomes.conversion'
+if len(sys.argv) != 2:
+    print('Usage:', sys.argv, '<dir>')
+    exit()
+
+genomes_output_file = '{}/001_phagesdb.genomes.fasta'.format(sys.argv[1])
+genomes_conversion_file = '{}/001_phagesdb.genomes.conversion'.format(sys.argv[1])
 genomes_output = open(genomes_output_file, 'w')
 genomes_conversion = open(genomes_conversion_file, 'w')
 
-genes_output_file = 'phagesdb_' + str(datetime.date.today()) + '.genes.fasta'
-genes_conversion_file = 'phagesdb_' + str(datetime.date.today()) + '.genes.conversion'
+genes_output_file = '{}/001_phagesdb.genes.fasta'.format(sys.argv[1])
+genes_conversion_file = '{}/001_phagesdb.genes.conversion'.format(sys.argv[1])
 genes_output = open(genes_output_file, 'w')
 genes_conversion = open(genes_conversion_file, 'w')
 
@@ -100,7 +103,11 @@ while True:
         fasta_id = 'phage{:0>7}'.format(genome_num)
         genome_num += 1
 
-        fasta_seq = get_seq(genome)
+        try:
+            fasta_seq = get_seq(genome)
+        except UnicodeDecodeError:
+            print('Cannot parse {}. Skipping...'.format(genome['fasta_file']))
+            continue
 
         genomes_output.write('>' + fasta_id + '\n')
         genomes_output.write(fasta_seq + '\n')
