@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
+from http.client import IncompleteRead
 from Bio.SeqRecord import SeqRecord
 from Bio import Entrez
 from Bio import SeqIO
+import time
 import sys
 
 
@@ -43,7 +45,8 @@ batch = 200
 genome_num = 1000000
 gene_num = 10000000
 
-for i in range(0, len(record['IdList']), batch):
+i = 0
+while i < len(record['IdList']):
 
     print('Downloaded', i, 'sequences.')
 
@@ -56,8 +59,13 @@ for i in range(0, len(record['IdList']), batch):
         gb_handle = Entrez.efetch(db="nucleotide", rettype="gb", retmode="text",
                                   retstart=i, retmax=batch, webenv=webenv, query_key=query_key)
 
-    fa_list = list(SeqIO.parse(fa_handle, 'fasta'))
-    gb_list = list(SeqIO.parse(gb_handle, 'genbank'))
+    try:
+        fa_list = list(SeqIO.parse(fa_handle, 'fasta'))
+        gb_list = list(SeqIO.parse(gb_handle, 'genbank'))
+    except IncompleteRead:
+        print('Incomplete read. Trying again...')
+        time.sleep(10)
+        continue
 
     fa_handle.close()
     gb_handle.close()
@@ -100,6 +108,8 @@ for i in range(0, len(record['IdList']), batch):
 
                 genes_conversion.write('{}\t{}\t{}\t{}\t{}\t{}\n'.format(gene_id, fasta_id, protein_id,
                                                                          feature.location, product, note))
+
+    i += batch
 
 genomes_output.close()
 genomes_conversion.close()
