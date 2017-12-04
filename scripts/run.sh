@@ -25,7 +25,7 @@ mkdir -p ${STAGE_DIR}
 if [ -f ${STAGE_DIR}/001_downloading ]; then
     echo "Data already downloaded. Skipping..."
 else
-    ${SCRIPT_DIR}/download_from_ncbi.py ${DATA_DIR}
+    #${SCRIPT_DIR}/download_from_ncbi.py ${DATA_DIR}
     ${SCRIPT_DIR}/download_from_phagesdb.py ${DATA_DIR}
     ${SCRIPT_DIR}/download_from_viralzone.py ${DATA_DIR}
 
@@ -46,7 +46,6 @@ else
 fi
 
 ###############################################################################
-exit
 
 if [ -f ${STAGE_DIR}/003_deduplicating ]; then
     echo "Data already deduplicated. Skipping..."
@@ -54,8 +53,11 @@ else
     ${SCRIPT_DIR}/deduplicate_genomes.py ${DATA_DIR}/002_all.genomes.fasta      \
                                          ${DATA_DIR}/002_all.genomes.conversion \
                                          ${DATA_DIR}/002_all.genes.conversion   \
-                                         ${DATA_DIR}        # TODO
+                                         ${DATA_DIR}
 fi
+
+###############################################################################
+exit
 
 prokka --force                                      \
        --kingdom Viruses                            \

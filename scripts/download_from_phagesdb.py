@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from requests.exceptions import ConnectionError
 from Bio import SeqIO
 import requests
 import time
@@ -89,7 +90,7 @@ while True:
 
     if req.status_code != 200:
         time.sleep(30)
-        print('Page', page_num, 'returned error status', req.status_code, '. Trying again.', file=sys.stderr)
+        print('\nPage', page_num, 'returned error status', req.status_code, '. Trying again.', file=sys.stderr)
         continue
 
     page_num += 1
@@ -118,11 +119,16 @@ while True:
 
         genomes_conversion.write('{}\t{}\t{}\t{}\t{}\n'.format(fasta_id, accession, name, host, 'NO_DATA'))
 
-        page = 'http://phagesdb.org/api/genesbyphage/' + name
-        req = requests.get(page)
+        try:
+            page = 'http://phagesdb.org/api/genesbyphage/' + name
+            req = requests.get(page)
+        except ConnectionError as e:
+            print('Could not get genes of {}. Skipping...'.format(name))
+            print(e)
+            continue
 
         if req.status_code != 200:
-            print('Page', page, 'returned error status.', file=sys.stderr)
+            print('\nPage', page, 'returned error status.', file=sys.stderr)
             continue
 
         genes = json.loads(req.text)

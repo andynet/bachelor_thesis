@@ -8,12 +8,12 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 if len(sys.argv) != 4:
-    print('Usage:', sys.argv[0], '<genomes.fasta> <genomes.conversion> <genes.conversion>')
+    print('Usage:', sys.argv[0], '<genomes.fasta> <genomes.conversion> <genes.conversion> <dir>')
     exit()
 
-deduplicated_genomes_file = 'deduplicated.genomes.fasta'
-deduplicated_genomes_conversion_file = 'deduplicated.genomes.conversion'
-deduplicated_genes_conversion_file = 'deduplicated.genes.conversion'
+deduplicated_genomes_file = '{}/003_deduplicated.genomes.fasta'.format(sys.argv[4])
+deduplicated_genomes_conversion_file = '{}/003_deduplicated.genomes.conversion'.format(sys.argv[4])
+deduplicated_genes_conversion_file = '{}/003_deduplicated.genes.conversion'.format(sys.argv[4])
 
 deduplicated_genomes = open(deduplicated_genomes_file, 'w')
 shutil.copy(sys.argv[2], deduplicated_genomes_conversion_file)
@@ -43,3 +43,5 @@ for genome in genomes:
         deduplicated_genomes.write(str(current_seq) + '\n')
 
         current_genome = genome
+
+deduplicated_genomes.close()

@@ -63,8 +63,8 @@ while i < len(record['IdList']):
         fa_list = list(SeqIO.parse(fa_handle, 'fasta'))
         gb_list = list(SeqIO.parse(gb_handle, 'genbank'))
     except IncompleteRead:
-        print('Incomplete read. Trying again...')
         time.sleep(10)
+        print('Incomplete read. Trying again...')
         continue
 
     fa_handle.close()
