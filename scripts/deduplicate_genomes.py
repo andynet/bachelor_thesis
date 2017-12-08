@@ -7,7 +7,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 5:
     print('Usage:', sys.argv[0], '<genomes.fasta> <genomes.conversion> <genes.conversion> <dir>')
     exit()
 

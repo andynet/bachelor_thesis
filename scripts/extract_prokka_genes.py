@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import sys
-import datetime
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 
@@ -13,14 +12,14 @@ def safe_get_qualifier(feature, key, default_value='NO_DATA'):
         return default_value
 
 
-genes_output_file = 'PROKKA_' + str(datetime.date.today()) + '.genes.fasta'
-genes_conversion_file = 'PROKKA_' + str(datetime.date.today()) + '.genes.conversion'
+if len(sys.argv) != 3:
+    print('Usage:', sys.argv[0], '<gbk_file> <dir>')
+    exit()
+
+genes_output_file = '{}/005_annotated.genes.fasta'.format(sys.argv[2])
+genes_conversion_file = '{}/005_annotated.genes.conversion'.format(sys.argv[2])
 genes_output = open(genes_output_file, 'w')
 genes_conversion = open(genes_conversion_file, 'w')
-
-if len(sys.argv) != 2:
-    print('Usage:', sys.argv[0], '<gbk_file>')
-    exit()
 
 gb_list = list(SeqIO.parse(sys.argv[1], 'genbank'))
 gene_num = 30000000

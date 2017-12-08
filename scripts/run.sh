@@ -54,18 +54,37 @@ else
                                          ${DATA_DIR}/002_all.genomes.conversion \
                                          ${DATA_DIR}/002_all.genes.conversion   \
                                          ${DATA_DIR}
+
+    touch ${STAGE_DIR}/003_deduplicating
 fi
 
 ###############################################################################
+
+if [ -f ${STAGE_DIR}/004_annotating ]; then
+    echo "Data already annotated. Skipping..."
+else
+    /usr/local/tools/prokka-1.12.0/bin/prokka --force                                      \
+                                              --kingdom Viruses                            \
+                                              --outdir ${DATA_DIR}/004_PROKKA              \
+                                              --prefix genomes                             \
+                                              ${DATA_DIR}/003_deduplicated.genomes.fasta
+
+    touch ${STAGE_DIR}/004_annotating
+fi
+
+###############################################################################
+
+if [ -f ${STAGE_DIR}/005_extracting ]; then
+    echo "Prokka genes already extracted. Skipping..."
+else
+    ${SCRIPT_DIR}/extract_prokka_genes.py ${DATA_DIR}/004_PROKKA/genomes.gbk \
+                                          ${DATA_DIR}
+
+    touch ${STAGE_DIR}/005_extracting
+fi
+
 exit
-
-prokka --force                                      \
-       --kingdom Viruses                            \
-       --outdir ${DATA_DIR}/PROKKA                  \
-       --prefix deduplicated.genomes                \
-       ${DATA_DIR}/003_deduplicated.genomes.fasta
-
-${SCRIPT_DIR}/extract_prokka_genes.py ${DATA_DIR}/PROKKA/003_deduplicated.genomes.gbk ${DATA_DIR}   # TODO
+###############################################################################
 
 crocoblast -add_database \
                 --sequence_file \
