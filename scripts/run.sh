@@ -83,26 +83,83 @@ else
     touch ${STAGE_DIR}/005_extracting
 fi
 
-exit
 ###############################################################################
 
-crocoblast -add_database \
-                --sequence_file \
-                    protein \
-                    ${DATA_DIR}/PROKKA_2017-08-31.genes.fasta \
-                    PROKKA_2017-08-31.genes.fasta \
-                    /data/projects/kimona/crocoblast/
+if [ -f ${STAGE_DIR}/006_local_aligning ]; then
+    echo "Local aligning already done. Skipping..."
+else
+    rm -rf ${DATA_DIR}/006_crocoblast/ ${DATA_DIR}/006_crocoblast_database/
+    cp -r  ${SCRIPT_DIR}/crocoblast/ ${DATA_DIR}/006_crocoblast/
+    mkdir  ${DATA_DIR}/006_crocoblast_database
 
-crocoblast -add_to_queue \
-                blastp \
-                PROKKA_2017-08-31.genes.fasta \
-                ${DATA_DIR}/PROKKA_2017-08-31.genes.fasta \
-                /data/projects/kimona/data/ \
-                --blast_options \
-                    -outfmt 6 \
-                    -max_target_seqs 1000000 \
-                    -max_hsps 1
+    ${DATA_DIR}/006_crocoblast/crocoblast -add_database                                 \
+                                              --sequence_file                           \
+                                                  protein                               \
+                                                  ${DATA_DIR}/005_annotated.genes.fasta \
+                                                  005_annotated.genes.fasta             \
+                                                  ${DATA_DIR}/006_crocoblast_database
 
-crocoblast -run
+    ${DATA_DIR}/006_crocoblast/crocoblast -add_to_queue                             \
+                                              blastp                                \
+                                              005_annotated.genes.fasta             \
+                                              ${DATA_DIR}/005_annotated.genes.fasta \
+                                              ${DATA_DIR}                           \
+                                              --blast_options                       \
+                                                  -outfmt 6                         \
+                                                  -max_target_seqs 1000000          \
+                                                  -max_hsps 1
 
+    echo "${DATA_DIR}/006_crocoblast/crocoblast -run > /dev/null; touch ${STAGE_DIR}/006_local_aligning" \
+    | qsub -l thr=16 -cwd -N crocoblast
 
+    while [ ! -f ${STAGE_DIR}/006_local_aligning ]; do
+        sleep 20m
+    done
+fi
+
+###############################################################################
+exit
+# until now everything LGTM
+# TODO refactor python scripts
+
+if [ -f ${STAGE_DIR}/007_global_aligning ]; then
+    echo "Global aligning already done. Skipping..."
+else
+    ${SCRIPT_DIR}/parallelize_global_alignment_from_blast.py    \
+                    ${DATA_DIR}/complete_assembled_output       \
+                    ${DATA_DIR}/005_annotated.genes.fasta       \
+                    ${DATA_DIR}/007_global_alignment
+
+    cat ${DATA_DIR}/007_global_alignment/*.tsv.gz > ${DATA_DIR}/all.tsv.gz
+    gunzip ${DATA_DIR}/all.tsv.gz
+
+    touch ${STAGE_DIR}/007_global_aligning
+fi
+
+###############################################################################
+
+if [ -f ${STAGE_DIR}/008_mcl ]; then
+    echo "Creating clusters with markov cluster algorithm done. Skipping..."
+else
+    mcl --abc ${DATA_DIR}/all.tsv -o ${DATA_DIR}/clusters.clstr -I 1.2
+
+    touch ${STAGE_DIR}/008_mcl
+fi
+
+###############################################################################
+
+if [ -f ${STAGE_DIR}/009_matrix_creation ]; then
+    echo "Matrix already created. Skipping..."
+else
+    less ${DATA_DIR}/003_deduplicated.genomes.conversion | cut -f1 | sort | uniq > ${DATA_DIR}/deduplicated.genomes.list
+
+    ${SCRIPT_DIR}/create_matrix_from_mcl.py ${DATA_DIR}/005_annotated.genes.conversion  \
+                                            ${DATA_DIR}/clusters.clstr                  \
+                                            ${DATA_DIR}/deduplicated.genomes.list
+    touch ${STAGE_DIR}/009_matrix_creation
+fi
+
+###############################################################################
+echo "Program finished successfully."
+echo "You can find final matrix in ${DATA_DIR}/"
+exit
