@@ -115,23 +115,25 @@ else
     while [ ! -f ${STAGE_DIR}/006_local_aligning ]; do
         sleep 20m
     done
+
+    mv ${DATA_DIR}/CrocoBLAST_1 ${DATA_DIR}/006_crocoblast_output
 fi
 
 ###############################################################################
-exit
-# until now everything LGTM
-# TODO refactor python scripts
+# TODO: still not totally clean
 
 if [ -f ${STAGE_DIR}/007_global_aligning ]; then
     echo "Global aligning already done. Skipping..."
 else
-    ${SCRIPT_DIR}/parallelize_global_alignment_from_blast.py    \
-                    ${DATA_DIR}/complete_assembled_output       \
-                    ${DATA_DIR}/005_annotated.genes.fasta       \
+    rm -rf ${DATA_DIR}/007_global_alignment/
+    mkdir  ${DATA_DIR}/007_global_alignment
+
+    ${SCRIPT_DIR}/parallelize_global_alignment_from_blast.py                          \
+                    ${DATA_DIR}/006_crocoblast_output/complete_assembled_output       \
+                    ${DATA_DIR}/005_annotated.genes.fasta                             \
                     ${DATA_DIR}/007_global_alignment
 
-    cat ${DATA_DIR}/007_global_alignment/*.tsv.gz > ${DATA_DIR}/all.tsv.gz
-    gunzip ${DATA_DIR}/all.tsv.gz
+    cat ${DATA_DIR}/007_global_alignment/*.tsv > ${DATA_DIR}/007_complete_global_alignment.abc
 
     touch ${STAGE_DIR}/007_global_aligning
 fi
@@ -141,7 +143,7 @@ fi
 if [ -f ${STAGE_DIR}/008_mcl ]; then
     echo "Creating clusters with markov cluster algorithm done. Skipping..."
 else
-    mcl --abc ${DATA_DIR}/all.tsv -o ${DATA_DIR}/clusters.clstr -I 1.2
+    mcl --abc ${DATA_DIR}/007_complete_global_alignment.abc -o ${DATA_DIR}/008_genes.clstr -I 1.2
 
     touch ${STAGE_DIR}/008_mcl
 fi
@@ -151,15 +153,18 @@ fi
 if [ -f ${STAGE_DIR}/009_matrix_creation ]; then
     echo "Matrix already created. Skipping..."
 else
-    less ${DATA_DIR}/003_deduplicated.genomes.conversion | cut -f1 | sort | uniq > ${DATA_DIR}/deduplicated.genomes.list
+    less ${DATA_DIR}/003_deduplicated.genomes.conversion | cut -f1 | sort | uniq > ${DATA_DIR}/009_genomes.list
 
     ${SCRIPT_DIR}/create_matrix_from_mcl.py ${DATA_DIR}/005_annotated.genes.conversion  \
-                                            ${DATA_DIR}/clusters.clstr                  \
-                                            ${DATA_DIR}/deduplicated.genomes.list
+                                            ${DATA_DIR}/008_genes.clstr                 \
+                                            ${DATA_DIR}/009_genomes.list                \
+                                            0                                           \
+                                            10000                                       \
+                                            ${DATA_DIR}/009_matrix.tsv
+
     touch ${STAGE_DIR}/009_matrix_creation
 fi
 
 ###############################################################################
 echo "Program finished successfully."
-echo "You can find final matrix in ${DATA_DIR}/"
-exit
+echo "You can find final matrix in ${DATA_DIR}/009_matrix.tsv"

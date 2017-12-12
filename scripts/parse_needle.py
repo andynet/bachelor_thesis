@@ -14,7 +14,7 @@ with open(sys.argv[1]) as f:
 
 for line in lines:
 
-    if line == '\n':
+    if line == '\n':    # TODO: is this needed?
         break
 
     first_ID = line.split()[0]
