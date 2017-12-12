@@ -48,11 +48,9 @@ lines_num = len(lines)
 files_num = 80000       # this number was established artificially based on number of threads on our cluster
 records_per_file = math.ceil(lines_num/files_num)
 
-script_template = '''
-                  #!/bin/bash\n\n
-                  {body}\n
-                  cat {list_of_tsv} > {fileno:0>5}.abc; rm {list_of_tsv}; rm {list_of_needle}\n
-                  '''
+script_template = '#!/bin/bash\n'                                                                   \
+                  '\n{body}\n'                                                                      \
+                  '\ncat {list_of_tsv} > {fileno:0>5}.abc; rm {list_of_tsv}; rm {list_of_needle}\n'
 
 created_needle_files = []
 created_needle_tsv_files = []
