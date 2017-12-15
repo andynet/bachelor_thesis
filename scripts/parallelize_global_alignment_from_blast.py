@@ -27,42 +27,49 @@ def create_fasta_dir(directory, fasta):
 
 
 if len(sys.argv) != 4:
-    print('Usage:', sys.argv[0], '<blast_output> <genes.fasta> <tmp_dir>')
+    print('Usage:', sys.argv[0], '<blast::tsv> <genes::fasta> <dir>')
     exit()
 
-script_dir = sys.path[0]
 blast_output = sys.argv[1]
-original_fasta = sys.argv[2]
-tmp_dir = sys.argv[3]
+genes_fasta = sys.argv[2]
 
-split_fastas = '{}/split_fastas'.format(tmp_dir)
+script_dir = sys.path[0]
+stage_dir = sys.argv[3]
+fasta_dir = '{}/fasta'.format(stage_dir)
+tmp_dir = '{}/tmp'.format(stage_dir)
 
-if not os.path.isdir(split_fastas):
-    create_fasta_dir(split_fastas, original_fasta)
+if not os.path.isdir(fasta_dir):
+    create_fasta_dir(fasta_dir, genes_fasta)
     print('Fasta files correctly prepared.')
 
 with open(blast_output) as f:
-    lines = f.readlines()
+    blast_lines = f.readlines()
 
-lines_num = len(lines)
-files_num = 80000       # this number was established artificially based on number of threads on our cluster
+# files_num is maximal number of files to be created. Bigger numbers create bigger overhead in time consumed
+# by grid engine, but smaller numbers make grid engine less available for other jobs with higher priority executed
+# after run of this script. For our cluster we established files_num to 80000 artificially based on number of threads
+# on our cluster.
+files_num = 80000
+lines_num = len(blast_lines)
 records_per_file = math.ceil(lines_num/files_num)
+print('Final product will be {} files in format abc.'.format(math.ceil(lines_num/records_per_file)))
 
-script_template = '#!/bin/bash\n'                                                                   \
-                  '\n{body}\n'                                                                      \
-                  '\ncat {list_of_tsv} > {fileno:0>5}.abc; rm {list_of_tsv}; rm {list_of_needle}\n'
-
+script_template = '#!/bin/bash\n\n'                                         \
+                  '{body}\n\n'                                              \
+                  'cat {list_of_needle_tsv} > {dir}/{file_num:0>5}.abc\n'   \
+                  'rm {list_of_needle}; rm {list_of_needle_tsv}\n'
+number = 0
+commands = []
 created_needle_files = []
 created_needle_tsv_files = []
-commands = []
 
-for i, line in enumerate(lines):
+for i, line in enumerate(blast_lines):
 
     seq1 = line.split('\t')[0].strip()
     seq2 = line.split('\t')[1].strip()
 
-    seq1_file = '{}/{}.fa'.format(split_fastas, seq1)
-    seq2_file = '{}/{}.fa'.format(split_fastas, seq2)
+    seq1_file = '{}/{}.fa'.format(fasta_dir, seq1)
+    seq2_file = '{}/{}.fa'.format(fasta_dir, seq2)
 
     needle_out = '{}/{}_to_{}.needle'.format(tmp_dir, seq1, seq2)
     needle_tsv_out = '{}/{}_to_{}.needle.tsv'.format(tmp_dir, seq1, seq2)
@@ -70,44 +77,39 @@ for i, line in enumerate(lines):
     created_needle_files.append(needle_out)
     created_needle_tsv_files.append(needle_tsv_out)
 
-    needle_command = 'needle -asequence {} ' \
-                     '       -bsequence {} ' \
-                     '       -outfile {}   ' \
-                     '       -gapopen 10.0 ' \
-                     '       -gapextend 0.5' \
-                     '       -endweight Y  ' \
-                     '       -endopen 10.0 ' \
-                     '       -endextend 0.5' \
-                     '       -aformat score'.format(seq1_file, seq2_file, needle_out)
+    needle_command = 'needle -asequence {} -bsequence {} ' \
+                     '       -outfile {}   -aformat score' \
+                     '       -gapopen 10.0 -gapextend 0.5' \
+                     '       -endopen 10.0 -endextend 0.5' \
+                     '       -endweight Y '.format(seq1_file, seq2_file, needle_out)
 
-    parse_needle_command = '{}/parse_needle.py {}' \
-                           '                   {}'.format(script_dir, needle_out, needle_tsv_out)
+    parse_command = '{}/parse_needle.py {}' \
+                    '                   {}'.format(script_dir, needle_out, needle_tsv_out)
 
     commands.append(re.sub(' +', ' ', needle_command))
-    commands.append(re.sub(' +', ' ', parse_needle_command))
+    commands.append(re.sub(' +', ' ', parse_command))
 
-    if i % records_per_file == 0:
+    if (i != 0 and i % records_per_file == 0) or (i == len(blast_lines)-1):
 
-        number = int(i/records_per_file)
+        script = script_template.format(body='\n'.join(commands),
+                                        dir=tmp_dir, file_num=number,
+                                        list_of_needle=' '.join(created_needle_files),
+                                        list_of_needle_tsv=' '.join(created_needle_tsv_files))
 
-        if number == 0:
-            continue
-
-        script = script_template.format(body='\n'.join(commands), list_of_tsv=' '.join(created_needle_tsv_files),
-                                        fileno=number, list_of_needle=' '.join(created_needle_files))
         script_name = '{}/tmp_script_{}.sh'.format(tmp_dir, number)
 
         script_out = open(script_name, 'w')
         script_out.write(script)
         script_out.close()
 
+        qsub_command = 'echo "bash {0}; rm {0}" | qsub -l thr=1 -cwd -N glal_{1}'.format(script_name, number)
+        subprocess.call(qsub_command, shell=True)
+
+        number += 1
+        commands = []
         created_needle_files = []
         created_needle_tsv_files = []
-        commands = []
 
-        qsub_command = 'echo "bash {0}; rm {0}" | qsub -l thr=1 -cwd -N glal_{1}'.format(script_name, number)
-        # print(qsub_command)
-        subprocess.call(qsub_command, shell=True)
 
 
 

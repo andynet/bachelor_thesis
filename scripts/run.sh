@@ -120,7 +120,6 @@ else
 fi
 
 ###############################################################################
-# TODO: still not totally clean
 
 if [ -f ${STAGE_DIR}/007_global_aligning ]; then
     echo "Global aligning already done. Skipping..."
@@ -133,7 +132,12 @@ else
                     ${DATA_DIR}/005_annotated.genes.fasta                             \
                     ${DATA_DIR}/007_global_alignment
 
-    cat ${DATA_DIR}/007_global_alignment/*.tsv > ${DATA_DIR}/007_complete_global_alignment.abc
+    for i in $(seq 0 1 9); do
+        cat ${DATA_DIR}/tmp/${i}*.abc > ${DATA_DIR}/tmp/${i}.final.abc;
+        echo "${DATA_DIR}/tmp/${i}.final.abc created."
+    done;
+
+    cat ${DATA_DIR}/tmp/*.final.abc > ${DATA_DIR}/007_complete_global_alignment.abc
 
     touch ${STAGE_DIR}/007_global_aligning
 fi
@@ -149,6 +153,7 @@ else
 fi
 
 ###############################################################################
+exit
 
 if [ -f ${STAGE_DIR}/009_matrix_creation ]; then
     echo "Matrix already created. Skipping..."
