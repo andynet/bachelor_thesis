@@ -14,6 +14,9 @@ out = open(sys.argv[2], 'w')
 
 for line in lines:
 
+    if line == '\n':
+        break
+
     first_ID = line.split()[0]
     second_ID = line.split()[1]
     score = line.split()[3].strip('()')

@@ -41,6 +41,10 @@ tmp_dir = '{}/tmp'.format(stage_dir)
 if not os.path.isdir(fasta_dir):
     create_fasta_dir(fasta_dir, genes_fasta)
     print('Fasta files correctly prepared.')
+else:
+    print('Fasta files was already prepared. Skipping...')
+
+os.mkdir(tmp_dir)
 
 with open(blast_output) as f:
     blast_lines = f.readlines()
@@ -102,7 +106,21 @@ for i, line in enumerate(blast_lines):
         script_out.write(script)
         script_out.close()
 
-        qsub_command = 'echo "bash {0}; rm {0}" | qsub -l thr=1 -cwd -N glal_{1}'.format(script_name, number)
+        if number % 100 == 0:
+            qsub_command = 'echo "bash {0}; rm {0};" | ' \
+                           'qsub -l thr=1 '             \
+                           '     -o {1} '               \
+                           '     -e {1} '               \
+                           '     -cwd '                 \
+                           '     -N glal_{2}            '.format(script_name, '/dev/null', number)
+        else:
+            qsub_command = 'echo "bash {0}; rm {0};" | ' \
+                           'qsub -l thr=1 '             \
+                           '     -o {1} '               \
+                           '     -e {1} '               \
+                           '     -cwd '                 \
+                           '     -N glal_{2} > /dev/null'.format(script_name, '/dev/null', number)
+
         subprocess.call(qsub_command, shell=True)
 
         number += 1
