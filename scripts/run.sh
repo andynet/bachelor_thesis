@@ -134,6 +134,10 @@ else
                     ${DATA_DIR}/005_annotated.genes.fasta                             \
                     ${GLOBAL_ALIGNMENT_DIR}
 
+    while [ ! -f ${GLOBAL_ALIGNMENT_DIR}/qsub_completed ]; do
+        sleep 20m
+    done
+
     for i in $(seq 0 1 9); do
         cat ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}*.abc > ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc;
         echo "${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc created."

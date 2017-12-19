@@ -93,7 +93,7 @@ for i, line in enumerate(blast_lines):
     commands.append(re.sub(' +', ' ', needle_command))
     commands.append(re.sub(' +', ' ', parse_command))
 
-    if (i != 0 and i % records_per_file == 0) or (i == len(blast_lines)-1):
+    if i != 0 and i % records_per_file == 0:
 
         script = script_template.format(body='\n'.join(commands),
                                         dir=tmp_dir, file_num=number,
@@ -107,14 +107,14 @@ for i, line in enumerate(blast_lines):
         script_out.close()
 
         if number % 100 == 0:
-            qsub_command = 'echo "bash {0}; rm {0};" | ' \
+            qsub_command = 'echo "bash {0}; rm {0};" | '\
                            'qsub -l thr=1 '             \
                            '     -o {1} '               \
                            '     -e {1} '               \
                            '     -cwd '                 \
                            '     -N glal_{2}            '.format(script_name, '/dev/null', number)
         else:
-            qsub_command = 'echo "bash {0}; rm {0};" | ' \
+            qsub_command = 'echo "bash {0}; rm {0};" | '\
                            'qsub -l thr=1 '             \
                            '     -o {1} '               \
                            '     -e {1} '               \
@@ -128,7 +128,24 @@ for i, line in enumerate(blast_lines):
         created_needle_files = []
         created_needle_tsv_files = []
 
+# if i == len(blast_lines)-1
+script = script_template.format(body='\n'.join(commands),
+                                dir=tmp_dir, file_num=number,
+                                list_of_needle=' '.join(created_needle_files),
+                                list_of_needle_tsv=' '.join(created_needle_tsv_files))
 
+script_name = '{}/tmp_script_{}.sh'.format(tmp_dir, number)
 
+script_out = open(script_name, 'w')
+script_out.write(script)
+script_out.close()
 
+qsub_command = 'echo "bash {0}; rm {0}; touch {3};" | '  \
+               'qsub -l thr=1 '                         \
+               '     -o {1} '                           \
+               '     -e {1} '                           \
+               '     -cwd '                             \
+               '     -N glal_{2}            '.format(script_name, '/dev/null', number,
+                                                     '{}/qsub_completed'.format(stage_dir))
 
+subprocess.call(qsub_command, shell=True)
