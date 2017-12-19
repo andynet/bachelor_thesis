@@ -25,9 +25,9 @@ mkdir -p ${STAGE_DIR}
 if [ -f ${STAGE_DIR}/001_downloading ]; then
     echo "Data already downloaded. Skipping..."
 else
-    #${SCRIPT_DIR}/download_from_ncbi.py ${DATA_DIR}
-    ${SCRIPT_DIR}/download_from_phagesdb.py ${DATA_DIR}
-    ${SCRIPT_DIR}/download_from_viralzone.py ${DATA_DIR}
+    ${SCRIPT_DIR}/001_download_from_ncbi.py ${DATA_DIR}
+    ${SCRIPT_DIR}/001_download_from_phagesdb.py ${DATA_DIR}
+    ${SCRIPT_DIR}/001_download_from_viralzone.py ${DATA_DIR}
 
     touch ${STAGE_DIR}/001_downloading
 fi
@@ -50,10 +50,10 @@ fi
 if [ -f ${STAGE_DIR}/003_deduplicating ]; then
     echo "Data already deduplicated. Skipping..."
 else
-    ${SCRIPT_DIR}/deduplicate_genomes.py ${DATA_DIR}/002_all.genomes.fasta      \
-                                         ${DATA_DIR}/002_all.genomes.conversion \
-                                         ${DATA_DIR}/002_all.genes.conversion   \
-                                         ${DATA_DIR}
+    ${SCRIPT_DIR}/003_deduplicate_genomes.py ${DATA_DIR}/002_all.genomes.fasta      \
+                                             ${DATA_DIR}/002_all.genomes.conversion \
+                                             ${DATA_DIR}/002_all.genes.conversion   \
+                                             ${DATA_DIR}
 
     touch ${STAGE_DIR}/003_deduplicating
 fi
@@ -77,8 +77,8 @@ fi
 if [ -f ${STAGE_DIR}/005_extracting ]; then
     echo "Prokka genes already extracted. Skipping..."
 else
-    ${SCRIPT_DIR}/extract_prokka_genes.py ${DATA_DIR}/004_PROKKA/genomes.gbk \
-                                          ${DATA_DIR}
+    ${SCRIPT_DIR}/005_extract_prokka_genes.py ${DATA_DIR}/004_PROKKA/genomes.gbk \
+                                              ${DATA_DIR}
 
     touch ${STAGE_DIR}/005_extracting
 fi
@@ -129,7 +129,7 @@ else
     rm -rf ${GLOBAL_ALIGNMENT_DIR}
     mkdir  ${GLOBAL_ALIGNMENT_DIR}
 
-    ${SCRIPT_DIR}/parallelize_global_alignment_from_blast.py                          \
+    ${SCRIPT_DIR}/007_parallelize_global_alignment_from_blast.py                      \
                     ${DATA_DIR}/006_crocoblast_output/complete_assembled_output       \
                     ${DATA_DIR}/005_annotated.genes.fasta                             \
                     ${GLOBAL_ALIGNMENT_DIR}
@@ -166,12 +166,12 @@ if [ -f ${STAGE_DIR}/009_matrix_creation ]; then
 else
     less ${DATA_DIR}/003_deduplicated.genomes.conversion | cut -f1 | sort | uniq > ${DATA_DIR}/009_genomes.list
 
-    ${SCRIPT_DIR}/create_matrix_from_mcl.py ${DATA_DIR}/005_annotated.genes.conversion  \
-                                            ${DATA_DIR}/008_genes.clstr                 \
-                                            ${DATA_DIR}/009_genomes.list                \
-                                            0                                           \
-                                            10000                                       \
-                                            ${DATA_DIR}/009_matrix.tsv
+    ${SCRIPT_DIR}/009_create_matrix_from_mcl.py ${DATA_DIR}/005_annotated.genes.conversion  \
+                                                ${DATA_DIR}/008_genes.clstr                 \
+                                                ${DATA_DIR}/009_genomes.list                \
+                                                0                                           \
+                                                10000                                       \
+                                                ${DATA_DIR}/009_matrix.tsv
 
     touch ${STAGE_DIR}/009_matrix_creation
 fi

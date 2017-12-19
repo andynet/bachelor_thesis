@@ -87,8 +87,8 @@ for i, line in enumerate(blast_lines):
                      '       -endopen 10.0 -endextend 0.5' \
                      '       -endweight Y '.format(seq1_file, seq2_file, needle_out)
 
-    parse_command = '{}/parse_needle.py {}' \
-                    '                   {}'.format(script_dir, needle_out, needle_tsv_out)
+    parse_command = '{}/007_parse_needle.py {}' \
+                    '                       {}'.format(script_dir, needle_out, needle_tsv_out)
 
     commands.append(re.sub(' +', ' ', needle_command))
     commands.append(re.sub(' +', ' ', parse_command))

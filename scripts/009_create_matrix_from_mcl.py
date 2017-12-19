@@ -74,12 +74,6 @@ def init(genes_conv_pointer, genes_to_cluster_pointer, phage_list_pointer, numbe
 # <editor-fold desc="start processes">
 if len(sys.argv) != 7:
     print('Usage:', sys.argv[0], '<genes.conversion> <complete_output.clstr> <phages_list> <start> <end> <out>')
-    print('Example:', sys.argv[0], '/data/projects/kimona/data/03-annotation/PROKKA_2017-08-31.genes.conversion ',
-                                   '/data/projects/kimona/data/mcl/complete_records.abc.clstr ',
-                                   '/data/projects/kimona/data/phage_list.txt ',
-                                   '0 ',
-                                   '10000 ',
-                                   '/data/projects/kimona/data/matrix_from_mcl.tsv')
     exit()
 
 with open(sys.argv[1]) as f:

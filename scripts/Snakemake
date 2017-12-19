@@ -49,7 +49,7 @@ rule download:
 #rule blast_genes_to_genes:
 #
 #rule align_globally_blast_searches:
-#../../scripts/bachelor_thesis/scripts/parallelize_global_alignment_from_blast.py \
+#../../scripts/bachelor_thesis/scripts/007_parallelize_global_alignment_from_blast.py \
 #                    ../data/CrocoBLAST_2/complete_assembled_output \
 #                    ../data/03-annotation/PROKKA_2017-08-31.genes.fasta \
 #                    ../data/global_alignment
@@ -78,7 +78,7 @@ rule download:
 ##                                  ../../data/PROKKA_2017-08-31.genes.conversion \
 ##                                  ../../deduplicated.genomes.list
 #
-#./create_matrix_from_mcl.py ../../data/03-annotation/PROKKA_2017-08-31.genes.conversion \
+#./009_create_matrix_from_mcl.py ../../data/03-annotation/PROKKA_2017-08-31.genes.conversion \
 #                            ../../data/mcl/complete_records.abc.clstr \
 #                            ../../data/phage_list.txt        # ../../data/deduplicated.genomes.list
 #
