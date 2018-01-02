@@ -121,11 +121,10 @@ fi
 
 ###############################################################################
 
-GLOBAL_ALIGNMENT_DIR=${DATA_DIR}/007_global_alignment
-
 if [ -f ${STAGE_DIR}/007_global_aligning ]; then
     echo "Global aligning already done. Skipping..."
 else
+    GLOBAL_ALIGNMENT_DIR=${DATA_DIR}/007_global_alignment
     rm -rf ${GLOBAL_ALIGNMENT_DIR}
     mkdir  ${GLOBAL_ALIGNMENT_DIR}
 
@@ -139,11 +138,12 @@ else
     done
 
     for i in $(seq 0 1 9); do
-        cat ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}*.abc > ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc;
-        echo "${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc created."
+        cat ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}*.abc > ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc \
+            && echo "${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc created." \
+            || echo "There are no files to merge into ${i}.final.abc."
     done;
 
-    cat ${GLOBAL_ALIGNMENT_DIR}/tmp/*.final.abc > ${GLOBAL_ALIGNMENT_DIR}/complete_global_alignment.abc
+    cat ${GLOBAL_ALIGNMENT_DIR}/tmp/*.final.abc > ${DATA_DIR}/007_complete_global_alignment.abc
 
     touch ${STAGE_DIR}/007_global_aligning
 fi
@@ -153,7 +153,7 @@ fi
 if [ -f ${STAGE_DIR}/008_mcl ]; then
     echo "Creating clusters with markov cluster algorithm done. Skipping..."
 else
-    mcl --abc ${GLOBAL_ALIGNMENT_DIR}/complete_global_alignment.abc -o ${DATA_DIR}/008_genes.clstr -I 1.2
+    mcl ${DATA_DIR}/007_complete_global_alignment.abc --abc -o ${DATA_DIR}/008_genes.clstr -I 1.2
 
     touch ${STAGE_DIR}/008_mcl
 fi
