@@ -138,8 +138,8 @@ else
     done
 
     for i in $(seq 0 1 9); do
-        cat ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}*.abc > ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc \
-            && echo "${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc created." \
+        cat ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}*.abc > ${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc  \
+            && echo "${GLOBAL_ALIGNMENT_DIR}/tmp/${i}.final.abc created."                       \
             || echo "There are no files to merge into ${i}.final.abc."
     done;
 
@@ -159,19 +159,23 @@ else
 fi
 
 ###############################################################################
-exit
 
 if [ -f ${STAGE_DIR}/009_matrix_creation ]; then
     echo "Matrix already created. Skipping..."
 else
     less ${DATA_DIR}/003_deduplicated.genomes.conversion | cut -f1 | sort | uniq > ${DATA_DIR}/009_genomes.list
 
-    ${SCRIPT_DIR}/009_create_matrix_from_mcl.py ${DATA_DIR}/005_annotated.genes.conversion  \
-                                                ${DATA_DIR}/008_genes.clstr                 \
-                                                ${DATA_DIR}/009_genomes.list                \
-                                                0                                           \
-                                                10000                                       \
-                                                ${DATA_DIR}/009_matrix.tsv
+    ${SCRIPT_DIR}/009_parallelize_matrix_creation_from_mcl.py ${DATA_DIR}/005_annotated.genes.conversion    \
+                                                              ${DATA_DIR}/008_genes.clstr                   \
+                                                              ${DATA_DIR}/009_genomes.list
+
+    while [ $(ls ${DATA_DIR}/matrix.part* | wc -l) -ne 10 ]; do
+        sleep 1m
+    done
+
+    sleep 1m
+    cat ${DATA_DIR}/matrix.part* > ${DATA_DIR}/009_matrix.tsv
+    rm ${DATA_DIR}/matrix.part*
 
     touch ${STAGE_DIR}/009_matrix_creation
 fi

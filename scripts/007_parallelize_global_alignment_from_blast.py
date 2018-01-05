@@ -106,7 +106,7 @@ for i, line in enumerate(blast_lines):
         script_out.write(script)
         script_out.close()
 
-        if number % 100 == 0:
+        if number % 1000 == 0:
             qsub_command = 'echo "bash {0}; rm {0};" | '\
                            'qsub -l thr=1 '             \
                            '     -o {1} '               \
