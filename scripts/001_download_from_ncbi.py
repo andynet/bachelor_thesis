@@ -65,6 +65,9 @@ while i < len(record['IdList']):
         print('Incomplete read. Trying again...')
         time.sleep(10)
         continue
+    except ValueError as e:
+        print(e)
+        continue
 
     fa_handle.close()
     gb_handle.close()
