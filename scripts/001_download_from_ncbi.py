@@ -48,6 +48,7 @@ i = 0
 while i < len(record['IdList']):
 
     print('Downloaded', i, 'sequences.')
+    sys.stdout.flush()
 
     fa_handle = None
     gb_handle = None
@@ -74,8 +75,13 @@ while i < len(record['IdList']):
 
     for j in range(0, len(fa_list)):
 
-        fa = fa_list[j]                 # type: SeqRecord
-        gb = gb_list[j]                 # type: SeqRecord
+        try:
+            fa = fa_list[j]                 # type: SeqRecord
+            gb = gb_list[j]                 # type: SeqRecord
+        except IndexError as e:
+            print(e)
+            i -= batch
+            break
 
         fasta_id = 'phage{:0>7}'.format(genome_num)
         genome_num += 1
