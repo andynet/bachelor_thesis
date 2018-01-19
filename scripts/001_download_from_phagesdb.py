@@ -93,6 +93,7 @@ while True:
         print('\nPage', page_num, 'returned error status', req.status_code, '. Trying again.', file=sys.stderr)
         continue
 
+    print('{} downloaded.'.format(page))
     page_num += 1
 
     genomes = json.loads(req.text)
