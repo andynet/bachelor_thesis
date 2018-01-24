@@ -12,7 +12,7 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-DATA_DIR=${1}           # Example: /data/projects/kimona/data_17-11-28
+DATA_DIR=${1}
 STAGE_DIR=${DATA_DIR}/stages
 
 mkdir -p ${DATA_DIR}

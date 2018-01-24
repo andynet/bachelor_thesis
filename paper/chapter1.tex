@@ -1,23 +1,65 @@
-\chapter{Introduction}
+\chapter*{Introduction}
 
 \chapter{Biological background}
+In this chapter we will present some basic biological terms, which we will need later in this work.
+At first we will describe the structure of DNA, its function in living organisms
+and methods of representation in bioinformatics and computational biology.
+We will also briefly describe how we can get information about DNA from living organisms.
+Next we will mention central dogma of molecular biology and we will provide more detailed description of bacteriophages,
+which will be the central topic of our work. At the end of this chapter we will point out what was already done in this field
+and what we would like to achieve.
+
 \section{What is DNA}
+Deoxyribonucleic acid (DNA) is a natural polymer, a long chain of nucleotides. There are 4 types of nucleotides
+naturally occurring in DNA - adenine, cytosine, guanine and thymine. These bases are connected through phosphodiester bonds,
+connection between the 3' carbon atom of one deoxyribose and the 5' carbon atom of second deoxyribose. \\
+The structure of DNA consists of 2 complementary strands coiled around each other in the form of double helix.
+In this double helix adenine is paired with thymine and cytosine with guanine through hydrogen bonds.
+In bioinformatics and computational biology we usually represent bases by its first letter - A for adenine, C for cytosine, G for guanine and T for thymine.
+Files in which we usually represent DNA sequences are simple plain text files. Probably the most widely used format is FASTA format.
+It can consist of one or multiple records, where each record starts with one line for record id and comment, which is followed by possibly multiple lines of sequence writen in direction from 5' to 3'.
+
 \section{DNA sequencing}
-%\subsection{Sanger sequencing}
-%\subsection{NGS sequencing}
-%\subsection{Nonapore sequencing}
+DNA sequencing is a process of retrieving data from biological samples.
+Data of DNA are usually retrieved in a small fragments on account of limitations of technology.
+Currently there are 3 main technologies of DNA sequencing - Sanger sequencing, NGS sequencing and Nanopore sequencing.
+They provide us with different parameters as length of read, error rate, throughput and price per base.
+We show a table of comparison between these techniques.
+
+\begin{center}
+  \begin{tabular}{ | l | c | c | c | c | }
+    \hline
+    name & length of read & error rate & throughput per day & price per MB \\
+    \hline
+    Sanger & 1000bp & <2\% & 3MB & 4000$ \\
+    NGS & 2*250bp & <1\% & 30GB & <1$ \\
+    Nanopore & 100kbp & 15\% & 1GB & 1$ \\
+    \hline
+  \end{tabular}
+\end{center}
+
 \section{Central dogma of molecular biology}
+We already showed some basic concepts about what DNA is and how we can work with it.
+In this section we would like to present how DNA is interpreted in living organisms.
+Usually DNA is transcripted into RNA molecules.
+RNA is, similarly as DNA, a long chain of nucleotides.
+The differences in these 2 molecules are, that RNA is mostly found in nature as single stranded molecule.
+Nucleotides in RNA also contain ribose instead of deoxyribose and nucleotide thymine is altered for uracil.
+RNA sometimes also exhibits enzymatic activity, but mostly it is translated into protein.
+Proteins are long chains of amino acids and can be presented in computer in similar way as DNA or RNA, althought there is 20 proteinogenic amino acids.
+We provide a table of codes for different aminoacids.
+Proteins have highly variable functions and therefore they will be in the middle of our interest in this work.
 
-\section{Phages}
 
-In this chapter we will present some known facts about phages, which will be the central topic of our work. We will
-describe phage morphology, life cycle and their role in environment. We will also point out their potential use for
-mankind.
+\chapter{Bacteriophages}
+Bacteriophages belong to the group of viruses, which have the capability to infect and replicate within bacterial hosts.
+It is estimated that they are also the most abundant group of entities on the earth with their estimated count around $10^{31}$.
+In comparison, it is estimated the count of all bacteria on planet earth is around $10^{30}$.
+They are also one of the most highly diverse group in the biosphere, with their genomes containing from a few genes to as many as hundreds of genes.
+We can find them in every place on earth, where bacteria are able to live, even inside our bodies.
+It is believed that one of the most saturated location of their occurrence is sea, with $9*10^{8}$ virions per milliliter of seawater at the surface and 70\% of bacteria infected. % http://mmbr.asm.org/content/64/1/69.full
+Thanks to the high abundance of bacteriophages, their impact on shaping of the environment is very significant. % + circulating carbon?
 
-\section{What are phages}
-Phages are viruses which are capable of infecting bacterial cells. They are also the most abundant species on earth
-with estimate count around $10^{31}$. That is 10 times more than the number of all bacteria on earth. Thanks to this
-high abundance, their impact for circulating of carbon is very significant.
 \section{Life cycle of phage}
 \section{Potential usage of phages}
 \section{Goal of this work}
