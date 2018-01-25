@@ -8,7 +8,7 @@ We will also briefly describe how we can get information about DNA from living o
 %and what we would like to achieve.
 
 \section{What is DNA}
-Deoxyribonucleic acid \(DNA\) is a natural polymer, a long chain of nucleotides. There are 4 types of nucleotides
+Deoxyribonucleic acid (DNA) is a natural polymer, a long chain of nucleotides. There are 4 types of nucleotides
 naturally occurring in DNA - adenine, cytosine, guanine and thymine. These bases are connected through phosphodiester bonds,
 connection between the 3' carbon atom of one deoxyribose and the 5' carbon atom of second deoxyribose. \\
 The structure of DNA consists of 2 complementary strands coiled around each other in the form of double helix.
@@ -114,13 +114,21 @@ Since we used a considerable amount of third party libraries and tools, we will 
 We will also provide some basic statistics of data retrieved.
 
 \section{Brief pipeline overview}
-\section{downloading}
-\section{genes identification}
-\section{clustering}
-\subsection{blast}
-\subsection{global alignment}
-\subsection{mcl}
-\subsection{matrix creation}
+Our pipeline consists of 9 pythons scripts and third party bioinformatics software.
+All of its parts are connected in one bash script, which ensures simple startup.
+When writing the code, we have taken care of its readability, sustainability and extensibility.
+We understand the time of execution of bioinformatics programs can be relatively enormous, so we divided our pipeline to various steps.
+After each step, there is a checkpoint, which ensures we will not need to run this step again in case of unexpected crash of pipeline.
+The pipeline starts with downloading of publicly available data from 3 sources - NCBI, viralzone and phagesdb.
+After downloading we merge all records into one file and eliminate duplicated records.
+
+\section{Downloading}
+\section{Gene identification}
+\section{Clustering}
+\subsection{Blast}
+\subsection{Global alignment}
+\subsection{Mcl}
+\section{Matrix creation}
 
 \chapter{Machine learning methods of data analysis}
 In this chapter we will explain methods used for analysis.
