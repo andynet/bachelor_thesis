@@ -2,10 +2,7 @@
 In this chapter we will present some basic biological terms, which we will need later in this work.
 At first we will describe the structure of DNA, its function in living organisms
 and methods of representation in bioinformatics and computational biology.
-We will also briefly describe how we can get information about DNA from living organisms and we will mention central dogma of molecular biology
-% and we will provide more detailed description of bacteriophages,
-% which will be the central topic of our work. At the end of this chapter we will point out what was already done in this field
-%and what we would like to achieve.
+We will also briefly describe how we can get information about DNA from living organisms and we will mention central dogma of molecular biology, which is needed in order to understand relationships between biological macromolecules.
 
 \section{What is DNA}
 Deoxyribonucleic acid (DNA) is a natural polymer, a long chain of nucleotides. There are 4 types of nucleotides
@@ -27,10 +24,10 @@ We show a table of comparison between these techniques.
 \begin{center}
   \begin{tabular}{ | l | c | c | c | c | }
     \hline
-    name & length of read & error rate & throughput per day & price per MB \\
+    method & length of read & error rate & throughput per day & price per MB \\
     \hline
     Sanger & 1000bp & <2\% & 3MB & 4000\$ \\
-    NGS & 2*250bp & <1\% & 30GB & <1\$ \\
+    NGS & 2*150bp & <1\% & 30GB & <1\$ \\
     Nanopore & 100kbp & 15\% & 1GB & 1\$ \\
     \hline
   \end{tabular}
@@ -40,22 +37,24 @@ We show a table of comparison between these techniques.
 We already showed some basic concepts about what DNA is and how we can work with it.
 In this section we would like to present how DNA is interpreted in living organisms.
 Usually DNA is transcripted into RNA molecules.
-RNA is, similarly as DNA, a long chain of nucleotides.
+RNA is, similarly as DNA, a long chain of nucleotides, but there are some important differences.
 The differences in these 2 molecules are, that RNA is mostly found in nature as single stranded molecule.
 Nucleotides in RNA also contain ribose instead of deoxyribose and nucleotide thymine is altered for uracil.
 RNA sometimes also exhibits enzymatic activity, but mostly it is translated into protein.
 Proteins are long chains of amino acids and can be presented in computer in similar way as DNA or RNA, althought there is 20 proteinogenic amino acids.
 We provide a table of codes for different aminoacids.
-Proteins have highly variable functions and therefore they will be in the middle of our interest in this work.
+Proteins have highly variable functions and therefore they will be of high importance in our analysis.
+
+\medskip
+(Amino acids table)
+\medskip
 
 \chapter{Bacteriophages}
 In this chapter we will provide more detailed description of bacteriophages, which will be the central topic of our work.
 We will describe what they are and where we can find them.
 We will also show currently valid taxonomical classification and the structure of typical representant of this group of organism.
 Next we will explain their life cycle and we will point out some of their use.
-
-% At the end of this chapter we will point out what was already done in this field
-% and what we would like to achieve.
+% At the end of this chapter we will point out what was already done in this field and what we would like to achieve.
 
 \section{Origin of bacteriophages}
 Bacteriophages belong to the group of viruses, which have the capability to infect and replicate within bacterial hosts.
@@ -64,7 +63,8 @@ In comparison, it is estimated the count of all bacteria on planet earth is arou
 They are also one of the most highly diverse group in the biosphere, with their genomes containing from a few genes to as many as hundreds of genes.
 We can find them in every place on earth, where bacteria are able to live, even inside our bodies.
 It is believed that one of the most saturated location of their occurrence is sea, with $9*10^{8}$ virions per milliliter of seawater at the surface and 70\% of bacteria infected. % http://mmbr.asm.org/content/64/1/69.full
-Thanks to the high abundance of bacteriophages, their impact on shaping of the environment is outstandingly significant. % + circulating carbon?
+Thanks to the high abundance of bacteriophages, their impact on shaping of the environment is outstandingly significant.
+% + circulating carbon?
 % + they contribute to horizontal gene transfer via transduction and transformation
 
 \section{Taxonomical classification}
@@ -72,7 +72,7 @@ Thanks to the high abundance of bacteriophages, their impact on shaping of the e
 
 \section{Structure of typical bacteriophage}
 Given the high variety of bacteriophages, they come in a lot of different sizes and shapes.
-Each bacteriophage consists of genetic information in form of DNA or RNA and capsid, a protein coat usually composited from higher number of the same protein unit.
+Each bacteriophage consists of genetic information in form of DNA or RNA and capsid, a protein coat usually composited from higher number of the same protein units.
 In this section we will describe the most typical form of bacteriophages, which is abundantly found in nature.
 As we can see on the picture, this bacteriophages body consists of head and tail.
 Both of these part are created from proteins and in addition head contains DNA or RNA of the bacteriophages genome.
@@ -114,13 +114,21 @@ Since we used a considerable amount of third party libraries and tools, we will 
 We will also provide some basic statistics of data retrieved.
 
 \section{Brief pipeline overview}
-Our pipeline consists of 9 pythons scripts and third party bioinformatics software.
+Our pipeline consists of python scripts and third party bioinformatics software.
 All of its parts are connected in one bash script, which ensures simple startup.
 When writing the code, we have taken care of its readability, sustainability and extensibility.
 We understand the time of execution of bioinformatics programs can be relatively enormous, so we divided our pipeline to various steps.
 After each step, there is a checkpoint, which ensures we will not need to run this step again in case of unexpected crash of pipeline.
 The pipeline starts with downloading of publicly available data from 3 sources - NCBI, viralzone and phagesdb.
 After downloading we merge all records into one file and eliminate duplicated records.
+Later on we predict bacteriophages genes with Prokka \cite{prokka}.
+The decision not to use predicted genes from online databases was based on our conviction to have all genes predicted by one software.
+This ensures us, that potential mistakes in predictions will be consistent along the entire dataset and predictions will be always up to date.
+Next step was to cluster all predicted genes into reasonable clusters based on similarity of protein sequences.
+For this purpose we use CrocoBLAST \cite{crocoblast}, EMBOSS needle software \cite{needle} and mcl algorithm \cite{mcl}.
+After clustering we created matrix, where rows were individual bacteriophages and columns were our clusters.
+In this matrix 1 represented, that given phage contains a gene from given cluster and 0 represented it does not contain a gene from a given cluster.
+This matrix was later used in analysis as input to machine learning algorithms.
 
 \section{Downloading}
 \section{Gene identification}
@@ -134,10 +142,12 @@ After downloading we merge all records into one file and eliminate duplicated re
 In this chapter we will explain methods used for analysis.
 
 \section{Dimension reduction methods}
-\subsection{univariate analysis}
+\subsection{Univariate analysis}
 \subsection{PCA}
-\subsection{random forest/decission tree}
-\section{interpretation}
+\subsection{Decission tree}
+\subsection{Random Forest}
+\subsection{Single value decomposition}
+
 
 \chapter{Results}
 In this chapter we will provide results of our analysis and explain our findings.
