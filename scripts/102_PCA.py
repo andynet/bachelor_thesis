@@ -32,7 +32,6 @@ def on_pick(event):
         print(labels[ind])
 
 
-
 if len(sys.argv) != 3:
     print('Usage:', sys.argv[0], '<distances_matrix> <labels>')
     exit()
