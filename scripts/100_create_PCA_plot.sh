@@ -23,5 +23,7 @@ less ${INPUT} | cut -f 1  > ${LIST}
 
 LABELS=${INPUT%%.tsv}.${QUERY}.labels
 
+# ${SCRIPT_DIR}/101_create_host_string.py ${DATA_DIR}/003_deduplicated.genomes.conversion > ${HOST_STRINGS}
+# ${SCRIPT_DIR}/101_split_matrix.py ${HOST_STRINGS} ${MATRIX} ${QUERY}
 ${SCRIPT_DIR}/101_create_labels_for_PCA.py ${LIST} ${DATA_DIR}/003_deduplicated.genomes.conversion ${QUERY} > ${LABELS}
 ${SCRIPT_DIR}/102_PCA.py ${MATRIX} ${LABELS}
