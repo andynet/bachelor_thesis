@@ -21,8 +21,8 @@ for phage in phages:
     for line in lines:
         record_phage = line.split('\t')[0].strip()
         if record_phage == phage:
-            host1 = line.split('\t')[3].strip()
-            host2 = line.split('\t')[4].strip()
+            host1 = line.split('\t')[3].strip().strip('\'')
+            host2 = line.split('\t')[4].strip().strip('\'')
 
             if host1 != 'NO_DATA':
                 hosts.append(host1)
