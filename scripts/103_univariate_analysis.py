@@ -13,6 +13,7 @@ with open(sys.argv[1]) as f:
     labels_lines = f.readlines()
 
 matrix = pd.read_csv(sys.argv[2], sep='\t', header=None)   # type: pd.DataFrame
+# matrix = pd.read_csv(sys.argv[2], sep='\t', header=0, index_col=0)
 
 # print(len(labels_lines))
 # print(matrix.shape)

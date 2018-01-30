@@ -19,6 +19,20 @@ genomes_per_node = math.ceil(num_of_genomes/num_of_nodes)
 script_dir = sys.path[0]
 data_dir = os.path.dirname(os.path.abspath(sys.argv[3]))
 
+# <editor-fold desc=header_creating>
+with open(sys.argv[2]) as f:
+    cluster_num = len(f.readlines())
+
+cluster_names = []
+for i in range(cluster_num):
+    cluster_names.append('Cluster_{}'.format(i))
+
+header = '\t{}\n'.format('\t'.join(cluster_names))
+
+with open('{}/matrix.part'.format(data_dir), 'w') as f:
+    f.write(header)
+# </editor-fold>
+
 for i in range(0, num_of_genomes, genomes_per_node):
     command = '{}/009_create_matrix_from_mcl.py {} {} {} {} {} {}/matrix.part{}'.format(
         script_dir,

@@ -169,7 +169,7 @@ else
                                                               ${DATA_DIR}/008_genes.clstr                   \
                                                               ${DATA_DIR}/009_genomes.list
 
-    while [ $(ls ${DATA_DIR}/matrix.part* | wc -l) -ne 10 ]; do
+    while [ $(ls ${DATA_DIR}/matrix.part* | wc -l) -ne 11 ]; do
         sleep 1m
     done
 
