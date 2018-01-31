@@ -176,6 +176,7 @@ else
     sleep 1m
     cat ${DATA_DIR}/matrix.part* > ${DATA_DIR}/009_matrix.tsv
     rm ${DATA_DIR}/matrix.part*
+    rm ${DATA_DIR}/009_genomes.list
 
     touch ${STAGE_DIR}/009_matrix_creation
 fi

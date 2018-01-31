@@ -62,10 +62,9 @@ for j in range(matrix.shape[1]):                 # matrix.shape[1]):
     # print(expected)
     # print('--------------------------------------------------\n')
 
-    if observed.iloc[1, 1] > expected.iloc[1, 1]:
-        obs = (observed.iloc[0, 0], observed.iloc[0, 1], observed.iloc[1, 0], observed.iloc[1, 1])
-        exp = (expected.iloc[0, 0], expected.iloc[0, 1], expected.iloc[1, 0], expected.iloc[1, 1])
-        print('Cluster{}\t{}\t{}\t{}'.format(j, p, obs, exp))
+    obs = (observed.iloc[0, 0], observed.iloc[0, 1], observed.iloc[1, 0], observed.iloc[1, 1])
+    exp = (expected.iloc[0, 0], expected.iloc[0, 1], expected.iloc[1, 0], expected.iloc[1, 1])
+    print('Cluster{}\t{}\t{}\t{}'.format(j, p, obs, exp))
 
 
 # matrix.drop(matrix.index[droplist], inplace=True)
