@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# TODO: 
+# TODO:
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import matplotlib as mpl
