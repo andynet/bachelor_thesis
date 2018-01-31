@@ -27,3 +27,8 @@ LABELS=${INPUT%%.tsv}.${QUERY}.labels
 # ${SCRIPT_DIR}/101_split_matrix.py ${HOST_STRINGS} ${QUERY} ${MATRIX}
 ${SCRIPT_DIR}/101_create_labels_for_PCA.py ${LIST} ${DATA_DIR}/003_deduplicated.genomes.conversion ${QUERY} > ${LABELS}
 ${SCRIPT_DIR}/102_PCA.py ${MATRIX} ${LABELS}
+
+# chi square - which gene clusters are interesting?
+
+# PCA
+# decision tree
