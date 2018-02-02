@@ -28,6 +28,8 @@ LABELS=${INPUT%%.tsv}.${QUERY}.labels
 ${SCRIPT_DIR}/101_create_labels_for_PCA.py ${LIST} ${DATA_DIR}/003_deduplicated.genomes.conversion ${QUERY} > ${LABELS}
 ${SCRIPT_DIR}/102_PCA.py ${MATRIX} ${LABELS}
 
+# interproscan -i /data/tools/interproscan-5.27.66/test_proteins.fasta -f tsv -dp -goterms
+
 # chi square - which gene clusters are interesting?
 
 # PCA
