@@ -163,11 +163,11 @@ fi
 if [ -f ${STAGE_DIR}/009_matrix_creation ]; then
     echo "Matrix already created. Skipping..."
 else
-    less ${DATA_DIR}/003_deduplicated.genomes.conversion | cut -f1 | sort | uniq > ${DATA_DIR}/009_genomes.list
+    less ${DATA_DIR}/003_deduplicated.genomes.conversion | cut -f1 | sort | uniq > ${DATA_DIR}/genomes.list
 
     ${SCRIPT_DIR}/009_parallelize_matrix_creation_from_mcl.py ${DATA_DIR}/005_annotated.genes.conversion    \
                                                               ${DATA_DIR}/008_genes.clstr                   \
-                                                              ${DATA_DIR}/009_genomes.list
+                                                              ${DATA_DIR}/genomes.list
 
     while [ $(ls ${DATA_DIR}/matrix.part* | wc -l) -ne 11 ]; do
         sleep 1m
@@ -176,9 +176,42 @@ else
     sleep 1m
     cat ${DATA_DIR}/matrix.part* > ${DATA_DIR}/009_matrix.tsv
     rm ${DATA_DIR}/matrix.part*
-    rm ${DATA_DIR}/009_genomes.list
+    rm ${DATA_DIR}/genomes.list
 
     touch ${STAGE_DIR}/009_matrix_creation
+fi
+
+###############################################################################
+
+if [ -f ${STAGE_DIR}/010_cluster_annotation ]; then
+    echo "Clusters already annotated. Skipping..."
+else
+    CLUSTER_ANNOTATION_DIR=${DATA_DIR}/010_cluster_annotation
+    rm -rf ${CLUSTER_ANNOTATION_DIR}
+    mkdir  ${CLUSTER_ANNOTATION_DIR}
+
+
+    for i in $(seq 0 $(less ${DATA_DIR}/008_genes.clstr | wc -l));
+    do
+        echo "Annotating Cluster_${i}"
+
+        ${SCRIPT_DIR}/101_prepare_cluster_for_interpro.py ${DATA_DIR}/005_annotated.genes.fasta                 \
+                                                          ${DATA_DIR}/008_genes.clstr                           \
+                                                          1                                                     \
+                                                          > ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta
+
+        cd-hit -c 1 -d 0 -i ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta              \
+                         -o ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit -T 16
+
+        interproscan -i ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit       \
+                     -o ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit.tsv   \
+                     -f tsv -goterms -cpu 16
+
+        less ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit.tsv | cut -f 12,13 | sort | uniq -c | sort -nr   \
+             > ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.result
+    done
+
+    touch ${STAGE_DIR}/010_cluster_annotation
 fi
 
 ###############################################################################
