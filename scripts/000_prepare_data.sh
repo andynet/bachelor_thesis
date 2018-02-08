@@ -190,18 +190,18 @@ else
     rm -rf ${CLUSTER_ANNOTATION_DIR}
     mkdir  ${CLUSTER_ANNOTATION_DIR}
 
-
     for i in $(seq 0 $(less ${DATA_DIR}/008_genes.clstr | wc -l));
     do
         echo "Annotating Cluster_${i}"
 
         ${SCRIPT_DIR}/101_prepare_cluster_for_interpro.py ${DATA_DIR}/005_annotated.genes.fasta                 \
                                                           ${DATA_DIR}/008_genes.clstr                           \
-                                                          1                                                     \
+                                                          ${i}                                                  \
                                                           > ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta
 
-        cd-hit -c 1 -d 0 -i ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta              \
-                         -o ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit -T 16
+        cd-hit -i ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta                \
+               -o ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit         \
+               -c 1 -d 0 -T 16
 
         interproscan -i ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit       \
                      -o ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit.tsv   \
@@ -209,6 +209,7 @@ else
 
         less ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.genes.fasta.cd-hit.tsv | cut -f 12,13 | sort | uniq -c | sort -nr   \
              > ${CLUSTER_ANNOTATION_DIR}/Cluster_${i}.result
+
     done
 
     touch ${STAGE_DIR}/010_cluster_annotation
