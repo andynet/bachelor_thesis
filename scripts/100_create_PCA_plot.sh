@@ -33,4 +33,24 @@ ${SCRIPT_DIR}/102_PCA.py ${MATRIX} ${LABELS}
 # chi square - which gene clusters are interesting?
 
 # PCA
+# ../scripts/bachelor_thesis/scripts/103_PCA.py ./101_hosts
+                                            # ./mycobac/hosts.out ./mycobac/matrix_host.tsv
+                                            # ./strepto/hosts.out ./strepto/matrix_host.tsv
+                                            # ./escheri/hosts.out ./escheri/matrix_host.tsv
+                                            # ./gordoni/hosts.out ./gordoni/matrix_host.tsv
+                                            # ./pseudom/hosts.out ./pseudom/matrix_host.tsv
+                                            # ./arthrob/hosts.out ./arthrob/matrix_host.tsv
+                                            # ./lactoco/hosts.out ./lactoco/matrix_host.tsv
+                                            # ./staphyl/hosts.out ./staphyl/matrix_host.tsv
+
 # decision tree
+# ../scripts/bachelor_thesis/scripts/104_decision_tree.py
+                                                        # ./mycobac/hosts.out ./mycobac/matrix_host.tsv
+                                                        # ./strepto/hosts.out ./strepto/matrix_host.tsv
+                                                        # ./escheri/hosts.out ./escheri/matrix_host.tsv
+                                                        # ./gordoni/hosts.out ./gordoni/matrix_host.tsv
+                                                        # ./pseudom/hosts.out ./pseudom/matrix_host.tsv
+                                                        # ./arthrob/hosts.out ./arthrob/matrix_host.tsv
+                                                        # ./lactoco/hosts.out ./lactoco/matrix_host.tsv
+                                                        # ./staphyl/hosts.out ./staphyl/matrix_host.tsv
+
