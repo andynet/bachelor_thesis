@@ -1,0 +1,30 @@
+\chapter{Data retrieval and preprocessing}
+In this chapter we will present our pipeline intended for data retrieval and preprocessing.
+Since we used a considerable amount of third party libraries and tools, we will explain them in detail and we will clarify our reasons to use them.
+We will also provide some basic statistics of data retrieved.
+
+\section{Brief pipeline overview}
+Our pipeline consists of python scripts and third party bioinformatics software.
+All of its parts are connected in one bash script, which ensures simple startup.
+When writing the code, we have taken care of its readability, sustainability and extensibility.
+We understand the time of execution of bioinformatics programs can be relatively enormous, so we divided our pipeline to various steps.
+After each step, there is a checkpoint, which ensures we will not need to run this step again in case of unexpected crash of pipeline.
+The pipeline starts with downloading of publicly available data from 3 sources - NCBI, viralzone and phagesdb.
+After downloading we merge all records into one file and eliminate duplicated records.
+Later on we predict bacteriophages genes with Prokka \cite{prokka}.
+The decision not to use predicted genes from online databases was based on our conviction to have all genes predicted by one software.
+This ensures us, that potential mistakes in predictions will be consistent along the entire dataset and predictions will be always up to date.
+Next step was to cluster all predicted genes into reasonable clusters based on similarity of protein sequences.
+For this purpose we use CrocoBLAST \cite{crocoblast}, EMBOSS needle software \cite{needle} and mcl algorithm \cite{mcl}.
+After clustering we created matrix, where rows were individual bacteriophages and columns were our clusters.
+In this matrix 1 represented, that given phage contains a gene from given cluster and 0 represented it does not contain a gene from a given cluster.
+This matrix was later used in analysis as input to machine learning algorithms.
+
+\section{Downloading}
+\section{Gene identification}
+\section{Clustering}
+% http://www.paccanarolab.org/scps/
+\subsection{Blast}
+\subsection{Global alignment}
+\subsection{Mcl}
+\section{Matrix creation}
