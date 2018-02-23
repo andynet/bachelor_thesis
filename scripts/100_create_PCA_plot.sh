@@ -22,16 +22,21 @@ less ${INPUT} | cut -f 2- > ${MATRIX}
 less ${INPUT} | cut -f 1  > ${LIST}
 
 LABELS=${INPUT%%.tsv}.${QUERY}.labels
+# HOST_STRING=101_hosts
 
-# ../scripts/bachelor_thesis/scripts/101_create_host_string.py 003_deduplicated.genomes.conversion > 101_hosts
 # ${SCRIPT_DIR}/101_create_host_string.py ${DATA_DIR}/003_deduplicated.genomes.conversion > ${HOST_STRINGS}
-# ${SCRIPT_DIR}/101_split_matrix.py ${HOST_STRINGS} ${QUERY} ${MATRIX}
-${SCRIPT_DIR}/101_create_labels_for_PCA.py ${LIST} ${DATA_DIR}/003_deduplicated.genomes.conversion ${QUERY} > ${LABELS}
-${SCRIPT_DIR}/102_PCA.py ${MATRIX} ${LABELS}
+# less ${HOST_STRINGS} | sort -k 2 | cut -f2 | sed 's/\(^.......\).*/\1/' | uniq -c | sort -nr > ${HOST_STRINGS}_count
+
+#
 
 # interproscan -i /data/tools/interproscan-5.27.66/test_proteins.fasta -f tsv -dp -goterms
 
 # chi square - which gene clusters are interesting?
+
+# ${SCRIPT_DIR}/101_split_matrix.py ${HOST_STRINGS} mycobac ${EDITED_MATRIX}
+# ${SCRIPT_DIR}/101_split_matrix.py ${HOST_STRINGS} strepto ${EDITED_MATRIX}
+# ${SCRIPT_DIR}/101_split_matrix.py ${HOST_STRINGS} escheri ${EDITED_MATRIX}
+# ${SCRIPT_DIR}/101_split_matrix.py ${HOST_STRINGS} gordoni ${EDITED_MATRIX}
 
 # PCA
 # ../scripts/bachelor_thesis/scripts/103_PCA.py ./101_hosts
