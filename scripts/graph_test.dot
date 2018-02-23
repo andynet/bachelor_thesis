@@ -1,0 +1,142 @@
+/*
+compile with:
+dot -Tpng ./graph_test.dot -o graph_test.png
+*/
+
+digraph G {
+
+    /*
+    ncbi_genes_conversion
+    ncbi_genes_fasta
+    ncbi_genomes_conversion
+    ncbi_genomes_fasta
+    phagesdb_genes_conversion
+    phagesdb_genes_fasta
+    phagesdb_genomes_conversion
+    phagesdb_genomes_fasta
+    viralzone_genes_conversion
+    viralzone_genes_fasta
+    viralzone_genomes_conversion
+    viralzone_genomes_fasta
+    all_genes_conversion
+    all_genes_fasta
+    all_genomes_conversion
+    all_genomes_fasta
+    deduplicated_genes_conversion
+    deduplicated_genomes_conversion
+    deduplicated_genomes_fasta
+    PROKKA
+    annotated_genes_conversion
+    annotated_genes_fasta
+    crocoblast
+    crocoblast_database
+    crocoblast_complete_assembled_output
+    complete_global_alignment_abc
+    global_alignment
+    genes_clstr
+    matrix_tsv
+    edited_matrix_tsv
+    */
+
+    /*
+    download_from_ncbi [shape=box fillcolor=yellow style=filled]
+    download_from_viralzone [shape=box fillcolor=yellow style=filled]
+    download_from_phagesdb [shape=box fillcolor=yellow style=filled]
+    */
+
+    deduplication [shape=box fillcolor=yellow style=filled]
+    prokka_and_extraction [shape=box fillcolor=yellow style=filled]
+    crocoblast [shape=box fillcolor=yellow style=filled]
+    global_alignment [shape=box fillcolor=yellow style=filled]
+    mcl [shape=box fillcolor=yellow style=filled]
+    matrix_creation [shape=box fillcolor=yellow style=filled]
+    create_host_string [shape=box fillcolor=yellow style=filled]
+    matrix_editing [shape=box fillcolor=yellow style=filled]
+    split_matrix [shape=box fillcolor=yellow style=filled]
+    PCA [shape=box fillcolor=yellow style=filled]
+    decision_tree [shape=box fillcolor=yellow style=filled]
+    cluster_dependence [shape=box fillcolor=yellow style=filled]
+    prepare_for_intepro [shape=box fillcolor=yellow style=filled]
+    cd_hit [shape=box fillcolor=yellow style=filled]
+    interpro [shape=box fillcolor=yellow style=filled]
+
+    /*
+    download_from_ncbi -> { ncbi_genes_conversion ncbi_genes_fasta ncbi_genomes_conversion ncbi_genomes_fasta }
+    download_from_viralzone -> { viralzone_genes_conversion viralzone_genes_fasta viralzone_genomes_conversion viralzone_genomes_fasta }
+    download_from_phagesdb -> { phagesdb_genes_conversion phagesdb_genes_fasta phagesdb_genomes_conversion phagesdb_genomes_fasta }
+    */
+
+    ncbi_genes_conversion -> all_genes_conversion
+    phagesdb_genes_conversion -> all_genes_conversion
+    viralzone_genes_conversion -> all_genes_conversion
+
+    /*
+    ncbi_genes_fasta -> all_genes_fasta
+    phagesdb_genes_fasta -> all_genes_fasta
+    viralzone_genes_fasta -> all_genes_fasta
+    */
+
+    ncbi_genomes_conversion -> all_genomes_conversion
+    phagesdb_genomes_conversion -> all_genomes_conversion
+    viralzone_genomes_conversion -> all_genomes_conversion
+
+    ncbi_genomes_fasta -> all_genomes_fasta
+    phagesdb_genomes_fasta -> all_genomes_fasta
+    viralzone_genomes_fasta -> all_genomes_fasta
+
+    all_genomes_fasta -> deduplication
+    all_genomes_conversion -> deduplication
+    all_genes_conversion -> deduplication
+
+    deduplication -> deduplicated_genomes_fasta
+    deduplication -> deduplicated_genomes_conversion
+    deduplication -> deduplicated_genes_conversion
+
+        deduplicated_genomes_conversion -> genomes_list
+        deduplicated_genomes_conversion -> create_host_string -> hosts -> hosts_count
+
+    deduplicated_genomes_fasta -> prokka_and_extraction
+
+    prokka_and_extraction -> annotated_genes_fasta
+    prokka_and_extraction -> annotated_genes_conversion
+
+    annotated_genes_fasta -> crocoblast
+    crocoblast -> crocoblast_complete_assembled_output
+
+    crocoblast_complete_assembled_output -> global_alignment
+    annotated_genes_fasta -> global_alignment
+
+    global_alignment -> complete_global_alignment_abc
+
+    complete_global_alignment_abc -> mcl
+    mcl -> genes_clstr
+
+    { genes_clstr annotated_genes_fasta } -> prepare_for_intepro -> cd_hit -> interpro -> cluster_X_result
+
+    genes_clstr -> matrix_creation
+    annotated_genes_conversion -> matrix_creation
+    genomes_list -> matrix_creation
+
+    matrix_creation -> matrix_tsv
+
+    matrix_tsv -> matrix_editing
+    hosts -> matrix_editing
+    hosts_count -> matrix_editing
+
+    matrix_editing -> edited_matrix
+
+    edited_matrix -> cluster_dependence -> cluster_X_dep
+
+    edited_matrix -> split_matrix
+
+    split_matrix -> { hosts1_out hosts2_out matrix_host1_tsv matrix_host2_tsv }
+
+    { hosts1_out hosts2_out
+      matrix_host1_tsv matrix_host2_tsv
+      hosts } -> PCA
+
+    { hosts1_out hosts2_out
+      matrix_host1_tsv matrix_host2_tsv
+    } -> decision_tree
+
+}
