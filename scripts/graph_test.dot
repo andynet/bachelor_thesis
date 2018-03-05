@@ -48,7 +48,7 @@ digraph G {
     prokka_and_extraction [shape=box fillcolor=yellow style=filled]
     crocoblast [shape=box fillcolor=yellow style=filled]
     global_alignment [shape=box fillcolor=yellow style=filled]
-    mcl [shape=box fillcolor=yellow style=filled]
+    scps_mcl [shape=box fillcolor=yellow style=filled]
     matrix_creation [shape=box fillcolor=yellow style=filled]
     create_host_string [shape=box fillcolor=yellow style=filled]
     matrix_editing [shape=box fillcolor=yellow style=filled]
@@ -59,6 +59,7 @@ digraph G {
     prepare_for_intepro [shape=box fillcolor=yellow style=filled]
     cd_hit [shape=box fillcolor=yellow style=filled]
     interpro [shape=box fillcolor=yellow style=filled]
+    create_train_test_sets [shape=box fillcolor=yellow style=filled]
 
     /*
     download_from_ncbi -> { ncbi_genes_conversion ncbi_genes_fasta ncbi_genomes_conversion ncbi_genomes_fasta }
@@ -108,8 +109,16 @@ digraph G {
 
     global_alignment -> complete_global_alignment_abc
 
-    complete_global_alignment_abc -> mcl
-    mcl -> genes_clstr
+    complete_global_alignment_abc -> create_train_test_sets
+    hosts_count -> create_train_test_sets
+    hosts -> create_train_test_sets
+    annotated_genes_conversion -> create_train_test_sets
+
+    create_train_test_sets -> train_set_abc
+    create_train_test_sets -> test_set_fasta
+
+    train_set_abc -> scps_mcl
+    scps_mcl -> genes_clstr
 
     { genes_clstr annotated_genes_fasta } -> prepare_for_intepro -> cd_hit -> interpro -> cluster_X_result
 
@@ -120,12 +129,10 @@ digraph G {
     matrix_creation -> matrix_tsv
 
     matrix_tsv -> matrix_editing
-    hosts -> matrix_editing
-    hosts_count -> matrix_editing
 
     matrix_editing -> edited_matrix
 
-    edited_matrix -> cluster_dependence -> cluster_X_dep
+    matrix_tsv -> cluster_dependence -> cluster_X_dep
 
     edited_matrix -> split_matrix
 
@@ -135,8 +142,11 @@ digraph G {
       matrix_host1_tsv matrix_host2_tsv
       hosts } -> PCA
 
-    { hosts1_out hosts2_out
+    { test_set_fasta
+      hosts1_out hosts2_out
       matrix_host1_tsv matrix_host2_tsv
     } -> decision_tree
+
+    decision_tree -> evaluation_of_model_specificity_and_sensitivity
 
 }
