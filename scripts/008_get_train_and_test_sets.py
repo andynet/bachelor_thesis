@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import sys
 import random
 
@@ -37,6 +38,9 @@ with open(sys.argv[3]) as f:
 selected_hosts = sys.argv[4].split(',')
 train_perc = float(sys.argv[5])
 
+data_dir = os.path.dirname(os.path.abspath(sys.argv[1]))
+train_out_file = '{}/008_train_set.abc'.format(data_dir)
+test_out_file = '{}/008_test_set.list'.format(data_dir)
 
 host_dict = dict()
 
@@ -65,9 +69,13 @@ for host in host_dict:
     train_set = train_set | set(phage_list[:train_num])
     test_set = test_set | set(phage_list[train_num:])
 
+test_out = open(test_out_file, 'w')
+for test_rec in test_set:
+    test_out.write('{}\n'.format(test_rec))
+test_out.close()
+
 # create sets of genes
 train_set_genes = set()
-test_set_genes = set()
 
 for phage in train_set:
     try:
@@ -76,10 +84,9 @@ for phage in train_set:
     except KeyError:
         print('Phage {} has no genes in dictionary.'.format(phage))
 
-
+train_out = open(train_out_file, 'w')
 for line in abc_lines:
     gene1, gene2 = line.split()[0:2]
-    if gene1 in train_set_genes and gene2 in train_set_genes:
-        print(line, end='')
-
-# TODO 
+    if gene1 in train_set_genes and gene2 in train_set_genes and gene1 != gene2:
+        train_out.write(line)
+train_out.close()

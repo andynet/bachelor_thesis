@@ -149,6 +149,15 @@ else
 fi
 
 ###############################################################################
+#
+#   ../scripts/bachelor_thesis/scripts/008_get_train_and_test_sets.py
+#       ./007_complete_global_alignment.abc
+#       ./005_annotated.genes.conversion
+#       ./101_hosts
+#       mycobac,strepto,escheri,gordoni,pseudom,arthrob,lactoco,staphyl
+#       0.8
+#
+###############################################################################
 
 if [ -f ${STAGE_DIR}/008_mcl ]; then
     echo "Creating clusters with markov cluster algorithm done. Skipping..."
