@@ -1,0 +1,221 @@
+
+SCRIPT_DIR = '/data/projects/kimona/scripts/bachelor_thesis/scripts'
+DATA_DIR = ['/data/projects/kimona/data_18-03-07']
+
+DATABASES = ['ncbi', 'viralzone', 'phagedb']
+
+# if HOSTS = '' , TRAIN_NUM should be bigger than 1
+HOSTS = 'mycobac,strepto,escheri,gordoni,pseudom,arthrob,lactoco,staphyl'
+TRAIN_NUM = 8
+TRAIN_PERCENTAGE = 0.8
+
+THREADS = 16
+SUFFIXES = ['genomes.fasta', 'genomes.conversion', 'genes.fasta', 'genes.conversion']
+
+rule all:
+  input:
+    '{data_dir}/008_crocoblast.abc'.format(data_dir=DATA_DIR[0])
+
+rule download_from_ncbi:
+  output:
+    '{data_dir}/001_ncbi.genes.conversion',
+    '{data_dir}/001_ncbi.genes.fasta',
+    '{data_dir}/001_ncbi.genomes.conversion',
+    '{data_dir}/001_ncbi.genomes.fasta'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    mkdir -p {wildcards.data_dir}
+    {params.script_dir}/001_download_from_ncbi.py {wildcards.data_dir}
+    '''
+
+rule download_from_viralzone:
+  output:
+    '{data_dir}/001_viralzone.genes.conversion',
+    '{data_dir}/001_viralzone.genes.fasta',
+    '{data_dir}/001_viralzone.genomes.conversion',
+    '{data_dir}/001_viralzone.genomes.fasta'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    mkdir -p {wildcards.data_dir}
+    {params.script_dir}/001_download_from_viralzone.py {wildcards.data_dir}
+    '''
+
+rule download_from_phagedb:
+  output:
+    '{data_dir}/001_phagedb.genes.conversion',
+    '{data_dir}/001_phagedb.genes.fasta',
+    '{data_dir}/001_phagedb.genomes.conversion',
+    '{data_dir}/001_phagedb.genomes.fasta'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    mkdir -p {wildcards.data_dir}
+    {params.script_dir}/001_download_from_phagesdb.py {wildcards.data_dir}
+    '''
+
+rule merge:
+  input:
+    expand('{data_dir}/001_{database}.genes.conversion', data_dir=DATA_DIR, database=DATABASES),
+    expand('{data_dir}/001_{database}.genes.fasta', data_dir=DATA_DIR, database=DATABASES),
+    expand('{data_dir}/001_{database}.genomes.conversion', data_dir=DATA_DIR, database=DATABASES),
+    expand('{data_dir}/001_{database}.genomes.fasta', data_dir=DATA_DIR, database=DATABASES)
+  output:
+    '{data_dir}/002_merged.genes.conversion',
+    '{data_dir}/002_merged.genes.fasta',
+    '{data_dir}/002_merged.genomes.conversion',
+    '{data_dir}/002_merged.genomes.fasta'
+  shell:
+    '''
+    cat {wildcards.data_dir}/001_*.genes.conversion   > {output[0]}
+    cat {wildcards.data_dir}/001_*.genes.fasta        > {output[1]}
+    cat {wildcards.data_dir}/001_*.genomes.conversion > {output[2]}
+    cat {wildcards.data_dir}/001_*.genomes.fasta      > {output[3]}
+    '''
+
+rule eliminate_duplicates:
+  input:
+    '{data_dir}/002_merged.genes.conversion',
+    '{data_dir}/002_merged.genomes.conversion',
+    '{data_dir}/002_merged.genomes.fasta'
+  output:
+    '{data_dir}/003_deduplicated.genes.conversion',
+    '{data_dir}/003_deduplicated.genomes.conversion',
+    '{data_dir}/003_deduplicated.genomes.fasta'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    {params.script_dir}/003_deduplicate_genomes.py {input[0]} {input[1]} {input[2]} {wildcards.data_dir}
+    '''
+
+rule annotate:
+  input:
+    '{data_dir}/003_deduplicated.genomes.fasta'
+  output:
+    '{data_dir}/004_PROKKA/genomes.gbk'
+  shell:
+    '''
+    prokka  --force                                                           \
+            --kingdom Viruses                                                 \
+            --outdir {wildcards.data_dir}/004_PROKKA                          \
+            --prefix genomes                                                  \
+            {output[0]}
+    '''
+
+rule extract_genes:
+  input:
+    '{data_dir}/004_PROKKA/genomes.gbk'
+  output:
+    '{data_dir}/005_annotated.genes.conversion',
+    '{data_dir}/005_annotated.genes.fasta'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    {params.script_dir}/005_extract_prokka_genes.py {input[0]}                \
+                                                    {wildcards.data_dir}
+    '''
+
+rule count_hosts:
+  input:
+    '{data_dir}/003_deduplicated.genomes.conversion'
+  output:
+    '{data_dir}/004_hosts',
+    '{data_dir}/004_hosts.counts'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    {params.script_dir}/101_create_host_string.py {input[0]} > {output[0]}
+    sort -k 2 {output[0]} | cut -f2 | sed "s/\\(^.\\{{7\\}}\\).*/\\1/" | uniq -c | sort -nr > {output[1]}
+    '''
+
+rule split_dataset:
+  input:
+    '{data_dir}/003_deduplicated.genomes.conversion',
+    '{data_dir}/003_deduplicated.genomes.fasta',
+    '{data_dir}/005_annotated.genes.conversion',
+    '{data_dir}/005_annotated.genes.fasta',
+    '{data_dir}/004_hosts',
+    '{data_dir}/004_hosts.counts'
+  output:
+    expand('{{data_dir}}/006_{set_name}.{suffix}', set_name=['train', 'test', 'other'], suffix=SUFFIXES)
+  params:
+    script_dir=SCRIPT_DIR,
+    train_percentage=TRAIN_PERCENTAGE,
+    train_num=TRAIN_NUM,
+    hosts=HOSTS
+  shell:
+    '''
+    if [ {params.hosts} = "" ]; then
+        HOSTS=$(grep -v no_host {input[5]} | head -n {params.train_num} | tr -s " " | cut -f3 -d " " | tr "\n" ",")
+        HOSTS=${{HOSTS::-1}}
+    else
+        HOSTS={params.hosts}
+    fi
+
+    {params.script_dir}/006_split_train_test_other.py {input[2]} {input[3]} {input[0]} {input[1]} {input[4]} \
+                                                      ${HOSTS} {params.train_percentage}
+    '''
+
+rule cd_hit:
+  input:
+    '{data_dir}/006_train.genes.fasta'
+  output:
+    '{data_dir}/007_train.cd-hit.genes.fasta',
+    '{data_dir}/007_train.cd-hit.genes.fasta.clstr'
+  threads:
+    THREADS
+  shell:
+    '''
+    cd-hit -c 1 -s 1 -g 1 -d 0 -T {threads} -i {input[0]} -o {output[0]}
+    '''
+
+rule crocoblast:
+  input:
+    '{data_dir}/007_train.cd-hit.genes.fasta'
+  output:
+    '{data_dir}/008_crocoblast.abc'
+  params:
+    script_dir=SCRIPT_DIR
+  threads:
+    THREADS
+  shell:
+    '''
+    rm -rf {wildcards.data_dir}/008_crocoblast/ {wildcards.data_dir}/008_crocoblast_database/
+    cp -r  {params.script_dir}/crocoblast/ {wildcards.data_dir}/008_crocoblast/
+    mkdir  {wildcards.data_dir}/008_crocoblast_database
+
+    {wildcards.data_dir}/008_crocoblast/crocoblast  -add_database                       \
+                                            --sequence_file                   \
+                                              protein                         \
+                                              {input[0]}                      \
+                                              007_train.cd-hit.genes.fasta    \
+                                              {wildcards.data_dir}/008_crocoblast_database
+
+    {wildcards.data_dir}/008_crocoblast/crocoblast  -add_to_queue                       \
+                                            blastp                            \
+                                            007_train.cd-hit.genes.fasta      \
+                                            {input[0]}                        \
+                                            {wildcards.data_dir}                        \
+                                            --blast_options                   \
+                                              -outfmt 6                       \
+                                              -max_target_seqs 1000000        \
+                                              -max_hsps 1
+
+    echo "{wildcards.data_dir}/006_crocoblast/crocoblast -run > /dev/null; touch {wildcards.data_dir}/008_finished"   \
+    | qsub -l thr={threads} -cwd -N crocoblast
+
+    while [ ! -f {wildcards.data_dir}/008_finished ]; do
+        sleep 20m
+    done
+
+    mv {wildcards.data_dir}/CrocoBLAST_1 {wildcards.data_dir}/008_crocoblast_output
+    cut -f 1,2,11 008_crocoblast_output/complete_assembled_output > {output[0]}
+    '''
+
