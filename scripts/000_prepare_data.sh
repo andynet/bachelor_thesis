@@ -84,6 +84,15 @@ else
 fi
 
 ###############################################################################
+#
+#   ../scripts/bachelor_thesis/scripts/006_split_train_test_other.py
+#       005_annotated.genes.conversion 005_annotated.genes.fasta
+#       003_deduplicated.genomes.conversion 003_deduplicated.genomes.fasta
+#       101_hosts
+#       mycobac,strepto,escheri,gordoni,pseudom,arthrob,lactoco,staphyl
+#       0.8
+#
+###############################################################################
 
 if [ -f ${STAGE_DIR}/006_local_aligning ]; then
     echo "Local aligning already done. Skipping..."
