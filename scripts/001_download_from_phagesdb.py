@@ -63,7 +63,7 @@ def get_host(genome):
 
 
 if len(sys.argv) != 2:
-    print('Usage:', sys.argv, '<dir>')
+    print('Usage:', sys.argv[0], '<dir>')
     exit()
 
 genomes_output_file = '{}/001_phagesdb.genomes.fasta'.format(sys.argv[1])

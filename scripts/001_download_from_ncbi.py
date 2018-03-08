@@ -18,7 +18,7 @@ def safe_get_qualifier(feature, key, default_value='NO_DATA'):
 
 
 if len(sys.argv) != 2:
-    print('Usage:', sys.argv, '<dir>')
+    print('Usage:', sys.argv[0], '<dir>')
     exit()
 
 genomes_output_file = '{}/001_ncbi.genomes.fasta'.format(sys.argv[1])
@@ -42,7 +42,7 @@ handle.close()
 
 webenv = record["WebEnv"]
 query_key = record["QueryKey"]
-batch = 200
+batch = 100
 genome_num = 0
 gene_num = 0
 
