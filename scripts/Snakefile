@@ -12,7 +12,7 @@ TRAIN_PERCENTAGE = 0.8
 THREADS = 12
 SUFFIXES = ['genomes.fasta', 'genomes.conversion', 'genes.fasta', 'genes.conversion']
 
-CLUSTERS = range(0, 3)
+CLUSTERS = range(0, 1)
 
 rule run:
   input:
@@ -214,7 +214,6 @@ rule create_cluster_file:
     script_dir=SCRIPT_DIR
   shell:
     '''
-    # TODO:
     {params.script_dir}/010_create_cluster_file.py {input[0]} {input[1]} {output[0]}
     '''
 
@@ -274,4 +273,16 @@ rule annotate_cluster:
     cut -f 12,13 {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit.tsv     \
         | sort | uniq -c | sort -nr                                                               \
         > {params.cluster_annotation_dir}/Cluster_{wildcards.i}.result
+    '''
+
+rule feature_selection:
+  input:
+    '{data_dir}/011_matrix.tsv'
+  output:
+    '{data_dir}/012_matrix.fs.tsv'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    {params.script_dir}/012_feature_selection.py
     '''
