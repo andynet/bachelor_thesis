@@ -62,7 +62,7 @@ rule eliminate_duplicates:
     script_dir=SCRIPT_DIR
   shell:
     '''
-    {params.script_dir}/003_deduplicate_genomes.py {input[0]} {input[1]} {input[2]} {wildcards.data_dir}
+    {params.script_dir}/003_deduplicate_genomes.py {input[2]} {input[1]} {input[2]} {wildcards.data_dir}
     '''
 
 rule annotate:
@@ -79,7 +79,7 @@ rule annotate:
             --kingdom Viruses                                                 \
             --outdir {wildcards.data_dir}/004_PROKKA                          \
             --prefix genomes                                                  \
-            {output[0]}
+            {input[0]}
     '''
 
 rule extract_genes:
@@ -135,7 +135,7 @@ rule split_dataset:
     fi
 
     {params.script_dir}/006_split_train_test_other.py {input[2]} {input[3]} {input[0]} {input[1]} {input[4]} \
-                                                      ${HOSTS} {params.train_percentage}
+                                                      ${{HOSTS}} {params.train_percentage}
     '''
 
 rule cd_hit:
@@ -249,10 +249,10 @@ rule annotate_cluster:
     '{data_dir}/006_train.genes.fasta',
     '{data_dir}/010_genes.tsv'
   output:
-    '{data_dir}/011_clusters_annotation/Cluster_{i}.result'
+    '{data_dir}/011_cluster_annotations/Cluster_{i}.result'
   params:
     script_dir=SCRIPT_DIR,
-    cluster_annotation_dir='{data_dir}/011_clusters_annotation'
+    cluster_annotation_dir='{data_dir}/011_cluster_annotations'
   shell:
     '''
     mkdir -p {params.cluster_annotation_dir}
@@ -275,7 +275,7 @@ rule annotate_cluster:
         > {params.cluster_annotation_dir}/Cluster_{wildcards.i}.result
     '''
 
-rule feature_selection:
+rule select_features:
   input:
     '{data_dir}/011_matrix.tsv'
   output:
@@ -285,4 +285,17 @@ rule feature_selection:
   shell:
     '''
     {params.script_dir}/012_feature_selection.py
+    '''
+
+rule find_cluster_dependence:
+  input:
+    '{data_dir}/011_matrix.tsv'
+  output:
+    '{data_dir}/012_cluster_dependence/Cluster_{i}.dependence'
+  params:
+    script_dir=SCRIPT_DIR
+    cluster_dependence_dir='{data_dir}/012_cluster_dependence'
+  shell:
+    '''
+    
     '''
