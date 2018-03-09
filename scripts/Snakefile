@@ -297,5 +297,5 @@ rule find_cluster_dependence:
     cluster_dependence_dir='{data_dir}/012_cluster_dependence'
   shell:
     '''
-    
+
     '''
