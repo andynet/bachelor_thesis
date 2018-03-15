@@ -11,7 +11,7 @@ def create_gtc_dict(file):
     dictionary = dict()
 
     for line in lines:
-        if line[0] == '%':
+        if line[0] == '%' or line[0] == '\n':
             continue
 
         phage, cluster = line.split()[0:2]
@@ -52,11 +52,11 @@ for key, value in gene_to_cluster_dict.items():
     else:
         cluster_to_gene_dict[value] = [key]
 
-
-with open(sys.argv[2], 'w') as f:
-    for i in range(len(cluster_to_gene_dict)):
+with open(sys.argv[3], 'w') as f:
+    for i in range(1, len(cluster_to_gene_dict)+1):
         f.write('\t'.join(cluster_to_gene_dict[i]) + '\n')
 
+print('completed')
 
 
 
