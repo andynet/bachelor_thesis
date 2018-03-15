@@ -17,7 +17,7 @@ CLUSTERS = range(0, 1)
 rule run:
   input:
     '{data_dir}/011_matrix.tsv'.format(data_dir=DATA_DIR),
-    expand('{data_dir}/011_clusters_annotation/Cluster_{i}.result', data_dir=DATA_DIR, i=CLUSTERS)
+    # expand('{data_dir}/011_clusters_annotation/Cluster_{i}.result', data_dir=DATA_DIR, i=CLUSTERS)
 
 rule download:
   output:
@@ -183,7 +183,7 @@ rule crocoblast:
                                               -max_target_seqs 1000000        \
                                               -max_hsps 1
 
-    echo "{wildcards.data_dir}/006_crocoblast/crocoblast -run > /dev/null; touch {wildcards.data_dir}/008_finished"   \
+    echo "{wildcards.data_dir}/008_crocoblast/crocoblast -run > /dev/null; touch {wildcards.data_dir}/008_finished"   \
     | qsub -l thr={threads} -cwd -N crocoblast
 
     while [ ! -f {wildcards.data_dir}/008_finished ]; do
@@ -191,22 +191,52 @@ rule crocoblast:
     done
 
     mv {wildcards.data_dir}/CrocoBLAST_1 {wildcards.data_dir}/008_crocoblast_output
-    cut -f 1,2,11 008_crocoblast_output/complete_assembled_output > {output[0]}
+    cut -f 1,2,11 {wildcards.data_dir}/008_crocoblast_output/complete_assembled_output > {output[0]}
     '''
 
-rule cluster:
+rule blast_to_needle:
   input:
     '{data_dir}/008_crocoblast.abc'
   output:
-    '{data_dir}/009_clusters.out'
+    '{data_dir}/009_crocoblast.needle.abc'
+  shell:
+    '''
+    # TODO
+    '''
+
+rule cluster_spectral:
+  input:
+    '{data_dir}/008_crocoblast.abc'
+  output:
+    '{data_dir}/009_spectral.clusters'
   shell:
     '''
     clusterx -t blast {input[0]} -o {output[0]}
     '''
 
+rule cluster_mcl:
+  input:
+    '{data_dir}/008_crocoblast.abc'
+  output:
+    '{data_dir}/009_mcl.clusters'
+  shell:
+    '''
+    clusterx -m mcl -p inflation=1.2 {input[0]} -o {output[0]}
+    '''
+
+rule cluster_needle_mcl:
+  input:
+    '{data_dir}/008_crocoblast.needle.abc'
+  output:
+    '{data_dir}/009_needle.mcl.clusters'
+  shell:
+    '''
+    clusterx -m mcl -p inflation=1.2,dont_transform=True {input[0]} -o {output[0]}
+    '''
+
 rule create_cluster_file:
   input:
-    '{data_dir}/009_clusters.out',
+    '{data_dir}/009_mcl.clusters',
     '{data_dir}/007_train.cd-hit.genes.fasta.clstr'
   output:
     '{data_dir}/010_genes.tsv'
@@ -287,15 +317,15 @@ rule select_features:
     {params.script_dir}/012_feature_selection.py
     '''
 
-rule find_cluster_dependence:
-  input:
-    '{data_dir}/011_matrix.tsv'
-  output:
-    '{data_dir}/012_cluster_dependence/Cluster_{i}.dependence'
-  params:
-    script_dir=SCRIPT_DIR
-    cluster_dependence_dir='{data_dir}/012_cluster_dependence'
-  shell:
-    '''
-
-    '''
+# rule find_cluster_dependence:
+#   input:
+#     '{data_dir}/011_matrix.tsv'
+#   output:
+#     '{data_dir}/012_cluster_dependence/Cluster_{i}.dependence'
+#   params:
+#     script_dir=SCRIPT_DIR
+#     cluster_dependence_dir='{data_dir}/012_cluster_dependence'
+#   shell:
+#     '''
+# 
+#     '''
