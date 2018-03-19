@@ -5,22 +5,38 @@ We will also provide some basic statistics of data retrieved.
 
 \section{Brief pipeline overview}
 Our pipeline consists of python scripts and third party bioinformatics software.
-All of its parts are connected in one bash script, which ensures simple startup.
 When writing the code, we have taken care of its readability, sustainability and extensibility.
-We understand the time of execution of bioinformatics programs can be relatively enormous, so we divided our pipeline to various steps.
+The time of execution of bioinformatics programs can be enormous, so we divided our pipeline to various steps.
 After each step, there is a checkpoint, which ensures we will not need to run this step again in case of unexpected crash of pipeline.
 The pipeline starts with downloading of publicly available data from 3 sources - NCBI, viralzone and phagesdb.
 After downloading we merge all records into one file and eliminate duplicated records.
 Later on we predict bacteriophages genes with Prokka \cite{prokka}.
-The decision not to use predicted genes from online databases was based on our conviction to have all genes predicted by one software.
-This ensures us, that potential mistakes in predictions will be consistent along the entire dataset and predictions will be always up to date.
-Next step was to cluster all predicted genes into reasonable clusters based on similarity of protein sequences.
+% The decision not to use predicted genes from online databases was based on our conviction to have all genes predicted by one software.
+% This ensures us, that potential mistakes in predictions will be consistent along the entire dataset and predictions will be always up to date.
+Next step was to cluster all predicted genes into clusters based on similarity of protein sequences.
 For this purpose we use CrocoBLAST \cite{crocoblast}, EMBOSS needle software \cite{needle} and mcl algorithm \cite{mcl}.
 After clustering we created matrix, where rows were individual bacteriophages and columns were our clusters.
 In this matrix 1 represented, that given phage contains a gene from given cluster and 0 represented it does not contain a gene from a given cluster.
 This matrix was later used in analysis as input to machine learning algorithms.
 
+\section{Snakefile}
+Snakefile is the main script, which executes all other components of our program. 
+It is written in Snakemake \cite{snakemake}, workflow engine designed for writing reproducible pipelines in bioinformatics. 
+Snakemake is inspired by GNU make, but it use python-like syntax with elements similar to pseudo code.
+Furthermore, it is fully portable, with dependency only on python.
+Snakefile consists of rules, where each rule is defined by its input files, output files and shell commands.
+These are commands needed to execute to produce output files from input files.
+When the Snakemake is executed, by default, it runs first rule in particular Snakefile. 
+If the rule cannot be completed, because of missing input files, it scan through the whole Snakefile and look for a rule, which is capable of creating desired file. 
+This process is repeated until there is rule which can be completed or rule whose input is not possible to create by any other rule.
+By this approach it is ensured we do not run any unnecessary rules and already completed rules.
+This is an important feature for our work as some rules can take several hours to complete even on a powerful server. 
+
 \section{Downloading}
+First rule possible to complete in our workflow was downloading data from publicly available databases.
+We made this rule easily extensible for new sources of information by writing a new script for downloading, 
+naming it \texttt{download\_from\_db} where \texttt{db} is name of the database and appending this name into variable DATABASES in config file.
+
 \section{Gene identification}
 \section{Clustering}
 % http://www.paccanarolab.org/scps/
