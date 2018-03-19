@@ -270,7 +270,7 @@ rule create_matrix:
     done
 
     sleep 1m
-    cat {wildcards.data_dir}/matrix.part* > {wildcards.data_dir}/009_matrix.tsv
+    cat {wildcards.data_dir}/matrix.part* > {output[0]}
     rm {wildcards.data_dir}/matrix.part*
     '''
 
