@@ -17,7 +17,7 @@ CLUSTERS = range(0, 1)
 rule run:
   input:
     '{data_dir}/011_matrix.tsv'.format(data_dir=DATA_DIR),
-    # expand('{data_dir}/011_clusters_annotation/Cluster_{i}.result', data_dir=DATA_DIR, i=CLUSTERS)
+    expand('{data_dir}/011_clusters_annotation/Cluster_{i}.result', data_dir=DATA_DIR, i=CLUSTERS)
 
 rule download:
   output:
@@ -251,15 +251,15 @@ rule create_matrix:
   input:
     '{data_dir}/010_genes.tsv',
     '{data_dir}/006_train.genes.conversion',
-    '{data_dir}/006_train.genomes.conversion'
+    '{data_dir}/006_train.genomes.fasta'
   output:
-    '{data_dir}/011_matrix.tsv'
+    '{data_dir}/011_matrix.raw.tsv'
   params:
     script_dir=SCRIPT_DIR,
     genomes_list='{data_dir}/011_train.genomes.list'
   shell:
     '''
-    cut -f1 {input[2]} | sort | uniq > {params.genomes_list}
+    grep "^>" {input[2]} | tr -d ">" | sort > {params.genomes_list}
 
     {params.script_dir}/009_parallelize_matrix_creation_from_mcl.py {input[1]}                    \
                                                                     {input[0]}                    \
@@ -307,25 +307,83 @@ rule annotate_cluster:
 
 rule select_features:
   input:
-    '{data_dir}/011_matrix.tsv'
+    '{data_dir}/011_matrix.raw.tsv'
   output:
-    '{data_dir}/012_matrix.fs.tsv'
+    '{data_dir}/011_matrix.fs.tsv'
   params:
     script_dir=SCRIPT_DIR
   shell:
     '''
-    {params.script_dir}/012_feature_selection.py
+    {params.script_dir}/011_feature_selection.py
     '''
 
-# rule find_cluster_dependence:
-#   input:
-#     '{data_dir}/011_matrix.tsv'
-#   output:
-#     '{data_dir}/012_cluster_dependence/Cluster_{i}.dependence'
-#   params:
-#     script_dir=SCRIPT_DIR
-#     cluster_dependence_dir='{data_dir}/012_cluster_dependence'
-#   shell:
-#     '''
-# 
-#     '''
+rule split_matrix:
+  input:
+    '{data_dir}/011_matrix.{type}.tsv',
+    '{data_dir}/004_hosts'
+  output:
+    '{data_dir}/012_matrix.{type}.{host}.tsv'
+    '{data_dir}/012_hosts.{host}.'
+  params:
+    script_dir=SCRIPT_DIR,
+    hosts=HOSTS
+  shell:
+    '''
+    {params.script_dir}/012_split_matrix.py {input[0]} {input[1]} {params.hosts}
+    '''
+
+rule create_model:
+  input:
+    '{data_dir}/012_matrix.{type}.{host}.tsv',
+    '{data_dir}/012_hosts.{host}'
+  output:
+    '{data_dir}/013_model.{type}.{host}.pkl',
+    '{data_dir}/013_tree.{type}.pdf'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    {params.script_dir}/104_decision_tree.py
+    '''
+
+rule classify:
+  input:
+    '{data_dir}/013_model.{type}.{host}.pkl',
+    expand('{data_dir}/test_fasta/{}.fasta'),
+    '{data_dir}/genes.fasta.blastdb',
+    '{data_dir}/clusters'
+  output:
+    '{data_dir}/{}.vector',
+    '{data_dir}/{}.result'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    # TODO
+    '''
+
+rule stats:
+  input:
+    '{data_dir}/{}.result',
+    '{data_dir}/004_hosts'
+  output:
+    '{data_dir}/stats'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    # TODO
+    '''
+
+rule find_cluster_dependence:
+  input:
+    '{data_dir}/011_matrix.tsv'
+  output:
+    '{data_dir}/012_cluster_dependence/Cluster_{i}.dependence'
+  params:
+    script_dir=SCRIPT_DIR,
+    cluster_dependence_dir='{data_dir}/012_cluster_dependence'
+  shell:
+    '''
+    # TODO
+    '''
