@@ -40,8 +40,8 @@ train_set_count = int(len(train_set) * train_ratio)
 train_list = list(train_set)
 random.shuffle(train_list)
 
-train_set = set(train_list[:train_set_count])
-test_set = set(train_list[train_set_count:])
+train_set = set(train_list[:train_set_count+1])
+test_set = set(train_list[train_set_count+1:])
 
 print('Train set: {}, Test set: {}, Other set: {}'.format(len(train_set), len(test_set), len(other_set)))
 
