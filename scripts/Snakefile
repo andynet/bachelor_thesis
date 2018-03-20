@@ -13,13 +13,24 @@ TRAIN_PERCENTAGE = 0.8
 THREADS = 12
 SUFFIXES = ['genomes.fasta', 'genomes.conversion', 'genes.fasta', 'genes.conversion']
 
-CLUSTERS = range(0, 1)
+CLUSTERS = [1, 2, 3]
+
+VARIANCE_THRESHOLD = 0.01
 
 rule run:
   input:
-    '{data_dir}/011_matrix.{cluster_method}.raw.tsv'.format(data_dir=DATA_DIR, cluster_method='needle.mcl'),
-    '{data_dir}/011_matrix.{cluster_method}.raw.tsv'.format(data_dir=DATA_DIR, cluster_method='mcl')
-    # expand('{data_dir}/011_clusters_annotation/Cluster_{i}.result', data_dir=DATA_DIR, i=CLUSTERS)
+    expand('{data_dir}/011_{cluster_method}_cluster_annotations/Cluster_{i}.result',
+            data_dir=DATA_DIR,
+            cluster_method=['needle.mcl', 'mcl'],
+            i=CLUSTERS),
+    expand([
+            '{data_dir}/012_matrix.{cluster_method}.{type}.{host}.tsv',
+            '{data_dir}/012_hosts.{cluster_method}.{type}.{host}'
+            ],
+            data_dir=DATA_DIR,
+            cluster_method=['needle.mcl', 'mcl'],
+            type='fs',
+            host='mycobac'),
 
 rule download:
   output:
@@ -169,21 +180,21 @@ rule crocoblast:
     mkdir  {wildcards.data_dir}/008_crocoblast_database
 
     {wildcards.data_dir}/008_crocoblast/crocoblast  -add_database                       \
-                                            --sequence_file                   \
-                                              protein                         \
-                                              {input[0]}                      \
-                                              007_train.cd-hit.genes.fasta    \
-                                              {wildcards.data_dir}/008_crocoblast_database
+                                                      --sequence_file                   \
+                                                        protein                         \
+                                                        {input[0]}                      \
+                                                        007_train.cd-hit.genes.fasta    \
+                                                        {wildcards.data_dir}/008_crocoblast_database
 
     {wildcards.data_dir}/008_crocoblast/crocoblast  -add_to_queue                       \
-                                            blastp                            \
-                                            007_train.cd-hit.genes.fasta      \
-                                            {input[0]}                        \
-                                            {wildcards.data_dir}                        \
-                                            --blast_options                   \
-                                              -outfmt 6                       \
-                                              -max_target_seqs 1000000        \
-                                              -max_hsps 1
+                                                      blastp                            \
+                                                      007_train.cd-hit.genes.fasta      \
+                                                      {input[0]}                        \
+                                                      {wildcards.data_dir}              \
+                                                      --blast_options                   \
+                                                        -outfmt 6                       \
+                                                        -max_target_seqs 1000000        \
+                                                        -max_hsps 1
 
     echo "{wildcards.data_dir}/008_crocoblast/crocoblast -run > /dev/null; touch {wildcards.data_dir}/008_finished"   \
     | qsub -l thr={threads} -cwd -N crocoblast
@@ -216,7 +227,7 @@ rule blast_to_needle:
 
     while [ ! -f {params.needle_dir}/qsub_completed ]; do
         sleep 20m
-    done
+    done;
 
     for i in $(seq 0 1 9); do
         cat {params.needle_dir}/tmp/${{i}}*.abc > {params.needle_dir}/tmp/${{i}}.final.abc        \
@@ -280,6 +291,8 @@ rule create_matrix:
   params:
     script_dir=SCRIPT_DIR,
     genomes_list='{data_dir}/011_train.genomes.list'
+  shadow:
+    'shallow'
   shell:
     '''
     grep "^>" {input[2]} | tr -d ">" | sort > {params.genomes_list}
@@ -297,107 +310,38 @@ rule create_matrix:
     rm {wildcards.data_dir}/matrix.part*
     '''
 
-#rule annotate_cluster:
-#  input:
-#    '{data_dir}/006_train.genes.fasta',
-#    '{data_dir}/010_genes.tsv'
-#  output:
-#    '{data_dir}/011_cluster_annotations/Cluster_{i}.result'
-#  params:
-#    script_dir=SCRIPT_DIR,
-#    cluster_annotation_dir='{data_dir}/011_cluster_annotations'
-#  shell:
-#    '''
-#    mkdir -p {params.cluster_annotation_dir}
-#
-#    {params.script_dir}/101_prepare_cluster_for_interpro.py {input[0]}                            \
-#                                                            {input[1]}                            \
-#                                                            {wildcards.i}                         \
-#                                                            > {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta
-#
-#    cd-hit  -i {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta                  \
-#            -o {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit           \
-#            -c 1 -d 0 -T 16
-#
-#    interproscan  -i {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit     \
-#                  -o {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit.tsv \
-#                  -f tsv -goterms -cpu 16
-#
-#    cut -f 12,13 {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit.tsv     \
-#        | sort | uniq -c | sort -nr                                                               \
-#        > {params.cluster_annotation_dir}/Cluster_{wildcards.i}.result
-#    '''
-#
-#rule select_features:
-#  input:
-#    '{data_dir}/011_matrix.raw.tsv'
-#  output:
-#    '{data_dir}/011_matrix.fs.tsv'
-#  params:
-#    script_dir=SCRIPT_DIR
-#  shell:
-#    '''
-#    {params.script_dir}/011_feature_selection.py
-#    '''
-#
-#rule split_matrix:
-#  input:
-#    '{data_dir}/011_matrix.{type}.tsv',
-#    '{data_dir}/004_hosts'
-#  output:
-#    '{data_dir}/012_matrix.{type}.{host}.tsv'
-#    '{data_dir}/012_hosts.{host}.'
-#  params:
-#    script_dir=SCRIPT_DIR,
-#    hosts=HOSTS
-#  shell:
-#    '''
-#    {params.script_dir}/012_split_matrix.py {input[0]} {input[1]} {params.hosts}
-#    '''
-#
-#rule create_model:
-#  input:
-#    '{data_dir}/012_matrix.{type}.{host}.tsv',
-#    '{data_dir}/012_hosts.{host}'
-#  output:
-#    '{data_dir}/013_model.{type}.{host}.pkl',
-#    '{data_dir}/013_tree.{type}.pdf'
-#  params:
-#    script_dir=SCRIPT_DIR
-#  shell:
-#    '''
-#    {params.script_dir}/104_decision_tree.py
-#    '''
-#
-#rule classify:
-#  input:
-#    '{data_dir}/013_model.{type}.{host}.pkl',
-#    expand('{data_dir}/test_fasta/{}.fasta'),
-#    '{data_dir}/genes.fasta.blastdb',
-#    '{data_dir}/clusters'
-#  output:
-#    '{data_dir}/{}.vector',
-#    '{data_dir}/{}.result'
-#  params:
-#    script_dir=SCRIPT_DIR
-#  shell:
-#    '''
-#    # TODO
-#    '''
-#
-#rule stats:
-#  input:
-#    '{data_dir}/{}.result',
-#    '{data_dir}/004_hosts'
-#  output:
-#    '{data_dir}/stats'
-#  params:
-#    script_dir=SCRIPT_DIR
-#  shell:
-#    '''
-#    # TODO
-#    '''
-#
+rule annotate_cluster:
+  input:
+    '{data_dir}/006_train.genes.fasta',
+    '{data_dir}/011_matrix.{cluster_method}.raw.tsv',
+  output:
+    '{data_dir}/011_{cluster_method}_cluster_annotations/Cluster_{i}.result'
+  params:
+    script_dir=SCRIPT_DIR,
+    cluster_annotation_dir='{data_dir}/011_{cluster_method}_cluster_annotations'
+  shell:
+    '''
+    mkdir -p {params.cluster_annotation_dir}
+
+    {params.script_dir}/101_prepare_cluster_for_interpro.py {input[0]}                            \
+                                                            {input[1]}                            \
+                                                            {wildcards.i}                         \
+                                                            > {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta
+
+    cd-hit  -i {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta                  \
+            -o {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit           \
+            -c 1 -d 0 -T 16
+
+    interproscan  -i {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit     \
+                  -o {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit.tsv \
+                  -f tsv -goterms -cpu 16
+
+    cut -f 12,13 {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit.tsv     \
+        | sort | uniq -c | sort -nr                                                               \
+        > {params.cluster_annotation_dir}/Cluster_{wildcards.i}.result
+    '''
+
+# TODO:
 #rule find_cluster_dependence:
 #  input:
 #    '{data_dir}/011_matrix.tsv'
@@ -406,6 +350,107 @@ rule create_matrix:
 #  params:
 #    script_dir=SCRIPT_DIR,
 #    cluster_dependence_dir='{data_dir}/012_cluster_dependence'
+#  shell:
+#    '''
+#
+#    '''
+
+rule select_features:
+  input:
+    '{data_dir}/011_matrix.{cluster_method}.raw.tsv'
+  output:
+    '{data_dir}/011_matrix.{cluster_method}.fs.tsv'
+  params:
+    script_dir=SCRIPT_DIR,
+    variance_threshold=VARIANCE_THRESHOLD
+  shell:
+    '''
+    {params.script_dir}/011_feature_selection.py
+    '''
+
+rule split_matrix:
+  input:
+    '{data_dir}/011_matrix.{cluster_method}.{type}.tsv',
+    '{data_dir}/004_hosts'
+  output:
+    expand([
+            '{{data_dir}}/012_matrix.{{cluster_method}}.{{type}}.{host}.tsv',
+            '{{data_dir}}/012_hosts.{{cluster_method}}.{{type}}.{host}'
+            ], host=['mycobac', 'strepto', 'escheri', 'gordoni', 'pseudom', 'arthrob', 'lactoco', 'staphyl']),
+  params:
+    script_dir=SCRIPT_DIR,
+    hosts=HOSTS
+  shell:
+    '''
+    {params.script_dir}/012_split_matrix.py {input[0]} {input[1]} {params.hosts}
+    '''
+
+# TODO:
+#rule create_model:
+#  input:
+#    expand('{{data_dir}}/012_matrix.{{cluster_method}}.{{type}}.{host}.tsv', host=HOSTS.split(',')),
+#    expand('{{data_dir}}/012_hosts.{host}', host=HOSTS.split(','))
+#  output:
+#    '{data_dir}/013_model.{cluster_method}.{type}.{spec}.pkl',
+#    '{data_dir}/013_tree.{cluster_method}.{type}.{spec}.pdf'
+#  params:
+#    script_dir=SCRIPT_DIR
+#  shell:
+#    '''
+#    # TODO
+#    {params.script_dir}/104_decision_tree.py {wildcards.spec} {input}
+#    '''
+#
+#rule prepare_classification:
+#  input:
+#    #expand('{{data_dir}}/006_{set_name}.{suffix}', set_name=['test'], suffix=SUFFIXES),
+#    '{data_dir}/006_test.genomes.fasta'
+#    '{data_dir}/006_test.genomes.conversion',
+#    '{data_dir}/006_test.genes.fasta',
+#    '{data_dir}/006_test.genes.conversion'
+#  output:
+#    '{data_dir}/014_classification/{phage}.genomes.fasta',
+#    '{data_dir}/014_classification/{phage}.genomes.conversion',
+#    '{data_dir}/014_classification/{phage}.genes.fasta',
+#    '{data_dir}/014_classification/{phage}.genes.conversion'
+#  params:
+#    script_dir=SCRIPT_DIR,
+#    classify_dir={data_dir}/014_classification
+#  shell:
+#    '''
+#    # TODO
+#    '''
+#
+#rule classify:
+#  input:
+#    '{data_dir}/010_{cluster_method}.tsv'
+#    '{data_dir}/013_model.{cluster_method}.{type}.{spec}.pkl'
+#    '{data_dir}/014_classification/{phage}.genes.fasta',
+#  output:
+#    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.vector',
+#    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.result',
+#  shell:
+#    '''
+#    blastp -db crocoblastdb output
+#
+#    create_vector.py output clusters vector
+#
+#    predict.py model vector result
+#
+#    ###############################################################################################
+#    # {data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.result #################
+#    ###############################################################################################
+#    # {phage}   {spec}    {0/1}
+#    '''
+#
+#rule stats:
+#  input:
+#    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.result',
+#    '{data_dir}/004_hosts'
+#  output:
+#    '{data_dir}/015_{cluster_method}.{type}.{spec}.stats'
+#  params:
+#    script_dir=SCRIPT_DIR
 #  shell:
 #    '''
 #    # TODO
