@@ -17,6 +17,8 @@ CLUSTERS = [1, 2, 3]
 
 VARIANCE_THRESHOLD = 0.01
 
+# PHAGES = 'test'
+
 rule run:
   input:
     expand('{data_dir}/011_{cluster_method}_cluster_annotations/Cluster_{i}.result',
@@ -107,11 +109,12 @@ rule extract_genes:
     '{data_dir}/005_annotated.genes.conversion',
     '{data_dir}/005_annotated.genes.fasta'
   params:
-    script_dir=SCRIPT_DIR
+    script_dir=SCRIPT_DIR,
+    prefix={data_dir}/005_annotated
   shell:
     '''
     {params.script_dir}/005_extract_prokka_genes.py {input[0]}                \
-                                                    {wildcards.data_dir}
+                                                    {params.prefix}
     '''
 
 rule count_hosts:
@@ -403,26 +406,32 @@ rule create_model:
     {params.script_dir}/013_decision_tree.py {wildcards.spec} {input}
     '''
 
-#rule prepare_classification:
-#  input:
-#    #expand('{{data_dir}}/006_{set_name}.{suffix}', set_name=['test'], suffix=SUFFIXES),
-#    '{data_dir}/006_test.genomes.fasta'
-#    '{data_dir}/006_test.genomes.conversion',
-#    '{data_dir}/006_test.genes.fasta',
-#    '{data_dir}/006_test.genes.conversion'
-#  output:
-#    '{data_dir}/014_classification/{phage}.genomes.fasta',
-#    '{data_dir}/014_classification/{phage}.genomes.conversion',
-#    '{data_dir}/014_classification/{phage}.genes.fasta',
-#    '{data_dir}/014_classification/{phage}.genes.conversion'
-#  params:
-#    script_dir=SCRIPT_DIR,
-#    classify_dir={data_dir}/014_classification
-#  shell:
-#    '''
-#    # TODO
-#    '''
-#
+rule prepare_classification:
+  input:
+    '{data_dir}/006_test.genomes.fasta',
+  output:
+    '{data_dir}/014_classification/{phage}.genomes.fasta',
+    '{data_dir}/014_classification/{phage}.genes.fasta',
+  params:
+    script_dir=SCRIPT_DIR,
+    classify_dir={data_dir}/014_classification
+    prefix={data_dir}/014_classification/{phage}
+  shell:
+    '''
+    mkdir -p {params.classify_dir}
+
+    grep -A 1 {wildcards.phage} {input[0]} > {output[0]}
+
+    prokka  --force                                                                               \
+            --kingdom Viruses                                                                     \
+            --outdir {params.classify_dir}                                                        \
+            --prefix {wildcards.phage}                                                            \
+            {output[0]}
+
+    {params.script_dir}/005_extract_prokka_genes.py {params.classify_dir}/{wildcards.phage}.gbk   \
+                                                    {params.prefix}
+    '''
+
 #rule classify:
 #  input:
 #    '{data_dir}/010_{cluster_method}.tsv'
@@ -447,7 +456,7 @@ rule create_model:
 #
 #rule stats:
 #  input:
-#    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.result',
+#    dynamic('{{data_dir}}/014_classification/{phage}.{{cluster_method}}.{{type}}.{{spec}}.result'),
 #    '{data_dir}/004_hosts'
 #  output:
 #    '{data_dir}/015_{cluster_method}.{type}.{spec}.stats'

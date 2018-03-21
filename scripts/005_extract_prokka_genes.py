@@ -13,11 +13,11 @@ def safe_get_qualifier(feature, key, default_value='NO_DATA'):
 
 
 if len(sys.argv) != 3:
-    print('Usage:', sys.argv[0], '<gbk_file> <dir>')
+    print('Usage:', sys.argv[0], '<gbk_file> <prefix>')
     exit()
 
-genes_output_file = '{}/005_annotated.genes.fasta'.format(sys.argv[2])
-genes_conversion_file = '{}/005_annotated.genes.conversion'.format(sys.argv[2])
+genes_output_file = '{}.genes.fasta'.format(sys.argv[2])
+genes_conversion_file = '{}.genes.conversion'.format(sys.argv[2])
 genes_output = open(genes_output_file, 'w')
 genes_conversion = open(genes_conversion_file, 'w')
 
