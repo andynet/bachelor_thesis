@@ -31,6 +31,11 @@ rule run:
             cluster_method=['needle.mcl', 'mcl'],
             type='fs',
             host='mycobac'),
+#    expand([
+#            '{{data_dir}}/013_model.{{cluster_method}}.{{type}}.{spec}.pkl',
+#            '{{data_dir}}/013_tree.{{cluster_method}}.{{type}}.{spec}.pdf'
+#            ], spec='mycobac',
+
 
 rule download:
   output:
@@ -376,7 +381,7 @@ rule split_matrix:
     expand([
             '{{data_dir}}/012_matrix.{{cluster_method}}.{{type}}.{host}.tsv',
             '{{data_dir}}/012_hosts.{{cluster_method}}.{{type}}.{host}'
-            ], host=['mycobac', 'strepto', 'escheri', 'gordoni', 'pseudom', 'arthrob', 'lactoco', 'staphyl']),
+            ], host=HOSTS.split(',')),
   params:
     script_dir=SCRIPT_DIR,
     hosts=HOSTS
@@ -385,22 +390,19 @@ rule split_matrix:
     {params.script_dir}/012_split_matrix.py {input[0]} {input[1]} {params.hosts}
     '''
 
-# TODO:
-#rule create_model:
-#  input:
-#    expand('{{data_dir}}/012_matrix.{{cluster_method}}.{{type}}.{host}.tsv', host=HOSTS.split(',')),
-#    expand('{{data_dir}}/012_hosts.{host}', host=HOSTS.split(','))
-#  output:
-#    '{data_dir}/013_model.{cluster_method}.{type}.{spec}.pkl',
-#    '{data_dir}/013_tree.{cluster_method}.{type}.{spec}.pdf'
-#  params:
-#    script_dir=SCRIPT_DIR
-#  shell:
-#    '''
-#    # TODO
-#    {params.script_dir}/104_decision_tree.py {wildcards.spec} {input}
-#    '''
-#
+rule create_model:
+  input:
+    expand('{{data_dir}}/012_matrix.{{cluster_method}}.{{type}}.{host}.tsv', host=HOSTS.split(',')),
+  output:
+    '{data_dir}/013_model.{cluster_method}.{type}.{spec}.pkl',
+    '{data_dir}/013_tree.{cluster_method}.{type}.{spec}.pdf'
+  params:
+    script_dir=SCRIPT_DIR
+  shell:
+    '''
+    {params.script_dir}/013_decision_tree.py {wildcards.spec} {input}
+    '''
+
 #rule prepare_classification:
 #  input:
 #    #expand('{{data_dir}}/006_{set_name}.{suffix}', set_name=['test'], suffix=SUFFIXES),
