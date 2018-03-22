@@ -33,9 +33,11 @@ By this approach it is ensured we do not run any unnecessary rules and already c
 This is an important feature for our work as some rules can take several hours to complete even on a powerful server. 
 
 \section{Downloading}
-First rule possible to complete in our workflow was downloading data from publicly available databases.
-We made this rule easily extensible for new sources of information by writing a new script for downloading, 
-naming it \texttt{download\_from\_db} where \texttt{db} is name of the database and appending this name into variable DATABASES in config file.
+First rule to complete in our workflow was downloading data from publicly available databases.
+We made this rule easily extensible for new sources of information.
+New database can be added by writing a new download script, 
+naming it \texttt{\{script_dir\}\\download\_from\_\{db\}} and appending this name into variable DATABASES in config file.
+We implemented downloading from 3 sources - NCBI \cite{ncbi}, viralzone \cite{viralzone}, phagesdb \cite{phagesdb}.
 
 \section{Gene identification}
 \section{Clustering}
