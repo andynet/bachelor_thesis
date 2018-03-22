@@ -110,7 +110,7 @@ rule extract_genes:
     '{data_dir}/005_annotated.genes.fasta'
   params:
     script_dir=SCRIPT_DIR,
-    prefix={data_dir}/005_annotated
+    prefix='{data_dir}/005_annotated'
   shell:
     '''
     {params.script_dir}/005_extract_prokka_genes.py {input[0]}                \
@@ -320,8 +320,8 @@ rule create_matrix:
 
 rule annotate_cluster:
   input:
-    '{data_dir}/006_train.genes.fasta',
-    '{data_dir}/011_matrix.{cluster_method}.raw.tsv',
+    '{data_dir}/005_annotated.genes.fasta',
+    '{data_dir}/010_{cluster_method}.tsv',
   output:
     '{data_dir}/011_{cluster_method}_cluster_annotations/Cluster_{i}.result'
   params:
@@ -338,11 +338,13 @@ rule annotate_cluster:
 
     cd-hit  -i {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta                  \
             -o {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit           \
-            -c 1 -d 0 -T 16
+            -c 1 -d 0
+            # -T 16
 
     interproscan  -i {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit     \
                   -o {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit.tsv \
-                  -f tsv -goterms -cpu 16
+                  -f tsv -goterms
+                  # -cpu 16
 
     cut -f 12,13 {params.cluster_annotation_dir}/Cluster_{wildcards.i}.genes.fasta.cd-hit.tsv     \
         | sort | uniq -c | sort -nr                                                               \
@@ -373,7 +375,7 @@ rule select_features:
     variance_threshold=VARIANCE_THRESHOLD
   shell:
     '''
-    {params.script_dir}/011_feature_selection.py
+    {params.script_dir}/011_feature_selection.py {input[0]} {output[0]} {params.variance_threshold}
     '''
 
 rule split_matrix:
@@ -414,8 +416,8 @@ rule prepare_classification:
     '{data_dir}/014_classification/{phage}.genes.fasta',
   params:
     script_dir=SCRIPT_DIR,
-    classify_dir={data_dir}/014_classification
-    prefix={data_dir}/014_classification/{phage}
+    classify_dir='{data_dir}/014_classification',
+    prefix='{data_dir}/014_classification/{phage}'
   shell:
     '''
     mkdir -p {params.classify_dir}

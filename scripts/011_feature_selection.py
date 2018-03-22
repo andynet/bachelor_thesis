@@ -4,7 +4,7 @@ import sys
 import pandas as pd
 from sklearn.feature_selection import VarianceThreshold
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     print('Usage:', sys.argv[0], '<matrix.raw.tsv> <matrix.fs.tsv> <variance_threshold>')
     exit()
 
