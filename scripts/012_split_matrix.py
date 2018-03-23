@@ -53,7 +53,7 @@ for q in queries:
     matrix_out = '{}/012_matrix.{}.{}.tsv'.format(dir_name, methods, q)
     new_matrix.to_csv(matrix_out, sep='\t')
 
-    hosts_out = '{}/012_hosts.{}'.format(dir_name, q)
+    hosts_out = '{}/012_hosts.{}.{}'.format(dir_name, methods, q)
     hosts_out_content = ''
     for record in query[q]:
         hosts_out_content += '{}\t{}\n'.format(record, hosts_dict[record])
