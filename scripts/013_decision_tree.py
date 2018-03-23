@@ -30,12 +30,11 @@ for host in hosts:
     file_name = '{}/012_matrix.{}.{}.{}.tsv'.format(data_dir, cluster_method, mtype, host)
     matrix = pd.read_csv(file_name, sep='\t', header=0, index_col=0)
 
-    # TODO: not sure if shape[0] or shape[1], test it!
     print(matrix.shape)
     if host == spec:
-        labels += [1]*matrix.shape[1]
+        labels += [1]*matrix.shape[0]
     else:
-        labels += [0]*matrix.shape[1]
+        labels += [0]*matrix.shape[0]
 
     matrices.append(matrix)
 
@@ -43,7 +42,7 @@ for host in hosts:
 features = pd.concat(matrices)
 
 # build model
-clf = DecisionTreeClassifier()
+clf = DecisionTreeClassifier(min_impurity_split=0.03)
 clf.fit(features, labels)
 
 # visualize tree
@@ -55,5 +54,5 @@ graph.render('{}/013_tree.{}.{}.{}'.format(data_dir, cluster_method, mtype, spec
 # save model as pickle
 model_file_name = '{}/013_model.{}.{}.{}.pkl'.format(data_dir, cluster_method, mtype, spec)
 model_pkl = open(model_file_name, 'wb')
-pickle.dump(model_file_name, model_pkl)
+pickle.dump(clf, model_pkl)
 model_pkl.close()
