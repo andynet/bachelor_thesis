@@ -17,7 +17,7 @@ CLUSTERS = [1, 2, 3]
 
 VARIANCE_THRESHOLD = 0.01
 
-# PHAGES = 'test'
+PHAGES = 'phage2000747,phage2001841,phage0000869'
 
 rule run:
   input:
@@ -25,19 +25,12 @@ rule run:
             data_dir=DATA_DIR,
             cluster_method=['needle.mcl', 'mcl'],
             i=CLUSTERS),
-    expand([
-            '{data_dir}/012_matrix.{cluster_method}.{type}.{host}.tsv',
-            '{data_dir}/012_hosts.{cluster_method}.{type}.{host}'
-            ],
-            data_dir=DATA_DIR,
-            cluster_method=['needle.mcl', 'mcl'],
-            type='fs',
-            host='mycobac'),
-#    expand([
-#            '{{data_dir}}/013_model.{{cluster_method}}.{{type}}.{spec}.pkl',
-#            '{{data_dir}}/013_tree.{{cluster_method}}.{{type}}.{spec}.pdf'
-#            ], spec='mycobac',
 
+    expand('{data_dir}/015_{cluster_method}.{type}.{spec}.stats',
+            data_dir=DATA_DIR,
+            cluster_method=['mcl'],
+            type='fs',
+            spec=HOSTS.split(',')),
 
 rule download:
   output:
@@ -408,63 +401,87 @@ rule create_model:
     {params.script_dir}/013_decision_tree.py {wildcards.spec} {input}
     '''
 
-rule prepare_classification:
+rule split_test_fasta:
   input:
-    '{data_dir}/006_test.genomes.fasta',
+    '{data_dir}/006_test.genomes.fasta'
   output:
-    '{data_dir}/014_classification/{phage}.genomes.fasta',
-    '{data_dir}/014_classification/{phage}.genes.fasta',
+    '{data_dir}/014_classification/{phage}.genomes.fasta'
+  params:
+    classify_dir='{data_dir}/014_classification',
+  shell:
+    '''
+    mkdir -p {params.classify_dir}
+
+    grep -A 1 {wildcards.phage} {input[0]} > {output[0]}
+    '''
+
+rule get_genes:
+  input:
+    '{data_dir}/014_classification/{phage}.genomes.fasta'
+  output:
+    '{data_dir}/014_classification/{phage}.genes.fasta'
   params:
     script_dir=SCRIPT_DIR,
     classify_dir='{data_dir}/014_classification',
     prefix='{data_dir}/014_classification/{phage}'
   shell:
     '''
-    mkdir -p {params.classify_dir}
-
-    grep -A 1 {wildcards.phage} {input[0]} > {output[0]}
-
     prokka  --force                                                                               \
             --kingdom Viruses                                                                     \
             --outdir {params.classify_dir}                                                        \
             --prefix {wildcards.phage}                                                            \
-            {output[0]}
+            {input[0]}
 
     {params.script_dir}/005_extract_prokka_genes.py {params.classify_dir}/{wildcards.phage}.gbk   \
                                                     {params.prefix}
     '''
 
-#rule classify:
-#  input:
-#    '{data_dir}/010_{cluster_method}.tsv'
-#    '{data_dir}/013_model.{cluster_method}.{type}.{spec}.pkl'
-#    '{data_dir}/014_classification/{phage}.genes.fasta',
-#  output:
-#    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.vector',
-#    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.result',
-#  shell:
-#    '''
-#    blastp -db crocoblastdb output
-#
-#    create_vector.py output clusters vector
-#
-#    predict.py model vector result
-#
-#    ###############################################################################################
-#    # {data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.result #################
-#    ###############################################################################################
-#    # {phage}   {spec}    {0/1}
-#    '''
-#
-#rule stats:
-#  input:
-#    dynamic('{{data_dir}}/014_classification/{phage}.{{cluster_method}}.{{type}}.{{spec}}.result'),
-#    '{data_dir}/004_hosts'
-#  output:
-#    '{data_dir}/015_{cluster_method}.{type}.{spec}.stats'
-#  params:
-#    script_dir=SCRIPT_DIR
-#  shell:
-#    '''
-#    # TODO
-#    '''
+rule blast_genes:
+  input:
+    '{data_dir}/014_classification/{phage}.genes.fasta',
+  output:
+    '{data_dir}/014_classification/{phage}.genes.blast',
+  params:
+    database='{data_dir}/008_crocoblast_database/007_train.cd-hit.genes.fasta',
+  shell:
+    '''
+    blastp  -query {input[0]}                                                                     \
+            -db {params.database}                                                                 \
+            -out {output[0]}                                                                      \
+            -outfmt "6 qseqid sseqid score pident evalue"                                         \
+            -max_target_seqs 1
+    '''
+
+rule classify:
+  input:
+    '{data_dir}/014_classification/{phage}.genes.blast',
+    '{data_dir}/010_{cluster_method}.tsv',
+    '{data_dir}/011_matrix.{cluster_method}.{type}.tsv',
+    '{data_dir}/013_model.{cluster_method}.{type}.{spec}.pkl',
+  output:
+    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.vector',
+    '{data_dir}/014_classification/{phage}.{cluster_method}.{type}.{spec}.result',
+  params:
+    script_dir=SCRIPT_DIR,
+  shell:
+    '''
+    {params.script_dir}/014_create_vector.py  {input[0]} {input[1]} {input[2]} {input[3]}         \
+                                              {output[0]} {output[1]}
+    '''
+
+rule stats:
+  input:
+    results=expand('{{data_dir}}/014_classification/{phage}.{{cluster_method}}.{{type}}.{{spec}}.result',
+                    phage=PHAGES.split(',')),
+    hosts='{data_dir}/004_hosts'
+  output:
+    '{data_dir}/015_{cluster_method}.{type}.{spec}.results',
+    '{data_dir}/015_{cluster_method}.{type}.{spec}.stats'
+  params:
+    script_dir=SCRIPT_DIR,
+  shell:
+    '''
+    cat {input.results} > {output[0]}
+
+    {params.script_dir}/015_calculate_stats.py {input.hosts} {output[0]} {output[1]}
+    '''
