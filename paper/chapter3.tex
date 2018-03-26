@@ -36,13 +36,48 @@ This is an important feature for our work as some rules can take several hours t
 First rule to complete in our workflow was downloading data from publicly available databases.
 We made this rule easily extensible for new sources of information.
 New database can be added by writing a new download script, 
-naming it \texttt{\{script_dir\}\\download\_from\_\{db\}} and appending this name into variable DATABASES in config file.
-We implemented downloading from 3 sources - NCBI \cite{ncbi}, viralzone \cite{viralzone}, phagesdb \cite{phagesdb}.
+naming it TODO:
+% \texttt{{\{script_dir\}\\download\_from\_\{db\}}} 
+and appending this name into variable DATABASES in config file.
+We implemented downloading from 3 sources - NCBI TODO:
+% \cite{ncbi}
+, viralzone 
+% \cite{viralzone}
+, phagesdb 
+% \cite{phagesdb}
+.
+
+\subsection{Downloading from NCBI}
+NCBI, National Center for Biotechnology Information, was the largest source of data for our pipeline.
+Their nucleotide database should contain all published genomes.
+Downloading of these genomes from their database is possible through web interface or through API.
+In our script we used python library Biopython \cite{biopython}, which provides python wrapper around NCBI API.
+Besides, Biopython offers useful classes for work with standard file formats used in bioinformatics.
+Downloaded data were stored in four files with extensions genomes.fasta, genomes.conversion, genes.fasta, genes.conversion.
+Fasta files were described in chapter 1.
+Conversion files are tab separated files containing metadata about particular downloaded sequences.
+In file with extension genomes.conversion these metadata are phage identifier in our database, phage identifier in external database, phage name and its hosts.
+In file with extension genes.conversion these metadata are gene identifier in our database, our phage identifier of bacteriophage with this gene, identifier of gene from external database, its position in phage genome and function.
+Reasons for creation of our internal identifiers were inconsistency in naming conventions between different databases.
+Our software downloaded all records in NCBI nucleotide database satisfying query TODO:
+% \texttt{{'phage[Title] AND (complete genome[Title] OR complete sequence[Title]) AND (viruses[filter] AND biomol_genomic[PROP] AND ("10000"[SLEN] : "100000000"[SLEN]))'}}.
+\subsection{Downloading from viralzone}
+\subsection{Downloading from phagesdb}
+
+\section{Merging and removing of duplicated records}
 
 \section{Gene identification}
+
+\section{Splitting to training set and testing set}
+
+\section{Local alignment of genes}
+
 \section{Clustering}
 % http://www.paccanarolab.org/scps/
-\subsection{Blast}
-\subsection{Global alignment}
-\subsection{Mcl}
-\section{Matrix creation}
+\subsection{Markov Cluster Algorithm}
+\subsection{Markov Cluster Algorithm with global alignment}
+\subsection{Spectral clustering}
+
+\section{Cluster annotation}
+
+\section{Creation of matrix}
