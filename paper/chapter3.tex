@@ -89,12 +89,29 @@ We made this decision because the inconsistency of gene annotations between diff
 To ensure predictions will be consistent along the entire dataset, we predicted all genes and their annotations by one software - Prokka.
 In addition, this software uses regularly updated databases, which guarantee the most up-to-date annotations.
 After annotation we extracted all genes with our script.
-The output of this program were files \verb|annotated.genes.fasta| and \verb|annotated.genes.conversion|.
+The output of this program were files \verb|annotated.genes.fasta| and \verb|annotated.genes.conversion| which were further used in pipeline.
 
 \section{Splitting to training set and testing set}
-
+In order to properly evaluate our final models, we divided whole dataset into training set and testing set.
+First we find out how many bacteriophages for every group of hosts we have. 
+Names of this groups were abreviations of host names.
+Reason to use abreviations as group names is that we wanted bring together phages with similar hosts in one group.
+We also needed to deal with typos and different formats of the same host.
+We selected first 8 groups with the highest counts of records.
+These were mycobac, strepto, escheri, gordoni, arthrob, pseudom, lactoco and staphyl with counts 1619, 354, 323, 293, 240, 236, 219, 184 respectively.
+All other groups were excluded from our dataset due to insufficient amount of samples.
+Furthermore we excluded all phages without the information about their hosts.
+This new purified dataset was divided into training set and testing set at a ratio 4:1.
+At the end of this step the training set consisted of 2787 records of bacteriophages and the testing set consisted of 699 records.
 
 \section{Local alignment of genes}
+After dataset splitting we performed local alignment of the genes in training set against themselves.
+Thanks to this step we were able to quantify similarities between different genes, which we needed further in pipeline at clustering step.
+The standard bioinformatics tool for this purpose is BLAST \cite{blast}. 
+The basic algorithm consists of searching seeds from database on the query sequence and then extending those seeds into neighboring bases.
+This approach provides orders of magnitude faster alignment method than classical Smith-Waterman algorithm \cite{smith_waterman} with comparable sensitivity.
+In our pipeline we used software CrocoBLAST \cite{crocoblast}, what is a wrapper around BLAST algorithm which make better use of paralellization than standard BLAST maintained by NCBI.
+With CrocoBLAST we were able to reduce time of this local alignment step from four days to one day as opposed to BLAST.
 
 \section{Clustering}
 % http://www.paccanarolab.org/scps/
