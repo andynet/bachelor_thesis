@@ -1,14 +1,76 @@
 \chapter{Machine learning methods of data analysis}
-In this chapter we will explain methods used for analysis.
+In this chapter we will describe machine learning methods used for analysis of binary matrix created in previous chapter. We will show data visualized by means of principal component analysis. Also, we will explain how this data was used to generate our decision tree models. At the end, we will reveal how we evaluated our models.
+
+\section{Principal component analysis}
+Principal component analysis (PCA) is often used as dimension reduction method.
+Detailed mathematical description of this method is beyond the scope of this thesis, but we will provide intuitive explanation.
+Each principal component is a set of values of linearly uncorrelated variables obtained from original, possibly correlated data.
 
 \section{Visualization of data with PCA}
+For visualization of data we used PCA in python library scikit-learn.
+Data was transformed and first few principal components were used to create plots in python library matplotlib.
 
 \section{Feature selection}
+Considering high dimensionality of our data and thus high probability of overfitting our models on data, we decided to perform feature selection.
+The reason why we chose feature selection over PCA presented in previous section was, we wanted out tree models representable in terms of important clusters rather than in terms of principal components.
+Our choice for feature selection method was Variance Threshold, as we expected a lot of clusters with insufficient number of genes.
+Furthermore, Variance threshold provides simple explanations why particular cluster was removed.
+In our work we removed all columns in matrix with ones or zeroes in more than 99\% of cases.
+This reduced our final matrix from 2787x15017 to 2787x1818.
 
-\section{Building decission tree models}
+\section{Building decision tree models}
+Decision tree is a model, which we can imagine as binary tree, where each node contains a condition.
+This condition splits the dataset for two distinct group according to its boolean value.
+These two groups are further divided by another condition, until the leaves of the tree are not pure or until certain threshold is met.
+In our work we used Decision Tree from scikit-learn. 
+This algorithm needs two sets of data - features and labels.
+Features contains data according to which the algorithm is able to distinguish between different samples.
+In our case this was the matrix, where one feature is represented by presence of gene from particular cluster in phage.
+Labels are data what we want to train and predict.
+In our case we decided to create one tree model per one host genera and therefore we used ability to infect as label.
+We marked this as one if the particular phage was able to infect particular host and zero otherwise.
+To prevent overfitting of our trees, we also used parameter \verb|min_impurity_split=0.03| which enabled threshold for splitting leaves.
+With this approach we created model for each of our eight selected host genera.
+Models was stored using python library pickle for later use.
+
 % http://scikit-learn.org/stable/modules/tree.html
 
 \section{Classification}
+For classification we expected to have complete sequence of bacteriophage.
+We annotated and extracted all genes from sequence.
+These genes were further aligned using BLAST to genes which were used for creation of models.
+We assigned cluster number to all genes based on the cluster number of the most similar gene from database.
+Thereafter, vector of ones and zeroes was created for each phage representing if this phage contains gene from particular cluster - similar to new row in matrix.
+This vector was passed to decision tree model and resulting prediction was saved.
 
 \section{Evaluation of models}
+To examine accuracy of our models, we classified all bacteriophages from our test dataset containing 699 phages.
+Resulting predictions were aggregated and number of correctly predicted, false positive and false negative was recorded.
+The table was constructed from these data.
+Accuracy was calculated as $CP/(CP+FP+FN)$, false positive percentage as $FP/(CP+FP+FN)$ and false negative percentage as $FN/(CP+FP+FN)$.
+
+\begin{tabular}{ r l l l l l l }
+\hline
+model & correct & fpos & fneg & accuracy & fposp & fnegp \\
+\hline
+arthrob & 683 & 11 & 5  & 97.71\% & 1.57\% & 0.71\% \\
+escheri & 679 & 17 & 3  & 97.13\% & 2.43\% & 0.42\% \\
+gordoni & 647 & 39 & 13 & 92.56\% & 5.57\% & 1.85\% \\
+lactoco & 680 & 3  & 16 & 97.28\% & 0.42\% & 2.28\% \\
+mycobac & 686 & 11 & 2  & 98.14\% & 1.57\% & 0.28\% \\
+pseudom & 686 & 6  & 7  & 98.14\% & 0.85\% & 1.00\% \\
+staphyl & 685 & 0  & 14 & 97.99\% & 0.00\% & 2.00\% \\
+strepto & 686 & 2  & 11 & 98.14\% & 0.28\% & 1.57\% \\
+\hline
+\end{tabular}  
+
+\section{Limitations and future work}
+Although high accuracy of our predictions, we are aware of potential improvement in the future.
+Sequences used were mostly annotated only with one host. Despite high phage specificity, some phages can have multiple hosts. Also, relatively small number of phages are known to mankind. These facts can decrease applicability of our models when predicting insufficiently discovered phage genera. 
+% better datasets
+% better clustering algorithms
+% not sure if it is possible to classify from incomplete sequences
+% inability to discover phages with brand new mechanism
+% decreased accuracy in insufficiently discovered phage genera
+\section{Future work}
 
