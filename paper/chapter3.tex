@@ -1,66 +1,81 @@
 \chapter{Data retrieval and preprocessing}
-In this chapter we will present our pipeline intended for data retrieval and preprocessing.
+In this chapter we will present parts of our pipeline intended for data retrieval and preprocessing.
 Since we used a considerable amount of third party libraries and tools, we will explain them in detail and we will clarify our reasons to use them.
 We will also provide some basic statistics of data retrieved.
 
-\section{Brief pipeline overview}
+\section{Pipeline overview}
 Our pipeline consists of python scripts and third party bioinformatics software.
 When writing the code, we have taken care of its readability, sustainability and extensibility.
-The time of execution of bioinformatics programs can be enormous, so we divided our pipeline to various steps.
-After each step, there is a checkpoint, which ensures we will not need to run this step again in case of unexpected crash of pipeline.
-The pipeline starts with downloading of publicly available data from 3 sources - NCBI, viralzone and phagesdb.
-After downloading we merge all records into one file and eliminate duplicated records.
-Later on we predict bacteriophages genes with Prokka \cite{prokka}.
-Next step was to cluster all predicted genes into clusters based on similarity of protein sequences.
-For this purpose we use CrocoBLAST \cite{crocoblast}, EMBOSS needle software \cite{needle} and mcl algorithm \cite{mcl}.
-After clustering we created matrix, where rows were individual bacteriophages and columns were our clusters.
-In this matrix 1 represented, that given phage contains a gene from given cluster and 0 represented it does not contain a gene from a given cluster.
-This matrix was later used in analysis as input to machine learning algorithms.
 
-\section{Snakefile}
-Snakefile is the main script, which executes all other components of our program. 
-It is written in Snakemake \cite{snakemake}, workflow engine designed for writing reproducible pipelines in bioinformatics. 
-Snakemake is inspired by GNU make, but it use python-like syntax with elements similar to pseudo code.
+As the main script we used Snakefile written in Snakemake.
+The Snakemake is a workflow management system designed for writing reproducible bioinformatics pipelines.
+It is inspired by GNU make, but it use python-like syntax with elements similar to pseudo code.
 Furthermore, it is fully portable, with dependency only on python.
 Snakefile consists of rules, where each rule is defined by its input files, output files and shell commands.
-These are commands needed to execute to produce output files from input files.
+These are commands needed to execute in order to produce output files from input files.
 When the Snakemake is executed, by default, it runs first rule in particular Snakefile. 
 If the rule cannot be completed, because of missing input files, it scan through the whole Snakefile and look for a rule, which is capable of creating desired file. 
 This process is repeated until there is rule which can be completed or rule whose input is not possible to create by any other rule.
+In the former case the execution starts running, in the latter case an error message is displayed.
 By this approach it is ensured we do not run any unnecessary rules and already completed rules.
-This is an important feature for our work as some rules can take several hours to complete even on a powerful server. 
+This is an important feature for our program as some rules can take several hours to complete even on a powerful server. 
+Another pleasant characteristics of the Snakemake engine is the ability to produce graphical visualisation of particular Snakefile in format of directed acyclic graph.
+Simplified graphical representation of our pipeline is in the Figure (\ref{fig:dag}).
+
+The pipeline starts with downloading of publicly available data.
+After downloading we merge all records and eliminate duplicated records.
+Later on, we predict bacteriophages genes.
+Consequently, phage genomes with their corresponding genes are split into training and testing set.
+Similarity between genes from training set are calculated and based on those, clusters of similar genes are produced. 
+From these clusters the binary matrix is created.
+This matrix is later used in analysis as input to machine learning algorithms.
+
+\begin{figure}[h]
+\includegraphics[height=\textheight]{./images/mcl.png}
+\centering
+\caption{Workflow visualization}
+\label{fig:dag}
+\end{figure}
 
 \section{Downloading}
-First rule to complete in our workflow was downloading data from publicly available databases.
-We made this rule easily extensible for new sources of information.
-New database can be added by writing a new download script, 
-naming it \verb|{script_dir}\download_from_{db}.py| and appending this name into variable \verb|DATABASES| in config file. We implemented downloading from 3 sources - NCBI \cite{ncbi}, viralzone \cite{viralzone}, phagesdb  \cite{phagesdb}.
+Since the first step in our pipeline is downloading of data from publicly available databases, we will provide more detailed description of these sources.
+In our pipeline we implemented downloading from three databases.
+Although they cover the most of currently sequenced and published phages, we made this step easily extensible for new sources of information.
+New source can be added by writing a new download script, naming it \verb|{script_dir}\download_from_{db}.py| and appending this name into variable \verb|DATABASES| in Snakefile. 
 
-\subsection{Downloading from NCBI}
-NCBI, National Center for Biotechnology Information, was the largest source of data for our pipeline.
-Their nucleotide database should contain all published genomes.
-Downloading of these genomes from their database is possible through web interface or through API.
-In our script we used python library Biopython \cite{biopython}, which provides python wrapper around NCBI API.
-Besides, Biopython offers useful classes for work with standard file formats used in bioinformatics.
-Downloaded data were stored in four files with extensions genomes.fasta, genomes.conversion, genes.fasta, genes.conversion.
-Fasta files were described in chapter 1.
-Conversion files are tab separated files containing metadata about particular downloaded sequences.
-In file with extension genomes.conversion these metadata are phage identifier in our database, phage identifier in external database, phage name and its hosts.
-In file with extension genes.conversion these metadata are gene identifier in our database, our phage identifier of bacteriophage with this gene, identifier of gene from external database, its position in phage genome and function.
-Reasons for creation of our internal identifiers were inconsistency in naming conventions between different databases.
-Our software downloaded all records in NCBI nucleotide database satisfying query 
-\begin{verbatim}
-'phage[Title] AND (complete genome[Title] 
-OR complete sequence[Title]) AND (viruses[filter] 
-AND biomol_genomic[PROP] AND ("10000"[SLEN] : "100000000"[SLEN]))'
-\end{verbatim}. There was 6704 such records. 
+\subsection{Downloading from GenBank}
+National Center for Biotechnology Information (NCBI) provides an access to GenBank\cite{genbank} database.
+This database is a comprehensive source of genomic data with more than 200 million sequences.
+Sequences are primarily submitted by individuals all around the globe.
+Moreover, GenBank is daily synchronized with European Nucleotide Archive and DNA Data Bank of Japan, which ensures that data are always up-to-date with human knowledge.
+NCBI administer GenBank database free of charge and give researchers the possibility to access data through various interfaces as web-based retrieval services, FTP and Entrez\cite{entrez}.
+Despite of these facts, there are also shortcomings of using GenBank.
+In the time of Next Generation Sequencing the amount of data flowing into GenBank database every day is enormous.
+Therefore it is unreasonable to check all data.
+This is the cause of redundancy of sequences and sometimes contradictions between information in system.
 
-\subsection{Downloading from viralzone}
-Viralzone is a website dedicated to viruses. 
-It provides high quality data about viruses, including bacteriophages.
-We used this website to get query similar to query in previous section.
-This new query was used by the same program as our query.
-There was 2107 records satisfying query from viralzone. (18-03-08)
+In our work, data from GenBank was downloaded through our custom script.
+We obtained data using python library Biopython \cite{biopython}, which implements python wrapper NCBI Entrez.
+Besides, Biopython was also useful for its classes enabling easy manipulation with standard file formats used in bioinformatics.
+When downloading sequences, we also created unique identifiers for each record.
+Those were used later in pipeline.
+Reasons behind the decision to use custom identifiers were ability to remove duplicated sequences and ability to find out possibly multiple sources of each sequence in our dataset.
+Downloading from GenBank was our largest source of data with 6704 downloaded records.
+
+\subsection{Downloading from ViralZone}
+ViralZone is a website dedicated to viruses. 
+It provides highly reliable data about viruses, including bacteriophages.
+Information about structure of capsid and genome, life cycle, replication mechanisms, taxonomy, geographical location and host are included.
+This website does not store sequences internally, rather it delivers links to RefSeq\cite{refseq} database.
+Compared to GenBank, RefSeq database contains fewer sequences, but all of these sequences are curated and manually reviewed.
+
+Our custom script was used to download records from RefSeq database.
+Although, large portion of sequences downloaded was identical with GenBank records, some sequences were unique.
+Another advantage in performing this action was that it enabled us to pair records in our dataset with full information from ViralZone portal.
+By this process we obtained 2107 records. 
+
+% end of session 2018.04.18
+% wc chapter* = 32521 letters
 
 \subsection{Downloading from PhagesDB}
 PhagesDB is an independent database from NCBI. 
@@ -152,6 +167,7 @@ We expected that proteins with similar function will end up in the same cluster.
 This was mostly the case although the information about particular proteins were sparse with a lot of proteins without any information in database.
 For annotation we used software interproscan\cite{interpro}.
 This tool scans given protein sequences against the protein signatures in databases PROSITE, PRINTS, Pfam, ProDom and SMART.
+% is supported by our knowledge of phage biology
 
 \section{Creation of matrix}
 Probably the most important part of our pipeline is binary matrix created from phage records and clusters.
