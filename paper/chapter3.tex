@@ -78,30 +78,52 @@ By this process we obtained 2107 records.
 % wc chapter* = 32521 letters
 
 \subsection{Downloading from PhagesDB}
-PhagesDB is an independent database from NCBI. 
-This database is specialized for Actinobacteriophages, so it has less phage records, but it is designed to avoid the time between sequencing and data availability.
-Authors declare, at the time of their publication, there was more than 600 records of bacteriophages in phagesdb that were not yet in GenBank.
-
-Furthermore, PhagesDB stores more biological relevant data which are easily obtainable through its RESTful Application Programming Interface.
-In our work we used this API to retrieve all genomic sequences with their hosts and annotations.
-Eventually we ended up with 2491 phage records from PhagesDB 
+PhagesDB is a database specialized for bacteriophages infecting bacteria from phylum Actinobacteria.
+This phylum is of great importance, because of its contribution to soil system.
+Phylum also contains genus Mycobacterium, which includes pathogens causing tuberculosis and leprosy in humans.
+The database was designed to avoid the time between sequencing and data availability.
+Authors declare, at the time of their publication, there was more than 600 records of bacteriophages that were not yet in GenBank.
+Furthermore, PhagesDB stores more biologically relevant data which are easily obtainable through its Application Programming Interface (API).
+These biological data contains discovery details, sequencing details, characterization details, sequence file and plaque picture.
+From this database we downloaded 2491 phage records with our automatized script using API.
 
 \section{Merging and removing of duplicated records}
-All download scripts produced four types of output - \verb|<db>.genomes.fasta| \verb|<db>.genomes.conversion| \verb|<db>.genes.fasta| \verb|<db>.genes.conversion|. 
-We were aware of high redundancy in our datasets, mainly because many of these records was submitted to more databases at once.
+We were aware of high redundancy in our datasets, mainly because many of those records was submitted to more databases at once.
 To solve this issue, we merged datasets together and removed duplicated records.
-For merging we used standard unix command \verb|cat| for all files with the same type.
-For removing duplicated we created our python script.
-We looked on all fasta records in merged \verb|genomes.fasta| and if there were more than one with the same sequence, we wrote the one with lesser internal identifier into output fasta file.
-We also changed other internal identifiers in files \verb|genomes.conversion| and \verb|genes.conversion| into this identifier.
-This approach preserves the relationships between one particular sequence and all data related to it.
-Therefore we are able to track phages, based on their internal identifier, to their source databases and also connect them with data already downloaded.
-After duplicate removing our dataset consisted of 6277 phage records.
+For merging we used standard unix command \verb|cat|.
+For removing duplicated sequences we created python script.
+This script made use of custom identifiers, which were assigned to every sequence downloaded.
+If more identical sequences were found their identifiers were rewritten with identifier of the first sequence.
+This approach preserved the relationships between one particular sequence and all data related to it.
+Therefore we were able to track phages, based on their identifiers, to their source databases and also connect them with all data already downloaded.
+After removing of duplicated sequences our dataset contained 6277 phage records.
 
 \section{Gene identification}
-Despite of downloading annotated sequences with genes, we do not use those genes further in out workflow.
-We made this decision because the inconsistency of gene annotations between different databases and different records could be potentially high.
-To ensure predictions will be consistent along the entire dataset, we predicted all genes and their annotations by one software - Prokka.
+Next step in the pipeline was to identify genes in the dataset.
+Although gene annotations of particular genomes can be found in most databases, we decided to annotate sequences from scratch.
+This decision was based on our request for consistency of predicted and annotated genes.
+Another advantage of annotating from scratch is that annotations will always be up-to-date with current human knowledge.
+
+\subsection{Prokka}
+For the purpose of gene identification we used third party software Prokka\cite{prokka}.
+Prokka uses external tools for identification and annotation of genes.
+First, coordinates of coding DNA sequences (CDS) are found with Prodigal tool\cite{prodigal}.
+CDSs are regions of genome that almost always start with AUG codon and end with stop codon.
+These regions can be directly translated into amino acid chains using standard codon table.
+After locations of genes were predicted, Prokka starts to annotate functions of all CDSs.
+This is usually done through comparing of sequence to database of sequences with experimentally determined function.
+The function of protein with the best match is than assigned to new CDS.
+Prokka also uses this approach, but it searches through multiple databases.
+Starting with the most reliable source, which is usually the smallest, it scans all the databases, always continuing with the less accurate one.
+The databases used with their corresponding order as as follows:
+An optional user-defined database,
+UniProt\cite{uniprot},
+RefSeq\cite{refseq},
+Pfam\cite{pfam} and TIGRFAM\cite{tigrfam}.
+
+% end of session 2018.04.12
+% wc chapter* = 33657 letters
+
 In addition, this software uses regularly updated databases, which guarantee the most up-to-date annotations.
 After annotation we extracted all genes with our script.
 The output of this program were files \verb|annotated.genes.fasta| and \verb|annotated.genes.conversion| which were further used in pipeline.
