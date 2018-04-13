@@ -116,33 +116,89 @@ The function of protein with the best match is than assigned to new CDS.
 Prokka also uses this approach, but it searches through multiple databases.
 Starting with the most reliable source, which is usually the smallest, it scans all the databases, always continuing with the less accurate one.
 The databases used with their corresponding order as as follows:
-An optional user-defined database,
-UniProt\cite{uniprot},
-RefSeq\cite{refseq},
-Pfam\cite{pfam} and TIGRFAM\cite{tigrfam}.
+An optional user-defined database, UniProt\cite{uniprot}, RefSeq\cite{refseq}, Pfam\cite{pfam} and TIGRFAM\cite{tigrfam}.
+If no match is found across databases, protein is labelled as \verb|hypothetical protein|. 
 
 % end of session 2018.04.12
 % wc chapter* = 33657 letters
 
-In addition, this software uses regularly updated databases, which guarantee the most up-to-date annotations.
-After annotation we extracted all genes with our script.
-The output of this program were files \verb|annotated.genes.fasta| and \verb|annotated.genes.conversion| which were further used in pipeline.
+\subsubsection{UniProt}
+The UniProt database is a huge collection of protein sequences and their corresponding detailed information.
+It contains more than 60 millions of proteins.
+Prokka uses just a small fraction of proteins backed up by experimental evidences.
+This typically provide information about around 50\% of queried proteins.
 
-\section{Splitting to training set and testing set}
-In order to properly evaluate our final models, we divided whole dataset into training set and testing set.
-First we find out how many bacteriophages for every group of hosts we have. 
-Names of this groups were abreviations of host names.
-Reason to use abreviations as group names is that we wanted bring together phages with similar hosts in one group.
-We also needed to deal with typos and different formats of the same host.
-We selected first 8 groups with the highest counts of records.
-These were mycobac, strepto, escheri, gordoni, arthrob, pseudom, lactoco and staphyl with counts 1619, 354, 323, 293, 240, 236, 219, 184 respectively.
-All other groups were excluded from our dataset due to insufficient amount of samples.
-Furthermore we excluded all phages without the information about their hosts.
-This new purified dataset was divided into training set and testing set at a ratio 4:1.
-At the end of this step the training set consisted of 2787 records of bacteriophages and the testing set consisted of 699 records.
+\subsubsection{RefSeq}
+RefSeq, in addition to genomic sequences, provides also information about protein sequences.
+It contains more than 2.5 millions of protein records.
+Multiple sources are integrated in annotation of genes.
+Furthermore, all records are curated by NCBI staff members.
 
-\section{Alignments}
-\section{Local alignment of genes}
+\subsubsection{Pfam}
+Pfam is a database consisting of protein families and domain records.
+Protein families are groups of protein sharing evolutionary history.
+This shared evolutionary history is often expressed by closely related functions and sequence similarity.
+Protein domains are parts of protein sequence responsible for a particular interaction.
+Members of the same protein domain usually share high sequence similarity.
+Protein families and domains are mostly characterized by Profile Hidden Markov Models.
+Pfam incorporate more than 6100 of those models.
+
+\subsubsection{TIGRFAM}
+TIGRFAM, similarly as Pfam, contains protein families characterized by Profile Hidden Markov Models.
+It contains more than 4200 models with comprehensive description of family structure and function.
+
+\vspace{\baselineskip}
+
+All of the aforementioned databases are regularly updated, which guarantee the most up-to-data annotations. 
+After annotation, resulting genes were selected and saved to files in format suitable for further use in the pipeline.
+
+\section{Training set, testing set and other}
+At the beginning of this step our dataset consisted of phage genomic records, their corresponding genes, information about phage hosts and functional annotation of genes.
+As our work used techniques of supervised machine learning, we needed to split the dataset to training set and testing set.
+Furthermore, we created set for other records, which we decided not to use due to missing information about host or due to host outside of our group of interest.
+We decided to group phages according to genus of their hosts.
+After calculating number of phages in each group, we selected first eight genera with the highest count of records as groups of our interest.
+These were Mycobacterium, Streptococcus, Escherichia, Gordonia, Arthrobacter, Pseudomonas, Lactococcus and Staphylococcus. 
+Number of phages within each group can be found in the Table (\ref{tab:counts}).
+All other genera were excluded from the dataset due to insufficient amount of samples.
+Phages without information about their hosts were also excluded.
+Subsequently, we divided remaining data into training set and testing set at a ratio 4:1.
+Resulting training set included 2787 records of bacteriophages and resulting testing set included 699 records. 
+
+\begin{table}
+  \centering
+    \begin{tabular}{ l  r  l  r }
+      \hline
+      genera & count & genera & count \\
+      \hline
+      Mycobacterium & 1619 & Streptococcus & 354 \\
+      Escherichia & 323 & Gordonia & 293 \\
+      Arthrobacter & 240 & Pseudomonas & 236 \\
+      Lactococcus & 219 & Staphylococcus & 184 \\
+      \hline
+    \end{tabular}
+    \caption{Counts of records within genera}
+    \label{tab:counts}
+\end{table}
+
+%-------------------------------------------------------------------------------
+%--------this part will be deeply described-------------------------------------
+%-------------------------------------------------------------------------------
+
+\section{Sequence alignment}
+% 3-5 pages = 5400-9000 characters
+% motivation
+We would like to dedicate this section to alignment of sequences as it is one of the most essential task in bioinformatics.
+We will describe its use, we will exactly define problem which we want to solve, we will describe algorithms commonly used and we will describe how we used them in our pipeline. 
+
+\subsection{Uses of sequence alignment}
+
+\subsection{Definition of problem}
+\subsubsection{Scoring matrix}
+\subsection{Global alignment}
+\subsection{Local alignment}
+\subsection{Blast}
+\subsection{Local alignment in our pipeline}
 After dataset splitting we performed local alignment of the genes in training set against themselves.
 Thanks to this step we were able to quantify similarities between different genes, which we needed further in pipeline at clustering step.
 The standard bioinformatics tool for this purpose is BLAST \cite{blast}. 
@@ -153,7 +209,14 @@ With CrocoBLAST we were able to reduce time of this local alignment step from fo
 Resulting file was in tab separated format, where first column was gene identifier of query sequence, second column was gene identifier of the target sequence and third column was e-value of alignment. 
 E-value is evaluation measure of how similar two sequences are.
 
-\section{Clustering}
+%-------------------------------------------------------------------------------
+
+\section{Data clustering}
+% 2-4pages = 3600-7200 characters
+\subsection{Definition of problem}
+\subsection{Markov Cluster Algorithm}
+\subsection{Spectral clustering}
+\subsection{Clustering in our pipeline}
 Clustering is a problem where we want to determine closely related entities and put them in distinct groups, also called clusters.
 In order to be able to distinguish which entity is more closely related to another, we usually use similarity matrix.
 To create a similarity matrix we used tab separated file described in previous section.
@@ -182,6 +245,10 @@ Spectral clustering is different algorithm used for clustering.
 In this work we tried SCPS implementation\cite{scps}.
 Authors of this bioinformatics software declare quality of clusters quantified by a measure that combines sensitivity and specificity to be better by 28\% in comparison to mcl algorithm.
 Unfortunately, memory required by this program was too high and we were not able to run it on our server with all input data. 
+
+%-------------------------------------------------------------------------------
+%--------end of deeply described parts--------------------------------------
+%-------------------------------------------------------------------------------
 
 \section{Cluster annotation}
 Created clusters were further annotated to examine their functions.
