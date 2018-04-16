@@ -181,96 +181,26 @@ Resulting training set included 2787 records of bacteriophages and resulting tes
     \label{tab:counts}
 \end{table}
 
-%-------------------------------------------------------------------------------
-%--------this part will be deeply described-------------------------------------
-%-------------------------------------------------------------------------------
-
-\section{Sequence alignment}
-% 3-5 pages = 5400-9000 characters
-% motivation
-We would like to dedicate this section to alignment of sequences as it is one of the most essential task in bioinformatics.
-We will describe its use, we will exactly define problem which we want to solve, we will describe algorithms commonly used and we will describe how we used them in our pipeline. 
-
-\subsection{Uses of sequence alignment}
-
-\subsection{Definition of problem}
-\subsubsection{Scoring matrix}
-\subsection{Global alignment}
-\subsection{Local alignment}
-\subsection{Blast}
-\subsection{Local alignment in our pipeline}
-After dataset splitting we performed local alignment of the genes in training set against themselves.
-Thanks to this step we were able to quantify similarities between different genes, which we needed further in pipeline at clustering step.
-The standard bioinformatics tool for this purpose is BLAST \cite{blast}. 
-The basic algorithm consists of searching seeds from database on the query sequence and then extending those seeds into neighbouring bases.
-This approach provides orders of magnitude faster alignment method than classical Smith-Waterman algorithm \cite{smith_waterman} with comparable sensitivity.
-In our pipeline we used software CrocoBLAST \cite{crocoblast}, what is a wrapper around BLAST algorithm which make better use of paralellization than standard BLAST maintained by NCBI.
-With CrocoBLAST we were able to reduce time of this local alignment step from four days to one day as opposed to BLAST.
-Resulting file was in tab separated format, where first column was gene identifier of query sequence, second column was gene identifier of the target sequence and third column was e-value of alignment. 
-E-value is evaluation measure of how similar two sequences are.
-
-%-------------------------------------------------------------------------------
-
-\section{Data clustering}
-% 2-4pages = 3600-7200 characters
-\subsection{Definition of problem}
-\subsection{Markov Cluster Algorithm}
-\subsection{Spectral clustering}
-\subsection{Clustering in our pipeline}
-Clustering is a problem where we want to determine closely related entities and put them in distinct groups, also called clusters.
-In order to be able to distinguish which entity is more closely related to another, we usually use similarity matrix.
-To create a similarity matrix we used tab separated file described in previous section.
-In this section we will mention different approaches we used for clustering. 
-% http://www.paccanarolab.org/scps/
-\subsection{Markov Cluster Algorithm}
-First approach we used was Markov Cluster Algorithm. 
-We used already implemented version called mcl \cite{mcl}.
-This software is often used in bioinformatics for clustering of sequences based on their similarity.
-It has the capability to determine number of resulting clusters automatically and except input data, it requires only one parameter.
-This parameter is called inflation and usually takes float number values from 1.2 to 5.0.
-Smaller values results in less and bigger clusters.
-In our work we needed as few clusters as possible, mainly due to number of phage records in our dataset.
-In case of too many clusters we would have too many features for classifier and we would risk overfitting of our final models to training dataset.
-For these reasons we used inflation value 1.2, which created 15017 clusters.
-
-\subsection{Markov Cluster Algorithm with global alignment}
-To get more accurate clustering we tried different approach, where we determined similarity score of alignments with needleman-wunsch algorithm. \cite{needleman-wunsch}
-This algorithm is able to calculate best global alignment score of given protein sequences.
-The difference between global alignment and local alignment is that former aligns sequences from end to end.
-The resulting score was then used as input to mcl algorithm described in previous section.
-By this approach we created 9176 final clusters.
-
-\subsection{Spectral clustering}
-Spectral clustering is different algorithm used for clustering.
-In this work we tried SCPS implementation\cite{scps}.
-Authors of this bioinformatics software declare quality of clusters quantified by a measure that combines sensitivity and specificity to be better by 28\% in comparison to mcl algorithm.
-Unfortunately, memory required by this program was too high and we were not able to run it on our server with all input data. 
-
-%-------------------------------------------------------------------------------
-%--------end of deeply described parts--------------------------------------
-%-------------------------------------------------------------------------------
+%--------deeply described parts-------------------------------------------------
+\input{section3.6.tex}
+\input{section3.7.tex}
+%--------end of deeply described parts------------------------------------------
 
 \section{Cluster annotation}
-Created clusters were further annotated to examine their functions.
-We expected that proteins with similar function will end up in the same cluster. 
-This was mostly the case although the information about particular proteins were sparse with a lot of proteins without any information in database.
-For annotation we used software interproscan\cite{interpro}.
-This tool scans given protein sequences against the protein signatures in databases PROSITE, PRINTS, Pfam, ProDom and SMART.
-% is supported by our knowledge of phage biology
+Resulting clusters were annotated for their function.
+We expected proteins with similar function to be included in same cluster.
+For functional annotation of particular proteins we used software InterProScan\cite{interpro}.
+This tool scans given protein sequences against the protein signatures in databases PROSITE\cite{prosite}, PRINTS\cite{prints}, Pfam\cite{pfam}, ProDom\cite{prodom} and SMART\cite{smart}.
+After acquiring of annotations for all proteins in particular cluster, we calculated number of occurrences of each protein function.
+These statistics represents our annotation of certain cluster.
+Our expectation of clusters containing proteins with similar function was met in most cases, although the information about particular proteins were sparse with a lot of proteins without any information.
+Therefore, reasonable clustering was achieved and is supported by our knowledge of phage biology.
 
 \section{Creation of matrix}
-Probably the most important part of our pipeline is binary matrix created from phage records and clusters.
-For the purpose of matrix creation we wrote our own script.
-This script takes as input tree files - \verb|annotated.genes.conversion|, \verb|genes.clstr| and \verb|genomes.list|.
-The first file is needed in order to know which phage contains which particular gene.
-The second file is file containing gene clusters in tab separated format where each line represents one cluster.
-The last file is just a list of all phages which should be included in matrix.
-This script is also parallelized to enable use of multiple computational nodes.
-We created raw matrix with 2787 rows representing phage records and 15017 columns represented gene clusters.
-This matrix was further reduced with feature selection method Variance Threshold.
-During this process we removed all columns with ones or zeroes in more than 99\%.
-The removed columns have a high potential to be non-functional proteins which created its own clusters.
-After feature selection our matrix contained 2787 phage records and 1818 distinct gene clusters.
-This matrix was used as input to machine learning algorithms. 
+One of the most crucial part of our analysis was binary matrix created in this step.
+Rows in this matrix represented particular phage record and columns represented particular protein cluster.
+The entry $a_{i,j}$ in matrix was filled with $1$ if phage $i$ contained gene from cluster $j$ and $0$ otherwise.
+Custom python script and files produced in previous steps were used for this task.
+Resulting matrix contained 2787 rows and 15017 columns and served as a main input file for machine learning algorithms.
 
 
