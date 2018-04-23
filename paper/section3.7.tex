@@ -1,0 +1,38 @@
+\section{Data clustering}
+% 2-4pages = 3600-7200 characters
+\subsection{Definition of problem}
+\subsection{Markov Cluster Algorithm}
+\subsection{Spectral clustering}
+\subsection{Clustering in our pipeline}
+Clustering is a problem where we want to determine closely related entities and put them in distinct groups, also called clusters.
+In order to be able to distinguish which entity is more closely related to another, we usually use similarity matrix.
+To create a similarity matrix we used tab separated file described in previous section.
+In this section we will mention different approaches we used for clustering. 
+% http://www.paccanarolab.org/scps/
+\subsection{Markov Cluster Algorithm}
+First approach we used was Markov Cluster Algorithm. 
+We used already implemented version called mcl \cite{mcl}.
+This software is often used in bioinformatics for clustering of sequences based on their similarity.
+It has the capability to determine number of resulting clusters automatically and except input data, it requires only one parameter.
+This parameter is called inflation and usually takes float number values from 1.2 to 5.0.
+Smaller values results in less and bigger clusters.
+In our work we needed as few clusters as possible, mainly due to number of phage records in our dataset.
+In case of too many clusters we would have too many features for classifier and we would risk overfitting of our final models to training dataset.
+For these reasons we used inflation value 1.2, which created 15017 clusters.
+
+\subsection{Markov Cluster Algorithm with global alignment}
+To get more accurate clustering we tried different approach, where we determined similarity score of alignments with needleman-wunsch algorithm. \cite{needleman-wunsch}
+This algorithm is able to calculate best global alignment score of given protein sequences.
+The difference between global alignment and local alignment is that former aligns sequences from end to end.
+The resulting score was then used as input to mcl algorithm described in previous section.
+By this approach we created 9176 final clusters.
+
+\subsection{Spectral clustering}
+Spectral clustering is different algorithm used for clustering.
+In this work we tried SCPS implementation\cite{scps}.
+Authors of this bioinformatics software declare quality of clusters quantified by a measure that combines sensitivity and specificity to be better by 28\% in comparison to mcl algorithm.
+Unfortunately, memory required by this program was too high and we were not able to run it on our server with all input data. 
+
+%-------------------------------------------------------------------------------
+%--------end of deeply described parts--------------------------------------
+%-------------------------------------------------------------------------------
