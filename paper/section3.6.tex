@@ -2,11 +2,10 @@
 In this section we would like to deeply explain what is sequence alignment as it is one of the most essential task in bioinformatics.
 Because of its usage in some form in almost all task related to biological sequences, we will describe possibilities of its application.
 As there are two main types of sequence alignment, we will describe both of them with emphasizing the differences.
-We will also go through the basic algorithm used for solving these problems.
+We will also explain the basic algorithms used for solving these problems and we will also describe heuristic method used in cases, when the input is too big to be computable by standard approaches.
 At the end of this section we will describe, how we used them in our analysis.
 
 \subsection{Global alignment}
-
 \subsubsection{Usage}
 Global alignment is commonly used from comparison between sequences from their beginning to their end.
 This comparison can help us to discover mutations in sequence, which cause certain phenotype or to determine highly conserved regions with a potential to carry a gene.
@@ -136,7 +135,8 @@ After completing the table, we need to find the highest number in it.
 This is resulting score of our local alignment.
 Following the path similarly as in global alignment we can reconstruct the alignment.
 The space and time complexity of this algorithm is also $\mathcal{O}(nm)$.
- 
+
+% TODO: poriadne prerobit
 \subsection{Word methods}
 Although Needleman-Wunsch and Smith-Waterman algorithms are sufficient for simple comparisons of sequences, their time complexity is not good enough when we want to search through big data.
 It is often the case, that we want to find the most similar sequence to ours in enormous bioinformatics database containing several completed genomes.
@@ -145,18 +145,39 @@ For this purpose various heuristic algorithms were developed.
 These algorithms do not guarantee finding the most optimal solution, but are orders of magnitude faster and therefore usable also for searching in vast databases.
   
 \subsubsection{BLAST}
-Basic Local Alignment Search Tool (BLAST) is probably the most widely used tool in bioinformatics.
-% end of session 23.04.2018  
+%The basic algorithm consists of searching seeds from database on the query sequence and then extending those seeds into neighbouring bases.
+%This approach provides orders of magnitude faster alignment method than classical Smith-Waterman algorithm \cite{smith_waterman} with comparable sensitivity.
+Basic Local Alignment Search Tool (BLAST) \cite{blast} is probably the most widely used tool in bioinformatics.
+It was developed in 1990 by Stephen Altschul et al. at the National Institutes of Health.
+The algorithm distinguishes between target sequences and query sequences.
+Target sequences are sequences from which we create database of all included k-mers.
+For every k-mer in every sequence we save its position.
+For example, for sequence GATCGATAG and given $k=3$ we create database as follows:
+\begin{verbatim}
+GAT = 1, 5
+ATC = 2
+TCG = 3
+CGA = 4
+ATA = 6
+TAG = 7
+\end{verbatim}
+Next, we find every k-mer from query sequence in the database.
+The matching k-mers are called cores of alignment and serves as starting points for extending of alignment.
+The extending is performed in a similar manner to that of Smith-Waterman algorithm.
+The difference is that we do not need to search through the whole matrix, but we search for good alignments just in the immediate surrounding of cores.
+Firstly, we extend cores without the possibility to insert any gaps into alignment.
+Secondly, we can join these extended cores together using also gaps, if the resulting score will be bigger than before joining. 
  
 \subsubsection{E-value}
+E-value is used to assess the relevancy of resulting alignment.
+It can be interpreted as how many alignments in database could reach the same score or better purely by chance.
+This means, the closer the E-value is to zero, the higher level of significance can be assumed.
+E-value is automatically produced by BLAST. 
 
 \subsection{Alignment in the pipeline}
-After dataset splitting we performed local alignment of the genes in training set against themselves.
-Thanks to this step we were able to quantify similarities between different genes, which we needed further in pipeline at clustering step.
-The standard bioinformatics tool for this purpose is BLAST \cite{blast}. 
-The basic algorithm consists of searching seeds from database on the query sequence and then extending those seeds into neighbouring bases.
-This approach provides orders of magnitude faster alignment method than classical Smith-Waterman algorithm \cite{smith_waterman} with comparable sensitivity.
-In our pipeline we used software CrocoBLAST \cite{crocoblast}, what is a wrapper around BLAST algorithm which make better use of paralellization than standard BLAST maintained by NCBI.
-With CrocoBLAST we were able to reduce time of this local alignment step from four days to one day as opposed to BLAST.
+In our pipeline, we used alignment to find similarity scores between genes in the training set.
+We needed these scores later in pipeline at clustering step.
+Software CrocoBLAST was used for this purpose.
+CrocoBLAST is a wrapper around BLAST algorithm which make better use of paralellization than standard BLAST maintained by NCBI.
+With this software we were able to reduce time needed for alignment step from around four days to one day. 
 Resulting file was in tab separated format, where first column was gene identifier of query sequence, second column was gene identifier of the target sequence and third column was e-value of alignment. 
-E-value is evaluation measure of how similar two sequences are.
