@@ -1,34 +1,34 @@
 \chapter{Data retrieval and preprocessing}
 In this chapter we will present parts of our pipeline intended for data retrieval and preprocessing.
-Since we used a considerable amount of third party libraries and tools, we will explain them in detail and we will clarify our reasons to use them.
-We will also provide some basic statistics of data retrieved.
+Since we used a considerable amount of third party libraries and tools, we will explain them in detail and we will clarify our reasons for using them.
+We will also provide some basic statistics of the data retrieved.
 
 \section{Pipeline overview}
-Our pipeline consists of python scripts and third party bioinformatics software.
+Our pipeline consists of python scripts and third-party bioinformatics software.
 When writing the code, we have taken care of its readability, sustainability and extensibility.
 
 As the main script we used Snakefile written in Snakemake.
 The Snakemake is a workflow management system designed for writing reproducible bioinformatics pipelines.
-It is inspired by GNU make, but it use python-like syntax with elements similar to pseudo code.
+It is inspired by GNU make, but it uses python-like syntax with elements similar to pseudo code.
 Furthermore, it is fully portable, with dependency only on python.
 Snakefile consists of rules, where each rule is defined by its input files, output files and shell commands.
 These are commands needed to execute in order to produce output files from input files.
-When the Snakemake is executed, by default, it runs first rule in particular Snakefile. 
-If the rule cannot be completed, because of missing input files, it scan through the whole Snakefile and look for a rule, which is capable of creating desired file. 
-This process is repeated until there is rule which can be completed or rule whose input is not possible to create by any other rule.
+When the Snakemake is executed, by default, it runs first rule in particular Snakefile.
+If the rule cannot be completed, because of missing input files, it scans through the whole Snakefile and looks for a rule that is capable of creating the desired file.
+This process is repeated until there is a rule which can be completed or until there is a rule whose input is not possible to create by any other rule.
 In the former case the execution starts running, in the latter case an error message is displayed.
-By this approach it is ensured we do not run any unnecessary rules and already completed rules.
-This is an important feature for our program as some rules can take several hours to complete even on a powerful server. 
-Another pleasant characteristics of the Snakemake engine is the ability to produce graphical visualisation of particular Snakefile in format of directed acyclic graph.
+By this approach it is ensured that we do not run any unnecessary rules nor any rules that have been already completed.
+This is an important feature for our program as some rules can take several hours to complete, even when we use a powerful server.
+Another useful characteristic of the Snakemake engine is the ability to produce graphical visualization of particular Snakefile in format of directed acyclic graph.
 Simplified graphical representation of our pipeline is in the Figure (\ref{fig:dag}).
 
 The pipeline starts with downloading of publicly available data.
-After downloading we merge all records and eliminate duplicated records.
-Later on, we predict bacteriophages genes.
-Consequently, phage genomes with their corresponding genes are split into training and testing set.
-Similarity between genes from training set are calculated and based on those, clusters of similar genes are produced. 
-From these clusters the binary matrix is created.
-This matrix is later used in analysis as input to machine learning algorithms.
+After downloading, we merge all records and eliminate duplicated records.
+Next, we predict the genes of the bacteriophages.
+Consequently, phage genomes with their corresponding genes are split into a training and a testing set.
+Similarity between the genes from the training set are calculated and based on those, clusters of similar genes are produced.
+From these clusters, the binary matrix is created.
+This matrix is later used in analysis as an input to machine learning algorithms.
 
 \begin{figure}[h]
 \includegraphics[height=\textheight]{./images/mcl.png}
@@ -38,64 +38,64 @@ This matrix is later used in analysis as input to machine learning algorithms.
 \end{figure}
 
 \section{Downloading}
-Since the first step in our pipeline is downloading of data from publicly available databases, we will provide more detailed description of these sources.
+Since the first step in our pipeline is downloading of data from publicly available databases, we will provide a more detailed description of these sources.
 In our pipeline we implemented downloading from three databases.
-Although they cover the most of currently sequenced and published phages, we made this step easily extensible for new sources of information.
-New source can be added by writing a new download script, naming it \verb|{script_dir}\download_from_{db}.py| and appending this name into variable \verb|DATABASES| in Snakefile. 
+Although they cover the majority of currently sequenced and published phages, we made this step easily extensible for adding new sources of information in the future.
+New sources can be added by writing a new download script, naming it \verb|{script_dir}\download_from_{db}.py| and appending this name into a variable \verb|DATABASES| in Snakefile.
 
 \subsection{Downloading from GenBank}
 National Center for Biotechnology Information (NCBI) provides an access to GenBank\cite{genbank} database.
 This database is a comprehensive source of genomic data with more than 200 million sequences.
-Sequences are primarily submitted by individuals all around the globe.
+Sequences are primarily submitted by individuals from all around the globe.
 Moreover, GenBank is daily synchronized with European Nucleotide Archive and DNA Data Bank of Japan, which ensures that data are always up-to-date with human knowledge.
-NCBI administer GenBank database free of charge and give researchers the possibility to access data through various interfaces as web-based retrieval services, FTP and Entrez\cite{entrez}.
-Despite of these facts, there are also shortcomings of using GenBank.
+NCBI administers the GenBank database free of charge and give researchers the possibility to access data through various interfaces as web-based retrieval services, FTP and Entrez\cite{entrez}.
+Despite of these facts, there are shortcomings of using GenBank.
 In the time of Next Generation Sequencing the amount of data flowing into GenBank database every day is enormous.
-Therefore it is unreasonable to check all data.
-This is the cause of redundancy of sequences and sometimes contradictions between information in system.
+Therefore, it is unreasonable to check all the data.
+This causes redundancy of sequences and sometimes it even creates contradictions between information in system.
 
 In our work, data from GenBank was downloaded through our custom script.
 We obtained data using python library Biopython \cite{biopython}, which implements python wrapper NCBI Entrez.
-Besides, Biopython was also useful for its classes enabling easy manipulation with standard file formats used in bioinformatics.
+Besides that, Biopython was also useful for its classes enabling easy manipulation with standard file formats used in bioinformatics.
 When downloading sequences, we also created unique identifiers for each record.
-Those were used later in pipeline.
-Reasons behind the decision to use custom identifiers were ability to remove duplicated sequences and ability to find out possibly multiple sources of each sequence in our dataset.
+Those were used later in the pipeline.
+Reasons behind the decision to use custom identifiers was the ability to remove duplicated sequences and the possibility to find out multiple sources of each sequence in our dataset.
 Downloading from GenBank was our largest source of data with 6704 downloaded records.
 
 \subsection{Downloading from ViralZone}
-ViralZone is a website dedicated to viruses. 
+ViralZone is a website dedicated to viruses.
 It provides highly reliable data about viruses, including bacteriophages.
-Information about structure of capsid and genome, life cycle, replication mechanisms, taxonomy, geographical location and host are included.
+Information about the structure of a capsid, a genome, life cycle, replication mechanisms, taxonomy, geographical location and host are included.
 This website does not store sequences internally, rather it delivers links to RefSeq\cite{refseq} database.
 Compared to GenBank, RefSeq database contains fewer sequences, but all of these sequences are curated and manually reviewed.
 
 Our custom script was used to download records from RefSeq database.
 Although, large portion of sequences downloaded was identical with GenBank records, some sequences were unique.
 Another advantage in performing this action was that it enabled us to pair records in our dataset with full information from ViralZone portal.
-By this process we obtained 2107 records. 
+By performing this process, we obtained 2107 records.
 
 % end of session 2018.04.18
 % wc chapter* = 32521 letters
 
 \subsection{Downloading from PhagesDB}
-PhagesDB is a database specialized for bacteriophages infecting bacteria from phylum Actinobacteria.
-This phylum is of great importance, because of its contribution to soil system.
-Phylum also contains genus Mycobacterium, which includes pathogens causing tuberculosis and leprosy in humans.
+PhagesDB is a database specialized in bacteriophages infecting bacteria from phylum Actinobacteria.
+This phylum is of great importance, because of its contribution to the soil system.
+This phylum also contains the genus Mycobacterium, which includes pathogens causing tuberculosis and leprosy in humans.
 The database was designed to avoid the time between sequencing and data availability.
 Authors declare, at the time of their publication, there was more than 600 records of bacteriophages that were not yet in GenBank.
 Furthermore, PhagesDB stores more biologically relevant data which are easily obtainable through its Application Programming Interface (API).
-These biological data contains discovery details, sequencing details, characterization details, sequence file and plaque picture.
-From this database we downloaded 2491 phage records with our automatized script using API.
+This biological data contains discovery details, sequencing details, characterization details, sequence file and a plaque picture.
+From this database we downloaded 2491 phage records with our automatized script using the API.
 
 \section{Merging and removing of duplicated records}
-We were aware of high redundancy in our datasets, mainly because many of those records was submitted to more databases at once.
+We were aware of high redundancy in our datasets, mainly because many of those records were submitted to more databases at once.
 To solve this issue, we merged datasets together and removed duplicated records.
-For merging we used standard unix command \verb|cat|.
-For removing duplicated sequences we created python script.
-This script made use of custom identifiers, which were assigned to every sequence downloaded.
-If more identical sequences were found their identifiers were rewritten with identifier of the first sequence.
+For merging we used the standard unix command \verb|cat|.
+For removing duplicated sequences, we created a python script.
+This script made use of custom identifiers, which were assigned to every sequence that was downloaded.
+In case more identical sequences were found, their identifiers were rewritten with the identifier of the first sequence.
 This approach preserved the relationships between one particular sequence and all data related to it.
-Therefore we were able to track phages, based on their identifiers, to their source databases and also connect them with all data already downloaded.
+Thus, we were able to track phages, based on their identifiers, to their source databases and also connect them with all data that was already downloaded.
 After removing of duplicated sequences our dataset contained 6277 phage records.
 
 \section{Gene identification}
@@ -105,43 +105,43 @@ This decision was based on our request for consistency of predicted and annotate
 Another advantage of annotating from scratch is that annotations will always be up-to-date with current human knowledge.
 
 \subsection{Prokka}
-For the purpose of gene identification we used third party software Prokka\cite{prokka}.
+For the purpose of gene identification, we used third party software Prokka\cite{prokka}.
 Prokka uses external tools for identification and annotation of genes.
 First, coordinates of coding DNA sequences (CDS) are found with Prodigal tool\cite{prodigal}.
-CDSs are regions of genome that almost always start with AUG codon and end with stop codon.
+CDSs are regions of genome that almost always start with AUG codon and end with a stop codon.
 These regions can be directly translated into amino acid chains using standard codon table.
-After locations of genes were predicted, Prokka starts to annotate functions of all CDSs.
-This is usually done through comparing of sequence to database of sequences with experimentally determined function.
-The function of protein with the best match is than assigned to new CDS.
-Prokka also uses this approach, but it searches through multiple databases.
+After the locations of genes are predicted, Prokka can start to annotate functions of all CDSs.
+This is usually done through comparing of a sequence to a database of sequences with an experimentally determined function.
+The function of protein with the best match is then assigned to the new CDS.
+Prokka, by using this approach searches through multiple databases.
 Starting with the most reliable source, which is usually the smallest, it scans all the databases, always continuing with the less accurate one.
-The databases used with their corresponding order as as follows:
+The databases used with their corresponding order are as follows:
 An optional user-defined database, UniProt\cite{uniprot}, RefSeq\cite{refseq}, Pfam\cite{pfam} and TIGRFAM\cite{tigrfam}.
-If no match is found across databases, protein is labelled as \verb|hypothetical protein|. 
+If no match is found across databases, protein is labelled as \verb|hypothetical protein|.
 
 % end of session 2018.04.12
 % wc chapter* = 33657 letters
 
 \subsubsection{UniProt}
 The UniProt database is a huge collection of protein sequences and their corresponding detailed information.
-It contains more than 60 millions of proteins.
+It contains more than 60 million proteins.
 Prokka uses just a small fraction of proteins backed up by experimental evidences.
-This typically provide information about around 50\% of queried proteins.
+This typically provides information about approximately 50\% of queried proteins.
 
 \subsubsection{RefSeq}
-RefSeq, in addition to genomic sequences, provides also information about protein sequences.
-It contains more than 2.5 millions of protein records.
+RefSeq, in addition to genomic sequences, also provides information about protein sequences.
+It contains more than 2.5 million protein records.
 Multiple sources are integrated in annotation of genes.
-Furthermore, all records are curated by NCBI staff members.
+Furthermore, all records are curated by the NCBI staff members.
 
 \subsubsection{Pfam}
 Pfam is a database consisting of protein families and domain records.
 Protein families are groups of protein sharing evolutionary history.
 This shared evolutionary history is often expressed by closely related functions and sequence similarity.
-Protein domains are parts of protein sequence responsible for a particular interaction.
-Members of the same protein domain usually share high sequence similarity.
+Protein domains are parts of a protein sequence responsible for a particular interaction. 
+Members of the same protein domain usually share a high sequence similarity.
 Protein families and domains are mostly characterized by Profile Hidden Markov Models.
-Pfam incorporate more than 6100 of those models.
+Pfam incorporates more than 6100 of those models.
 
 \subsubsection{TIGRFAM}
 TIGRFAM, similarly as Pfam, contains protein families characterized by Profile Hidden Markov Models.
@@ -149,36 +149,36 @@ It contains more than 4200 models with comprehensive description of family struc
 
 \vspace{\baselineskip}
 
-All of the aforementioned databases are regularly updated, which guarantee the most up-to-data annotations. 
+All of the aforementioned databases are regularly updated, which guarantees the most up-to-data annotations.
 After annotation, resulting genes were selected and saved to files in format suitable for further use in the pipeline.
 
 \section{Training set, testing set and other}
-At the beginning of this step our dataset consisted of phage genomic records, their corresponding genes, information about phage hosts and functional annotation of genes.
-As our work used techniques of supervised machine learning, we needed to split the dataset to training set and testing set.
+At the beginning of this step, our dataset consisted of: phage genomic records, their corresponding genes, information about phage hosts and functional annotation of genes.
+As our work used techniques of supervised machine learning, we needed to split the dataset to a training set and a testing set.
 Furthermore, we created set for other records, which we decided not to use due to missing information about host or due to host outside of our group of interest.
-We decided to group phages according to genus of their hosts.
-After calculating number of phages in each group, we selected first eight genera with the highest count of records as groups of our interest.
-These were Mycobacterium, Streptococcus, Escherichia, Gordonia, Arthrobacter, Pseudomonas, Lactococcus and Staphylococcus. 
+We decided to group phages according to the genus of their hosts.
+After calculating the number of phages in each group, we selected first eight genera with the highest count of records as groups of our interest.
+These were Mycobacterium, Streptococcus, Escherichia, Gordonia, Arthrobacter, Pseudomonas, Lactococcus and Staphylococcus.
 Number of phages within each group can be found in the Table (\ref{tab:counts}).
-All other genera were excluded from the dataset due to insufficient amount of samples.
+All other genera were excluded from the dataset due to the insufficient number of samples.
 Phages without information about their hosts were also excluded.
-Subsequently, we divided remaining data into training set and testing set at a ratio 4:1.
-Resulting training set included 2787 records of bacteriophages and resulting testing set included 699 records. 
+Subsequently, we divided remaining data into a training set and a testing set at a ratio of 4:1.
+The resulting training set included 2787 records of bacteriophages and resulting testing set included 699 records.
 
 \begin{table}
   \centering
-    \begin{tabular}{ l  r  l  r }
-      \hline
-      genera & count & genera & count \\
-      \hline
-      Mycobacterium & 1619 & Streptococcus & 354 \\
-      Escherichia & 323 & Gordonia & 293 \\
-      Arthrobacter & 240 & Pseudomonas & 236 \\
-      Lactococcus & 219 & Staphylococcus & 184 \\
-      \hline
-    \end{tabular}
-    \caption{Counts of records within genera}
-    \label{tab:counts}
+	\begin{tabular}{ l  r  l  r }
+  	\hline
+  	genera & count & genera & count \\
+  	\hline
+  	Mycobacterium & 1619 & Streptococcus & 354 \\
+  	Escherichia & 323 & Gordonia & 293 \\
+  	Arthrobacter & 240 & Pseudomonas & 236 \\
+  	Lactococcus & 219 & Staphylococcus & 184 \\
+  	\hline
+	\end{tabular}
+	\caption{Counts of records within genera}
+	\label{tab:counts}
 \end{table}
 
 %--------deeply described parts-------------------------------------------------
