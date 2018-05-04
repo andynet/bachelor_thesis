@@ -10,11 +10,11 @@ For matrix with $r$ rows and $c$ columns it creates $min(r-1, c)$ distinct princ
 Principal components are linearly uncorrelated variables created in such way that first principal component preserves most variance from original dataset, with each subsequent principal component preserving less than previous one.
 
 For principal component analysis we used python library scikit-learn \cite{sklearn}.
-Binary matrix was used as input.
+Reduced representation of phages in form of binary matrix was used as input.
 First few principal components were used to create plots in python library matplotlib.
 In the Figure (\ref{pca}) we can see data visualized with principal component one on the x-axis and principal component two on the y-axis.
 Each data point represents one phage record and the color of particular data point corresponds to genus of that phage.
-As we can see, most phage records are located near point $[0, 0]$, with some clear groups of Mycobacterium and Staphylococcus phages outside the center.
+As we can see, most phage records are located around the center, with some distinct groups of Mycobacterium and Staphylococcus phages outside the center.
 Although, this could suggest difficulties with distinguishing different genera, it was not the case as first two principal components retained less than 15\% of dataset variability.
 Therefore, we proceeded with another analysis method.
 
@@ -66,7 +66,6 @@ For example, for created model Mycobacterium we could ask if given phage sequenc
 The model will return one or zero, where one represents that model assumes that the given sequence belong to Mycobacterium phage and zero represents that model assumes it does not belong to Mycobacterium phage.
 Models were trained with reduced matrix used as features.
 The ability to infect particular genus was used as labels.
-We marked this as one if the particular phage was able to infect particular host and zero otherwise.
 To prevent overfitting of our trees, we also used parameter \verb|min_impurity_split=0.03|.
 This enabled threshold for splitting leaves and therefore only nodes with impurity index greater than 0.03 were divided.
 The threshold 0.03 was determined empirically.
@@ -81,7 +80,7 @@ We can see example of this visualization in the Figure \ref{fig:tree}.
 \label{fig:tree}
 \end{figure}
 
-From the Figure we can see that cluster number 172 provides the best division of phages infecting Arthrobacter genus.
+We can see that cluster number 172 provides the best division of phages infecting Arthrobacter genus.
 Most Arthrobacter phages have some gene from this cluster.
 This suggests genes from this cluster are of high importance for Arthrobacter phages and could participate on important mechanism for infecting bacteria from genus Arthrobacter.
 Of course, these claims need to be supported by additional evidence and biological experiments, but it can provide valuable insight into data.
@@ -90,7 +89,7 @@ Finally, the models were stored using python library pickle for later use.
 
 % http://scikit-learn.org/stable/modules/tree.html
 
-\section{Classification from sequence}
+\section{Classification of phage sequences}
 For classification we expected to have complete sequence of bacteriophage.
 This sequence was annotated using Prokka and genes were extracted using custom script.
 Extracted genes were aligned using BLAST to database of genes from training set.
@@ -107,23 +106,23 @@ Accuracy was calculated as $CP/(CP+FP+FN)$, false positive percentage as $FP/(CP
 We can see summary of model statistics in the Table \ref{tab:models}. 
 
 \begin{table}
-  \centering
-    \begin{tabular}{ r l l l l l l }
-	\hline
-	model & correct & fpos & fneg & accuracy & fposp & fnegp \\
-	\hline
-	Arthrobacter & 683 & 11 & 5  & 97.71\% & 1.57\% & 0.71\% \\
-	Escherichia & 679 & 17 & 3  & 97.13\% & 2.43\% & 0.42\% \\
-	Gordonia & 647 & 39 & 13 & 92.56\% & 5.57\% & 1.85\% \\
-	Lactococcus & 680 & 3  & 16 & 97.28\% & 0.42\% & 2.28\% \\
-	Mycobacterium & 686 & 11 & 2  & 98.14\% & 1.57\% & 0.28\% \\
-	Pseudomonas & 686 & 6  & 7  & 98.14\% & 0.85\% & 1.00\% \\
-	Staphylococcus & 685 & 0  & 14 & 97.99\% & 0.00\% & 2.00\% \\
-	Streptococcus & 686 & 2  & 11 & 98.14\% & 0.28\% & 1.57\% \\
-	\end{tabular}
-	\bigskip
-    \caption{Evaluation of models}
-    \label{tab:models}
+ \centering
+   \begin{tabular}{ r l l l l l l }
+        \hline
+        model & correct & fpos & fneg & accuracy & fposp & fnegp \\
+        \hline
+        Arthrobacter & 683 & 11 & 5  & 97.71\% & 1.57\% & 0.71\% \\
+        Escherichia & 679 & 17 & 3  & 97.13\% & 2.43\% & 0.42\% \\
+        Gordonia & 647 & 39 & 13 & 92.56\% & 5.57\% & 1.85\% \\
+        Lactococcus & 680 & 3  & 16 & 97.28\% & 0.42\% & 2.28\% \\
+        Mycobacterium & 686 & 11 & 2  & 98.14\% & 1.57\% & 0.28\% \\
+        Pseudomonas & 686 & 6  & 7  & 98.14\% & 0.85\% & 1.00\% \\
+        Staphylococcus & 685 & 0  & 14 & 97.99\% & 0.00\% & 2.00\% \\
+        Streptococcus & 686 & 2  & 11 & 98.14\% & 0.28\% & 1.57\% \\
+        \end{tabular}
+        \bigskip
+   \caption{Evaluation of models}
+   \label{tab:models}
 \end{table}
 
 \section{Limitations and future work}

@@ -1,20 +1,21 @@
-\chapter{Basics of molecular biology}
-In this chapter we will present basic biological terms, which we are needed later in this work.
-We will describe molecules performing functions in living organisms and we will define their representation in bioinformatics and computational biology.
-We will elucidate relationships between these molecules, which will support our technique later.
+\chapter{Biological background}
+In this chapter we will present basic biological terms, which we will use later in this work.
+We will describe molecules performing functions in living organisms and their representation in bioinformatics and computational biology.
+We will explain relationships between these molecules, which will support our method later.
 
-\section{Biologically important molecules}
+\section{Biological molecules}
 
 \subsection{Deoxyribonucleic acid}
-Deoxyribonucleic acid (DNA) is a long chain of nucleotides.
-There are four types of nucleotides naturally occurring in DNA - adenine, cytosine, guanine and thymine.
+Deoxyribonucleic acid (DNA) is a long chain of nucleotides (bases) of four types - adenine, cytosine, guanine and thymine.
 These bases are connected through a phosphodiester bond, connection between the 3' carbon atom of one deoxyribose and the 5' carbon atom of the second deoxyribose.
 The structure of DNA consists of two complementary strands coiled around each other in the form of a double helix.
 In this double helix adenine is paired with thymine and cytosine with guanine through hydrogen bonds.
+
 In bioinformatics and computational biology, we usually represent a base by its first letter - A for adenine, C for cytosine, G for guanine and T for thymine.
-We usually store biological sequences in simple plain text files.
-Probably the most widely used format is the FASTA format.
-It can consist of one or multiple records, where each record starts with one line for record identifier, which is followed by possibly multiple lines of sequence written in direction from 5' to 3'.
+Due to linear organisation of nucleotides, a DNA molecule can be represented as a word from alphabet \{A, C, G, T\}, called DNA sequence. We usually store biological sequences in simple plain text files.
+Probably the most commonly used format is the FASTA format.
+It can consist of one or multiple records, each representing a single DNA sequence.
+Each record starts with the identifier of the sequence, which is followed by lines of the DNA sequence written in direction from 5' to 3'.
 
 \subsection{Ribonucleic acid}
 Ribonucleic acid (RNA) is, similar to DNA, it is a polymeric molecule consisting of four types of nucleotides.
@@ -34,28 +35,28 @@ Thanks to this characteristic, they will be of high importance in our analysis.
 In bioinformatics, protein sequences are represented as a string of 1-letter abbreviations of their amino acids. All proteinogenic amino acids with their 1-letter codes can be found in the Table (\ref{tab:amino})
 
 \begin{table}
-  \centering
-	\begin{tabular}{ l  l  l  l }
-  	\hline
-  	amino acid & 1-letter code & amino acid & 1-letter code \\
-  	\hline  
-  	alanine & A & arginine & R \\
-  	asparagine & N & aspartic acid & D \\
-  	cysteine & C & glutamine & Q \\
-  	glutamic acid & E & glycine & G \\
-  	histidine & H & isoleucine & I \\
-  	leucine & L & lysine & K \\
-  	methionine & M & phenylalanine & F \\
-  	proline & P & serine & S \\
-  	threonine & T & tryptophan & W \\
-  	tyrosine & Y & valine & V \\
-  	selenocysteine & U & pyrrolysine & O \\
-  	\hline
-	\end{tabular}
-	\caption{Amino acids}
-	\label{tab:amino}
+ \centering
+        \begin{tabular}{ l  l  l  l }
+         \hline
+         amino acid & 1-letter code & amino acid & 1-letter code \\
+         \hline  
+         alanine & A & arginine & R \\
+         asparagine & N & aspartic acid & D \\
+         cysteine & C & glutamine & Q \\
+         glutamic acid & E & glycine & G \\
+         histidine & H & isoleucine & I \\
+         leucine & L & lysine & K \\
+         methionine & M & phenylalanine & F \\
+         proline & P & serine & S \\
+         threonine & T & tryptophan & W \\
+         tyrosine & Y & valine & V \\
+         selenocysteine & U & pyrrolysine & O \\
+         \hline
+        \end{tabular}
+        \caption{Amino acids}
+        \label{tab:amino}
 \end{table}
- 
+
 
 
 \section{Central dogma of molecular biology}
@@ -70,5 +71,5 @@ We based our work on the central dogma of molecular biology and on the assumptio
 \begin{figure}[htp]
 \includegraphics[width=\linewidth]{./images/central_dogma.png}
 \centering
-\caption{Central dogma of molecular biology}
+\caption{Central dogma of molecular biology[h]}
 \end{figure}

@@ -1,33 +1,30 @@
 \section{Sequence alignment}
 In this section we would like to deeply explain what is sequence alignment as it is one of the most essential task in bioinformatics.
-Because of its usage in some form in almost all task related to biological sequences, we will describe possibilities of its application.
-As there are two main types of sequence alignment, we will describe both of them with emphasizing the differences.
-We will also explain the basic algorithms used for solving these problems and we will also describe heuristic method used in cases, when the input is too big to be computable by standard approaches.
+We will describe two main types of sequence alignment, with emphasizing the differences.
+We will also explain the basic algorithms used for solving these problems and we will also describe heuristic method used in cases, when the input is too big to be computable by standard approaches that guarantee optimal solution.
 At the end of this section we will describe, how we used them in our analysis.
 
 \subsection{Global alignment}
 \subsubsection{Usage}
-Global alignment is commonly used from comparison between sequences from their beginning to their end.
+Global alignment is commonly used for comparison between two sequences with roughly the same length.
 This comparison can help us to discover mutations in sequence, which cause certain phenotype or to determine highly conserved regions with a potential to carry a gene.
 The relationships between conserved regions and mutations in certain sequences often serves as a basic assumptions for construction of phylogenetic trees.
 Therefore, it can tell us a lot about the nature of evolution.
 Global alignment is also capable of calculating similarity score for two sequences.
-In general, it is mostly used when comparing sequences with roughly the same length.
 
 \subsubsection{Problem statement}
-Let the input for the problem be set of two sequences consisting of nucleotides.
-For example, $ X = ATTGATGG $ and $ Y = AATTCAAC $.
+Let the input for the problem be set of two sequences consisting of nucleotides, for example, $ X = ATTGATGG $ and $ Y = AATTCAAC $.
 Then the output is represented as matrix, where each row is one sequence with possible gaps between nucleotides.
 We can see potential solutions in the Table (\ref{tab:potsol})
 
 \begin{table}
-  \centering
-    \begin{tabular}{ l | r }
-    \verb|A-TTGATGG| & \verb|-ATTG-ATGG| \\
-    \verb|AATTCAAC-| & \verb|AATTCAAC--| \\
-    \end{tabular}
-  \caption{Global alignment examples}
-  \label{tab:potsol}
+ \centering
+   \begin{tabular}{ l | r }
+   \verb|A-TTGATGG| & \verb|-ATTG-ATGG| \\
+   \verb|AATTCAAC-| & \verb|AATTCAAC--| \\
+   \end{tabular}
+ \caption{Global alignment examples}
+ \label{tab:potsol}
 \end{table} 
 
 As we can see, every alignment could have more than one valid solution.
@@ -38,25 +35,26 @@ Scoring scheme consists of rules, which add numerical value to each column of pa
 For example, we can evaluate match in column with score $+1$, mismatch with score $-1$ and alignment to gap with score $-1$.
 With this scoring scheme, we can evaluate quality of particular alignment.
 For alignment on the left side of the Table (\ref{tab:potsol}), resulting score is $+1-1+1+1-1+1-1-1-1 = -1$ and for alignment on the right side of the Table (\ref{tab:potsol}) $-1+1+1+1-1-1+1-1-1-1 = -2$.
-From this example, we can clearly see, that according to our scoring scheme alignment on the left is better.
+According to our scoring scheme alignment on the left is better.
 
-\subsubsection{Scoring}
+\subsubsection{Scoring schemes}
 In practice we could use more complex scoring scheme, which better reflects reality.
 For example substitution between purines (adenine, guanine) or substitution between pyrimidines (cytosine, thymine) occur more often, because they do not require change in the number of rings in the chemical structure of these nucleotides.
-Another example, when more complex scoring scheme is inevitable is aligning of two proteins.
+Even more complex scoring scheme is required for alignment of two proteins to reflect impact on protein structure.
 Amino acids differ in many parameters as polarity, size and structure of their side chains.
 This influences the probability of substitution between two amino acids.
 Therefore, it is much more likely that Leucine will be substituted for Isoleucine, than substituted for Aspartic Acid.
 To solve the complexity of substitutions between amino acids, matrix BLOSUM62 (\ref{fig:blosum}) was created.
+
 Another layer of complexity, which reflects reality better, is affine gap penalty function.
 This reflects the fact that insertions and deletions do not usually occur only on one nucleotide, but often a longer region of DNA is deleted or inserted.
 Affine gap penalty solves this issue by higher negative score for opening a new gap in alignment and a lower negative gap for extension of already created gap.
 
 \begin{figure}[ht]
-  \centering
-    \includegraphics[width=\textwidth]{./images/blosum62.png}
-  \caption{BLOSUM62}
-  \label{fig:blosum}
+ \centering
+   \includegraphics[width=\textwidth]{./images/blosum62.png}
+ \caption{BLOSUM62}
+ \label{fig:blosum}
 \end{figure}
 
 % end of session 16.04.2018
@@ -70,10 +68,10 @@ Then the main problem is reconstructed from already computed subproblems.
 Dynamic programming algorithms offer saving time on computation at the expense of higher memory usage.
 
 \begin{figure}[ht]
-  \centering
-    \includegraphics[width=\textwidth]{./images/needle_wunsch.png}
-  \caption{Needleman-Wunsch}
-  \label{fig:glal}
+ \centering
+   \includegraphics[width=\textwidth]{./images/needle_wunsch.png}
+ \caption{Needleman-Wunsch}
+ \label{fig:glal}
 \end{figure}
 
 Needleman-Wunsch algorithm produces table as in the Figure (\ref{fig:glal}). 
@@ -87,7 +85,7 @@ Into each cell $A_{i,j}$ write maximum of:
 \item $A_{i-1, j} + g()$,
 \item $A_{i, j-1} + g()$,
 \end{itemize}
-where s() returns score of match/mismatch from scoring scheme and g() returns score of gap penalty (possibly affine gap).
+where $s(X_i, Y_j)$ returns score of match/mismatch from scoring scheme and $g$ returns score of gap penalty (possibly affine gap).
 The final score of the alignment can be found in the bottom right corner of filled table.
 Specific alignments can be found by tracking all possible paths to this value.
 The time and space complexity of Needleman-Wunsch algorithm is $\mathcal{O}(nm)$, where $n$ is the length of the first sequence and $m$ is the length of the second sequence.
@@ -105,14 +103,14 @@ The difference is that we do not know where the alignment in both sequences star
 For example, $ X = TAATAACTCTCTGAATAA $ and $ Y = CGGCGGCGGTCTCTGCC $ can be aligned as in the Figure (\ref{tab:loal}) and the score is calculated just from the first aligned base to the last aligned base.
 
 \begin{table}
-  \centering
-    \begin{tabular}{ c }
-    \verb|--TAATAACTCTCTGAATAA| \\
-    \verb%         ||||||     % \\
-    \verb|CGGCGGCGGTCTCTGCC---| \\
-    \end{tabular}
-  \caption{Local alignment example}
-  \label{tab:loal}
+ \centering
+   \begin{tabular}{ c }
+   \verb|--TAATAACTCTCTGAATAA| \\
+   \verb%         ||||||     % \\
+   \verb|CGGCGGCGGTCTCTGCC---| \\
+   \end{tabular}
+ \caption{Local alignment example}
+ \label{tab:loal}
 \end{table} 
 
 \subsubsection{Scoring}
@@ -138,17 +136,16 @@ The space and time complexity of this algorithm is also $\mathcal{O}(nm)$.
 
 % TODO: poriadne prerobit
 \subsection{Word methods}
-Although Needleman-Wunsch and Smith-Waterman algorithms are sufficient for simple comparisons of sequences, their time complexity is not good enough when we want to search through big data.
-It is often the case, that we want to find the most similar sequence to ours in enormous bioinformatics database containing several completed genomes.
+Although Needleman-Wunsch and Smith-Waterman algorithms are sufficient for simple comparisons of sequences, their time complexity is not good enough when we want to search through very long sequences that are common in genomics.
+It is often the case, that we want to find the most similar sequence to ours in enormous bioinformatics database containing genomes of large amount of organisms.
 This is particularly useful if we want to find potential source of our sequence or comparing it to all known proteins to get some indicators about its potential function.
 For this purpose various heuristic algorithms were developed.
 These algorithms do not guarantee finding the most optimal solution, but are orders of magnitude faster and therefore usable also for searching in vast databases.
-  
+ 
 \subsubsection{BLAST}
 %The basic algorithm consists of searching seeds from database on the query sequence and then extending those seeds into neighbouring bases.
 %This approach provides orders of magnitude faster alignment method than classical Smith-Waterman algorithm \cite{smith_waterman} with comparable sensitivity.
 Basic Local Alignment Search Tool (BLAST) \cite{blast} is probably the most widely used tool in bioinformatics.
-It was developed in 1990 by Stephen Altschul et al. at the National Institutes of Health.
 The algorithm distinguishes between target sequences and query sequences.
 Target sequences are sequences from which we create database of all included k-mers.
 For every k-mer in every sequence we save its position.
@@ -166,8 +163,8 @@ The matching k-mers are called cores of alignment and serves as starting points 
 The extending is performed in a similar manner to that of Smith-Waterman algorithm.
 The difference is that we do not need to search through the whole matrix, but we search for good alignments just in the immediate surrounding of cores.
 Firstly, we extend cores without the possibility to insert any gaps into alignment.
-Secondly, we can join these extended cores together using also gaps, if the resulting score will be bigger than before joining. 
- 
+Secondly, we can join these extended cores together using also gaps, if the resulting score would improve. 
+
 \subsubsection{E-value}
 E-value is used to assess the relevancy of resulting alignment.
 It can be interpreted as how many alignments in database could reach the same score or better purely by chance.

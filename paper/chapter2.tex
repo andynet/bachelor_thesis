@@ -40,15 +40,14 @@ We will describe the most typical form of bacteriophages, which is abundantly fo
 \end{figure}
 
 
-As we can see on the Picture (\ref{fig:phage}), this bacteriophages body consists of a head and a tail.
+As we can see in the Figure \ref{fig:phage}, this bacteriophages body consists of a head and a tail.
 These parts are created from proteins and in addition, the head contains DNA or RNA of the bacteriophage genome.
 The tail is used to attach and to inject the genetic code into bacteria.
 At the end of the tail, there are proteins, which are able to bind to specific receptors on the surface of a bacteria.
 Thanks to this mechanism, bacteriophages tend to have a high specificity in selection of their prey.
 
 \section{Life cycle of bacteriophages}
-Generally, there are two strategies that bacteriophages use to secure their survival.
-The first strategy is called the lysogenic cycle and the second strategy is called the lytic cycle.
+Generally, there are two strategies that bacteriophages use to secure their survival and replication; the lysogenic cycle and the the lytic cycle.
 Viruses tend to use these strategies in different proportions, but usually prefer to choose one of them.
 The lysogenic cycle results in incorporations of phage genetic information into host DNA or creation of a circular replicon in the bacterial cytoplasm.
 By this approach, the genetic material of a phage inside the host, called prophage, is duplicated together with the host genome and after cell division, both daughter cells contain DNA of the bacteriophage.
@@ -59,13 +58,13 @@ After this step virus is not incorporated, but it compromises bacterial translat
 Once enough virions have been produced, special viral proteins dissolve the bacterial cell and virions are released into surrounding space.
 
 \section{Potential usage of bacteriophages}
-Their ability to kill or alter behavior of bacteria with high specificity makes bacteriophages a valuable target for research.
+Their ability to kill or alter behavior of highly specific strains of bacteria makes bacteriophages a valuable target for research.
 Humankind tried to harness the power of phages since their discovery in the year 1917.
 This discovery is attributed to a French-Canadian microbiologist Félix d'Hérelle, who experimented extensively with phages and introduced the concept of phage therapy\cite{phages_in_nature}.
 Unfortunately, after the discovery of antibiotics, research in this field suffered from insufficient funding and the development was significantly slowed down.\\
 Nowadays, when humanity face the threat of multiresistant bacteria and phages could bring a new methods into the battle against pathogenic bacteria, the research in this field begins to flourish.
 We can see the potential of their use in the field of food industry as the substances that are prolonging life and improve the quality of our food. In the field of pharmacy, they are used as medicines for bacterial infections. Their use is significant when we encounter the need to control the lives of microbial communities.
-Moreover, due to their specificity to a particular strain of bacteria is high, these new practices will likely be without adverse effects on natural microbiome.
+Moreover, due to their high specificity to a particular strain of bacteria, these new practices will likely be without adverse effects on natural microbiome.
 
 % \section{Phage effectiveness}
 % documented case of use from india
@@ -74,19 +73,16 @@ Moreover, due to their specificity to a particular strain of bacteria is high, t
 
 \section{Current state of knowledge}
 In our work we focus on prediction of phage hosts from genomic sequence.
-We build our program around the assumption that bacteriophages with similar set of genes will have the same host.
+We based our method on the assumption that bacteriophages with similar set of genes will infect the same bacterial host.
 In addition, the decision to pick the host as our trait of interest was made based on its straightforward use in searching for phages suitable for phage therapy.
 Attempts to classify bacteriophages from a genomic sequence were already made.
 In the study "The Phage Proteomic Tree: a Genome-Based Taxonomy for Phage"\cite{phage} from year 2002, researchers performed analysis based on genomes resulting in phylogenetic tree compatible with ICTV system.
 In their work, they proved phages indeed do not contain any universal genetic marker, which could be used as 16S rRNA sequence for classification.
 They also showed that classification based on whole proteome of phage is a reasonable approach.
-In 2016 a similar tool for predicting hosts from genomic sequences appeared.
-It was published in the paper "HostPhinder: A Phage Host Prediction Tool"\cite{hostphinder}.
+In 2016 a similar tool, called HostPhinder, for predicting hosts from genomic sequences appeared \cite{hostphinder}.
 Their approach to classification was through rate of similar k-mers, short sequences of nucleotides of length $k$.
 With this approach they achieved the results of 81\% of correctly predicted genera.
 In our work we tried a different approach, where we looked for similar genes instead of rate of similar k-mers.  
 
 % +https://academic.oup.com/bioinformatics/article/33/19/3113/3964377
 % +virhostmatcher
-
-
