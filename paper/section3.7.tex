@@ -1,13 +1,13 @@
 \section{Data clustering}
 In this section we will explain what is data clustering.
 We will describe its use in data analysis and bioinformatics and how we used it in our program.
-We will briefly define the problem and we will explain algorithm used for solving it.
-At the end we will present three approaches used in our pipeline.
+We will briefly define the problem and we will explain the algorithm used for solving it.
+At the end, we will present three approaches used in our pipeline.
 
 \subsection{Usage}
-Data clustering is used to group data according to some similar characteristics.
-In computational biology it can be used to cluster organisms in order to examine relationships between different groups or to study structure of population.
-By clustering genes we can investigate their functions and see which regions in sequence are responsible for them.
+Data clustering is used to group data according to similar characteristics.
+In computational biology it can be used to cluster organisms to examine relationships between different groups or to study structure of population.
+By clustering genes, we can investigate their functions and see which regions in sequence are responsible for them.
 Clustering can also be used to distinguish different types of tissue or group drugs with similar effects according to their mechanism of action.
 
 In our work, we clustered genes with sequential similarities.
@@ -16,20 +16,20 @@ We expected, that this approach will create clusters of genes with closely relat
 \subsection{Definition of problem}
 Clustering is a problem where we want to determine closely related entities and put them in distinct groups, also called clusters.
 Cluster can be characterized by presence of many edges between cluster members.
-Members from different clusters are connected with lesser probability and the distance between them is usually longer.
-Although, to intuitively understand what is clustering is not hard, there exists a lot of clustering models with slightly different approaches, which makes exact general definition impossible.  
+Members from different clusters have lesser probability to be connected and the distance between them is usually longer.
+Although, to intuitively understand clustering is not complicated, there exists a lot of clustering models with slightly different approaches, which makes exact general definition impossible.  
 
 \subsection{Markov Cluster Algorithm}
-Markov Cluster Algorithm is algorithm searching for clusters by simulating random walks on the graph.
+Markov Cluster Algorithm is searching for clusters by simulating random walks on the graph. 
 It assumes that these random walks will infrequently go from one cluster to different cluster and mostly will stay in the starting cluster.
 The algorithm simulates random walks through the graph deterministically with two operations, expansion and inflation.
 Expansion corresponds with squaring of stochastic matrix, non-negative matrix where each column sums to 1 and entry $a_{ij}$ corresponds to probability of going from node $j$ to node $i$.
 Inflation is defined by entry-wise powering of stochastic matrix to the power of $r$, followed by scaling step to get stochastic matrix again.
-It is observed that for $r>1$ inflation favour more probable walks over less probable walks.
+It is observed that for $r>1$ inflation favors more probable walks over less probable walks.
 Expansion can be interpreted as random walk with many steps.
-Inflation then enlarge the effect of random walks within cluster and reduce random walks across different cluster.
-By repeating expansion and inflation operations, the equilibrium is reached which produce clusters.
-These clusters does not contain any paths between each other and the only paths in graph are those within clusters.
+Inflation then enlarges the effect of random walks within a cluster and reduces random walks across a different cluster.
+By repeating expansion and inflation operations, the equilibrium is reached which produces the clusters.
+These clusters do not contain any paths between each other and the only paths in graph are those within clusters.
 This algorithm does not need any prior knowledge of clusters and resulting clusters emerge from the primary structure of the graph.
 Furthermore, size of clusters can be regulated by changing parameter $r$ of inflation operation.
 Bigger $r$ will cause algorithm to converge to equilibrium faster and will produce smaller resulting clusters.
@@ -40,25 +40,25 @@ In practice, $r$ from 1.2 to 5.0 is used.
 
 \subsection{Clustering in our pipeline}
 \subsubsection{MCL}
-Firstly, we used Markov Cluster Algorithm implemented in package MCL \cite{mcl}. 
-This software is popular among bioinformatics community for its capabilities to work with big data.
+Firstly, we used Markov Cluster Algorithm implemented in package MCL \cite{mcl}.
+This software is popular in the bioinformatics community for its capabilities to work with big data.
 As input data we used E-values from CrocoBLAST results.
-These E-values was automatically transformed into similarity score to enable creation of adjacency matrix.
-As inflation parameter we used value 1.2.
-This was the smallest value recommended by developers.
-The reason for using the smallest possible inflation value was, that we wanted to create the biggest possible clusters.
-This approach also reduced number of different clusters.
-In our work we needed as few clusters as possible, mainly due to number of phage records in our dataset.
-In case of too many clusters we would have too many features for classifier and we would risk overfitting of our final models to training dataset.
-Finally, we created 15017 gene clusters.
+These E-values were automatically transformed into a similarity score to enable creation of the adjacency matrix.
+We used the value 1.2 as the inflation parameter.
+This was the smallest value recommended by the developers.
+The reason for using the smallest possible inflation value was that we wanted to create clusters that are as large as possible
+This approach also reduced the number of different clusters.
+In our work, we needed as few clusters as possible, mainly due to the number of phage records in our dataset.
+If we had too many clusters, we would have too many features for classifier and we would risk overfitting of our final models to the training dataset.
+We created 15017 gene clusters.
 
 \subsubsection{MCL with global alignment}
-To get more accurate clustering we tried different approach, where we determined similarity score from global alignment.
-All the matches from CrocoBLAST search were aligned with needleman-wunsch algorithm \cite{needleman-wunsch} and the resulting score of alignment was used instead of E-value.
-Implementation of Markov Cluster Algorithm was executed with inflation parameter of value 1.2, without any transformation of similarity score.
+To get more accurate clustering, we tried different approach, where we determined similarity score from the global alignment.
+All the matches from CrocoBLAST search were aligned with the needleman-wunsch algorithm \cite{needleman-wunsch} and the resulting score of alignment was used instead of the E-value.
+Implementation of the Markov Cluster Algorithm was executed with an inflation parameter value of 1.2, without any transformation of the similarity score.
 By this approach we created 9176 final clusters.
 
 \subsubsection{Spectral clustering}
-In this work, we also experimented with different clustering algorithm, Spectral clustering.
+In this work, we also experimented with a different clustering algorithm, Spectral clustering.
 SCPS implementation\cite{scps} was tested in the pipeline.
-Although authors of this software declare quality of clusters quantified by a measure that combines sensitivity and specificity to be better by 28\% in comparison to MCL algorithm, our memory was not sufficient for the program to run with all input data.
+Although authors of this software declare quality of clusters quantified by a measure that combines sensitivity and specificity to be better by 28\% in comparison to MCL algorithm, our memory was not sufficient for the program to run with all the input data.
