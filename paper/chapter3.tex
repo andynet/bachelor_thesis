@@ -8,7 +8,7 @@ We will also provide some basic statistics of the data retrieved.
 Our pipeline consists of python scripts and publicly available bioinformatics software.
 When writing the code, we have taken care of its readability, sustainability and extensibility.
 
-We implemented our pipeline in  workflow management system Snakemake that was primarily designed for writing reproducible bioinformatics pipelines.
+We implemented our pipeline in  workflow management system \emph{Snakemake} that was primarily designed for writing reproducible bioinformatics pipelines.
 Snakemake is inspired by GNU make, but it uses python-like syntax with elements similar to pseudo code.
 Furthermore, it is fully portable, depending only on Python executables and libraries.
 Snakefile consists of rules, where each rule is defined by its input files, output files and shell commands.
@@ -43,7 +43,7 @@ Although they cover the majority of currently sequenced and published phages, we
 New sources can be added by writing a new download script, naming it \verb|{script_dir}\download_from_{db}.py| and appending this name into a variable \verb|DATABASES| in Snakefile.
 
 \subsection{GenBank database}
-National Center for Biotechnology Information (NCBI) provides an access to GenBank\cite{genbank} database.
+National Center for Biotechnology Information (NCBI) provides an access to \emph{GenBank}\cite{genbank} database.
 This database is a comprehensive source of genomic data with more than 200 million genomic sequences of all life’s domains.
 NCBI administers the GenBank database free of charge and give researchers the possibility to access data through various interfaces as web-based retrieval services, FTP and Entrez\cite{entrez}.
 Despite of these facts, there are shortcomings of using GenBank.
@@ -62,7 +62,7 @@ Downloading from GenBank was our largest source of data with 6704 downloaded rec
 \subsection{ViralZone database}
 ViralZone provides highly reliable data about viruses, including bacteriophages.
 Information about the structure of a capsid, a genome, life cycle, replication mechanisms, taxonomy, geographical location and host are included.
-This website does not store sequences internally, rather it delivers links to RefSeq\cite{refseq} database.
+This website does not store sequences internally, rather it delivers links to \emph{RefSeq}\cite{refseq} database.
 Compared to GenBank, RefSeq database contains fewer sequences, but all of these sequences are curated and manually reviewed.
 
 Our custom script was used to download records from RefSeq database.
@@ -74,7 +74,7 @@ By performing this process, we obtained 2107 records.
 % wc chapter* = 32521 letters
 
 \subsection{PhagesDB}
-PhagesDB is a database specialized in bacteriophages infecting bacteria from phylum Actinobacteria.
+\emph{PhagesDB} is a database specialized in bacteriophages infecting bacteria from phylum Actinobacteria.
 This phylum is of great importance, because of its contribution to the soil system.
 This phylum also contains the genus Mycobacterium, which includes pathogens causing tuberculosis and leprosy in humans.
 The database was designed to avoid the time between sequencing and data availability.
@@ -100,7 +100,7 @@ This way we ensured consistency of annotations accross our data .
 Another advantage of annotating from scratch is that annotations will always be up-to-date with current human knowledge.
 
 \subsection{Prokka}
-We used publicly available pipeline called  Prokka \cite{prokka} to identify and annotate genes.
+We used publicly available pipeline called \emph{Prokka} \cite{prokka} to identify and annotate genes.
 First, coordinates of coding DNA sequences (CDS) were found with Prodigal tool\cite{prodigal}.
 CDSs are regions of genome that almost always start with AUG codon and end with a stop codon.
 These regions can be directly translated into amino acid chains using standard codon table.
@@ -147,7 +147,7 @@ After annotation, resulting genes were selected and saved to files in format sui
 
 \section{Datasets used}
 At the beginning of this step, our dataset consisted of: phage genomic records, their corresponding genes, information about phage hosts and functional annotation of genes.
-As our work used techniques of supervised machine learning, we needed to split the dataset to a training set and a testing set.
+As our work used techniques of supervised machine learning, we needed to split the dataset to a \emph{training set} and a \emph{testing set}.
 Furthermore, we created set for other records, which we decided not to use due to missing information about host or due to host outside of our group of interest.
 We decided to group phages according to the genus of their hosts.
 After calculating the number of phages in each group, we selected first eight genera with the highest count of records as groups of our interest.
@@ -182,15 +182,15 @@ The resulting training set included 2787 records of bacteriophages and resulting
 \section{Annotation of gene clusters}
 Clusters of genes were annotated to determine their function.
 We expected proteins with similar biological function to be included in same cluster.
-For functional annotation of particular proteins we used software InterProScan\cite{interpro}.
-This tool scans given protein sequences against the protein signatures in databases PROSITE\cite{prosite}, PRINTS\cite{prints}, Pfam\cite{pfam}, ProDom\cite{prodom} and SMART\cite{smart}.
+For functional annotation of particular proteins we used software \emph{InterProScan} \cite{interpro}.
+This tool scans given protein sequences against the protein signatures in databases PROSITE \cite{prosite}, PRINTS \cite{prints}, Pfam \cite{pfam}, ProDom \cite{prodom} and SMART \cite{smart}.
 After acquiring of annotations for all proteins in a particular cluster, we calculated number of occurrences of each distinct biological function.
 These statistics represent our annotation of a certain cluster.
 Our expectation of clusters containing proteins with similar function was met in most cases, although the information about particular proteins were sparse with a lot of proteins without any information.
 Therefore, we assumed that reasonable clustering was achieved.
 
 \section{Reducing phage genomes}
-One of the most crucial part of our analysis was binary matrix created in this step.
+One of the most crucial part of our analysis was \emph{binary matrix} created in this step.
 Rows in this matrix represented particular phage records and columns represented particular protein clusters.
 The entry $a_{i,j}$ in matrix was filled with $1$ if phage $i$ contained gene from cluster $j$ and $0$ otherwise.
 Custom python script and files produced in previous steps were used for this task.

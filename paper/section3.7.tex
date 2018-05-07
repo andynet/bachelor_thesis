@@ -6,7 +6,7 @@ We will briefly define the problem and we will explain the algorithm used for so
 At the end, we will present three approaches used in our pipeline.
 
 \subsection{Usage}
-Data clustering is used to group data according to similar characteristics.
+\emph{Data clustering} is used to group data according to similar characteristics.
 In computational biology it can be used to cluster organisms to examine relationships between different groups or to study structure of population.
 By clustering genes, we can investigate their functions and see which regions in sequence are responsible for them.
 Clustering can also be used to distinguish different types of tissue or group drugs with similar effects according to their mechanism of action.
@@ -21,11 +21,11 @@ Members from different clusters have lesser probability to be connected and the 
 Although, to intuitively understand clustering is not complicated, there exists a lot of clustering models with slightly different approaches, which makes exact general definition impossible.  
 
 \subsection{Markov Cluster Algorithm}
-Markov Cluster Algorithm is searching for clusters by simulating random walks on the graph. 
+\emph{Markov Cluster Algorithm} is searching for clusters by simulating random walks on the graph.
 It assumes that these random walks will infrequently go from one cluster to different cluster and mostly will stay in the starting cluster.
 The algorithm simulates random walks through the graph deterministically with two operations, expansion and inflation.
-Expansion corresponds with squaring of stochastic matrix, non-negative matrix where each column sums to 1 and entry $a_{ij}$ corresponds to probability of going from node $j$ to node $i$.
-Inflation is defined by entry-wise powering of stochastic matrix to the power of $r$, followed by scaling step to get stochastic matrix again.
+\emph{Expansion} corresponds with squaring of stochastic matrix, non-negative matrix where each column sums to 1 and entry $a_{ij}$ corresponds to probability of going from node $j$ to node $i$.
+\emph{Inflation} is defined by entry-wise powering of stochastic matrix to the power of $r$, followed by scaling step to get stochastic matrix again.
 It is observed that for $r>1$ inflation favors more probable walks over less probable walks.
 Expansion can be interpreted as random walk with many steps.
 Inflation then enlarges the effect of random walks within a cluster and reduces random walks across a different cluster.

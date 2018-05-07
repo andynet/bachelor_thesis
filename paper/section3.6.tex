@@ -7,7 +7,7 @@ At the end of this section we will describe, how we used the algorithms in our a
 
 \subsection{Global alignment}
 \subsubsection{Usage}
-Global alignment is commonly used for comparison between two sequences with roughly the same length.
+\emph{Global alignment} is commonly used for comparison between two sequences with roughly the same length.
 This comparison can help us to discover mutations in a sequence that causes a certain phenotype, or we can use the comparison to determine highly conserved regions with a potential to carry a gene.
 The relationships between conserved regions and mutations in certain sequences often serve as a basic assumption for construction of phylogenetic trees.
 Therefore, global alignment can tell us a lot about the nature of evolution.
@@ -31,7 +31,7 @@ We can see potential solutions in the Table (\ref{tab:potsol})
 As we can see, every alignment could have more than one valid solution.
 Despite of multiple possible solutions, not every solution is of equal value to us.
 We want to find the best possible solution to this problem and for this purpose, we implement a scoring scheme to determine what is the best solution.
-Scoring scheme consists of rules, which add numerical value to each column of pairwise alignment.
+\emph{Scoring scheme} consists of rules, which add numerical value to each column of pairwise alignment.
 For example, we can evaluate match in column with score $+1$, mismatch with score $-1$ and alignment to gap with score $-1$.
 With this scoring scheme, we can evaluate quality of a particular alignment.
 For alignment on the left side of the Table (\ref{tab:potsol}), resulting score is $+1-1+1+1-1+1-1-1-1 = -1$ and for alignment on the right side of the Table (\ref{tab:potsol}) $-1+1+1+1-1-1+1-1-1-1 = -2$.
@@ -45,7 +45,7 @@ Amino acids differ in many parameters such as: polarity, size and structure of t
 This influences the probability of a substitution occurring between two amino acids.
 Therefore, there is a higher probability that Leucine will be substituted for Isoleucine, rather than Aspartic Acid.
 To solve the complexity of substitutions between amino acids, matrix BLOSUM62 (\ref{fig:blosum}) was created.
-Another layer of complexity, that does a better job of reflecting reality is the affine gap penalty function.
+Another layer of complexity, that does a better job of reflecting reality is the \emph{affine gap penalty function}.
 This reflects the fact that insertions and deletions do not usually occur only on one nucleotide, but often a longer region of DNA is deleted or inserted.
 Affine gap penalty solves this issue by having a higher negative score for opening a new gap in alignment and a lower negative gap for extension of an already created gap.
 
@@ -60,7 +60,7 @@ Affine gap penalty solves this issue by having a higher negative score for openi
 
 \subsubsection{Needleman-Wunsch algorithm}
 For searching optimal global alignment, we usually use the Needleman-Wunsch algorithm.
-It is an algorithm from a group of dynamic programming algorithms.
+It is an algorithm from a group of \emph{dynamic programming} algorithms.
 This means that the main problem is divided into smaller problems, which are computable more easily and solutions to them are stored in memory.
 At each occurrence of a small problem, we can look into stored solutions, where we can find it.
 Then the main problem is reconstructed from already computed subproblems.
@@ -91,7 +91,7 @@ The time and space complexity of Needleman-Wunsch algorithm is $\mathcal{O}(nm)$
 
 \subsection{Local alignment}
 \subsubsection{Usage}
-In comparison with global alignment, local alignment search for regions inside sequences with high similarities and does not provide alignment from beginning to end.
+In comparison with global alignment, \emph{local alignment} search for regions inside sequences with high similarities and does not provide alignment from beginning to end.
 It is generally useful when searching for a small subsequence inside a vast sequence.
 For example, searching for a gene inside the whole bacterial genome.
 It can be also used when comparing two different sequences and we want to find out if they contain any highly similar sequence.
@@ -138,13 +138,13 @@ The space and time complexity of this algorithm is also $\mathcal{O}(nm)$.
 Needleman-Wunsch and Smith-Waterman algorithms are sufficient for simple comparisons of sequences, but their time complexity is not good enough when we want to search through very long sequences that are common in genomics.
 It is often the case that we want to find the most similar sequence to ours in enormous bioinformatics database containing genomes of large amount of organisms.
 This is particularly useful if we want to find the potential source of our sequence or comparing it to all known proteins to get some indicators about its potential function.
-For this purpose, various heuristic algorithms were developed.
+For this purpose, various \emph{heuristic algorithms} were developed.
 These algorithms do not guarantee finding the most optimal solution but are orders of magnitude faster and therefore usable also for searching in vast databases.
 
 \subsubsection{BLAST}
 %The basic algorithm consists of searching seeds from database on the query sequence and then extending those seeds into neighbouring bases.
 %This approach provides orders of magnitude faster alignment method than classical Smith-Waterman algorithm \cite{smith_waterman} with comparable sensitivity.
-Basic Local Alignment Search Tool (BLAST) \cite{blast} is probably the most widely used tool in bioinformatics.
+\emph{Basic Local Alignment Search Tool} (BLAST) \cite{blast} is probably the most widely used tool in bioinformatics.
 The algorithm distinguishes between target sequences and query sequences.
 Target sequences are sequences from which we create a database of all included k-mers.
 For every k-mer in every sequence we save its position.
@@ -165,7 +165,7 @@ Firstly, we extend cores without the possibility to insert any gaps into alignme
 Secondly, we can join these extended cores together using the gaps, if the resulting score will be bigger than before joining.
 
 \subsubsection{E-value}
-E-value is used to assess the relevancy of the resulting alignment.
+\emph{E-value} is used to assess the relevancy of the resulting alignment.
 It can be interpreted as how many alignments in database could reach the same score or better purely by chance.
 This means, the closer the E-value is to zero, the higher level of significance can be assumed.
 E-value is automatically produced by BLAST.

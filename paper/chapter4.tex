@@ -6,7 +6,7 @@ Next, we will describe method used for selecting important characteristics.
 We will also explain how we generated our predictive models and we will reveal how we evaluated them.
 
 \section{Principal component analysis}
-Principal component analysis (PCA) is method mostly used for visualization of high dimensional data.
+\emph{Principal component analysis} (PCA) is method mostly used for visualization of high dimensional data.
 For matrix with $r$ rows and $c$ columns it creates $min(r-1, c)$ distinct principal components.
 Principal components are linearly uncorrelated variables created in such way that first principal component preserves most variance from original dataset, with each subsequent principal component preserving less than previous one.
 
@@ -26,7 +26,7 @@ Therefore, we proceeded with another analysis method.
 \end{figure}
 
 \section{Decision tree}
-Decision tree is a model, which we can imagine as binary tree.
+\emph{Decision tree} is a model, which we can imagine as binary tree.
 In this tree, every node is either decision node or end node.
 Decision node contains condition and has two child nodes.
 First child node represents all cases, where the condition was not met and the second child node represents all cases, where condition was met.
@@ -54,7 +54,7 @@ This high dimensionality of our data could lead to increased probability of over
 To address this concern, we decided to perform feature selection.
 Feature selection is a process of removing dimensions with low importance from the dataset.
 The reason to prefer feature selection over feature extraction methods as PCA presented in previous section was, we wanted our tree models to be representable in terms of important clusters rather than in terms of principal components.
-Because we expected a lot of clusters with small number of genes, our choice for feature selection method was Variance Threshold.
+Because we expected a lot of clusters with small number of genes, our choice for feature selection method was \emph{Variance Threshold}.
 The Variance Threshold method is a simple method, which removes columns with variance under certain threshold.
 With this technique we removed all columns in matrix with ones in more than 99\% of cases or with zeros in more than 99\% of cases.
 The reduced matrix had 2787 rows and 1818 columns.
@@ -103,7 +103,7 @@ To examine accuracy of our models, we classified all bacteriophages from our tes
 Test dataset contained 699 phage records.
 Resulting predictions were aggregated and number of correctly predicted, false positive and false negative was recorded.
 The table was constructed from these data.
-Accuracy was calculated as $CP/(CP+FP+FN)$, false positive percentage as $FP/(CP+FP+FN)$ and false negative percentage as $FN/(CP+FP+FN)$.
+\emph{Accuracy} was calculated as $CP/(CP+FP+FN)$, \emph{false positive} percentage as $FP/(CP+FP+FN)$ and \emph{false negative} percentage as $FN/(CP+FP+FN)$.
 We can see summary of model statistics in the Table \ref{tab:models}. 
 
 \begin{table}
