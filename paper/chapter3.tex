@@ -183,14 +183,14 @@ Clusters of genes were annotated to determine their function.
 We expected proteins with similar biological function to be included in same cluster.
 For functional annotation of particular proteins we used software InterProScan\cite{interpro}.
 This tool scans given protein sequences against the protein signatures in databases PROSITE\cite{prosite}, PRINTS\cite{prints}, Pfam\cite{pfam}, ProDom\cite{prodom} and SMART\cite{smart}.
-After acquiring of annotations for all proteins in particular cluster, we calculated number of occurrences of each distinct biological function.
-These statistics represent our annotation of certain cluster.
+After acquiring of annotations for all proteins in a particular cluster, we calculated number of occurrences of each distinct biological function.
+These statistics represent our annotation of a certain cluster.
 Our expectation of clusters containing proteins with similar function was met in most cases, although the information about particular proteins were sparse with a lot of proteins without any information.
 Therefore, we assumed that reasonable clustering was achieved.
 
 \section{Reducing phage genomes}
 One of the most crucial part of our analysis was binary matrix created in this step.
-Rows in this matrix represented particular phage record and columns represented particular protein cluster.
+Rows in this matrix represented particular phage records and columns represented particular protein clusters.
 The entry $a_{i,j}$ in matrix was filled with $1$ if phage $i$ contained gene from cluster $j$ and $0$ otherwise.
 Custom python script and files produced in previous steps were used for this task.
-Resulting matrix contained 2787 rows and 15017 columns and served as a main input file for machine learning algorithms.
+Resulting matrix contained 2787 rows and 15017 columns and served as a main input file for the machine learning algorithms.
