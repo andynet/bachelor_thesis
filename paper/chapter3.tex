@@ -1,8 +1,8 @@
 % v0.2
 \chapter{Modelling bacteriophage genomes}
-In this chapter we will present parts of our pipeline intended for data retrieval and preprocessing.
+In this chapter we will present parts of our pipeline used for data retrieval and manipulation.
 Since we used a considerable amount of third party libraries and tools, we will explain them in detail and we will clarify our reasons for using them.
-We will also provide some basic statistics of the data retrieved.
+We will also provide some basic stats of the data as number of downloaded genomes and number of obtained genes to later support statistical significance of our results.
 
 \section{Pipeline overview}
 Our pipeline consists of python scripts and publicly available bioinformatics software.
@@ -11,7 +11,7 @@ When writing the code, we have taken care of its readability, sustainability and
 We implemented our pipeline in  workflow management system \emph{Snakemake} \cite{} that was primarily designed for writing reproducible bioinformatics pipelines.
 Snakemake is inspired by GNU make, but it uses python-like syntax with elements similar to pseudo code.
 Furthermore, it is fully portable, depending only on Python executables and libraries.
-Snakefile consists of rules, where each rule is defined by its input files, output files and shell commands.
+Snakefile consists of rules, where each rule is defined by its input files, output files and commands.
 
 When the Snakemake is executed, it runs first rule in specified Snakefile.
 If the rule is missing input files, it scans through the whole Snakefile and looks for rules that are capable of creating required files.
@@ -31,9 +31,9 @@ From these clusters, the binary matrix is created.
 This matrix is later used in classification.
 
 \begin{figure}[h]
-\includegraphics[height=\textheight]{./images/mcl.png}
+\includegraphics[height=0.9\textheight]{./images/mcl.png}
 \centering
-\caption{Workflow visualization}
+\caption{Workflow visualization, cells symbolizing rules in workflow, arrows create acyclic graph, where rules at the top need to be completed before executing rules at the bottom}
 \label{fig:dag}
 \end{figure}
 
@@ -102,8 +102,6 @@ Another advantage of annotating from scratch is that annotations will always be 
 \subsection{Prokka}
 We used publicly available pipeline called \emph{Prokka} \cite{prokka} to identify and annotate genes.
 First, coordinates of coding DNA sequences (CDS) were found with Prodigal tool\cite{prodigal}.
-CDSs are regions of genome that almost always start with AUG codon and end with a stop codon.
-These regions can be directly translated into amino acid chains using standard codon table.
 After the locations of genes are predicted, Prokka can start to annotate functions of all CDSs.
 This is usually done through comparing of a sequence to a database of sequences with an experimentally determined function.
 The function of protein with the best match is then assigned to the new CDS.

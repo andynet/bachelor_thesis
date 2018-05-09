@@ -2,7 +2,7 @@
 \chapter{Biological background}
 In this chapter we will present basic biological terms, which we will use later in this work.
 Firstly, we will describe molecules performing functions in living organisms and their representation in bioinformatics and computational biology.
-Then, we will explain relationships between these molecules, which will support our method later.
+Then, we will explain relationships between these molecules.
 We will also provide detailed description of bacteriophages, which will be the central topic of our work.
 Description of what they are and where we can find them will be provided.
 Furthermore, we will explain their life cycle and we will point out some of their use.
@@ -10,9 +10,9 @@ We will also show currently valid taxonomical classification and the structure o
 At the end of this chapter we will point out what was already done in the field of their hosts prediction and what we would like to achieve.
 
 \section{Biological molecules}
-Molecules are basic components of organic matter and therefore every living organism on Earth.
+Molecules are basic components of every living organism on Earth.
 Vast majority of biological function are mediated by them.
-Next, we will present the central types of molecules of molecular biology, which we will use in our analysis.
+Next, we will present the central types of molecules in molecular biology, which we will use in our analysis.
 
 \subsection{Deoxyribonucleic acid}
 \emph{Deoxyribonucleic acid} (DNA) is a long chain of nucleotides (bases) of four types - adenine, cytosine, guanine and thymine.
@@ -66,27 +66,35 @@ In bioinformatics, protein sequences are represented as a string of 1-letter abb
         \label{tab:amino}
 \end{table}
 
-\section{Genome and gene}
-Genome is a complete genetic material of an organism.
+% upravene start
+\section{Flow of genetic information}
+\emph{Genome} is a complete genetic material of an organism.
 It usually consists of DNA molecules, but some organisms can have genome in the form of RNA molecules.
-In genome, there is written entire information about the composition of particular organism and functional elements included.
-These functional elements, also called genes, are encoded in sequence of DNA or RNA and can be found using bioinformatics methods.
-% dokoncit
-
-\section{Central dogma of molecular biology}
-Central dogma of molecular biology explains relationships between biological molecules described in previous sections.
-Most organisms store their genetic information in the form of DNA.
-Some parts of DNA, usually called genes, are transcribed into RNA.
-Afterwards, ribosome translates the RNA sequence into a protein that is based on the RNA codon table.
+In genome, there is written entire information about the composition of particular organism with functional elements included.
+These functional elements, also called \emph{genes}, are encoded in the sequence of DNA or RNA.
+Genes can be located in genomes using bioinformatics tools, which usually search for coding DNA sequences (CDSs).
+CDS is a region of genome that starts with the start codon and end with the stop codon.
+These regions can be directly translated into amino acid chains using \emph{standard codon table}.
+In this table, every combination of three nucleotides corresponds to amino acid, with exception of the combinations TAA, TAG and TGA, which correspond to stop codons.
+The relationships between biological molecules and the flow of genetic information in most living organisms are described in \emph{central dogma of molecular biology}.
+Most organisms store their genetic information in the nucleus in the form of DNA.
+Some parts of that DNA are transcribed into the RNA molecules.
+Afterwards, ribosome translates the RNA sequence into a protein that is based on the codon table.
 Proteins are then folded into their natural 3D structure and prepared to realize their corresponding functions.
+
+Despite of central dogma of molecular biology needs advanced compartments as ribosome for ensuring the flow of genetic material, not all organisms do have these compartments.
+Viruses tends to exploit hosts mechanisms for expression of viral genes and replication of themselves.
 
 We based our work on the central dogma of molecular biology and on the assumption that genes will be useful indicators when predicting the biological trait, the ability to infect certain hosts.
 
 \begin{figure}[htp]
 \includegraphics[width=\linewidth]{./images/central_dogma.png}
 \centering
-\caption{Central dogma of molecular biology[h]}
+\cite{central_dogma}
+\caption{Central dogma of molecular biology,
+arrows show the flow of information between biological molecules, full lines symbolizing usual flow in living organisms and dashed line symbolizing flow of information used by some primitive organisms (viruses)}
 \end{figure}
+% upravene end
 
 \section{Bacteriophages}
 \emph{Bacteriophages} (phages) belong to the group of viruses, which have the capability to infect and replicate within bacterial hosts.
@@ -95,13 +103,16 @@ In comparison, it is estimated that the count of all bacteria on planet Earth is
 They are one of the most highly diverse group in the biosphere, with their genomes spanning from few genes to as many as hundreds of genes.
 We can find them in every place on earth, where bacteria are able to live, even inside our bodies.
 It is believed that one of the most saturated location of their occurrence is sea, with  $9\cdot 10^8$ virions per milliliter of seawater at the surface and 70\% of bacteria infected \cite{virioplankton}.
-Thanks to the high abundance of bacteriophages, their impact on shaping of the environment is outstandingly significant.
+% upravene start
+Thanks to the high abundance of bacteriophages, their impact on shaping of the environment is outstandingly significant, reducing considerable amount of bacteria.
+% upravene end
+
 % + circulating carbon?
 % + they contribute to horizontal gene transfer via transduction and transformation
 
 \subsection{Taxonomical classification}
 Classification of bacteriophages is difficult mainly due to their high diversity and genome mosaicism. \cite{phagetax}
-Consequently, there exists no universal marker similar to 16S rRNA gene in bacteria, according to which we will be able to classify bacteriophages based on their genetic information.
+Consequently, there exists no universal marker similar to universal markers in bacteria, according to which we will be able to classify bacteriophages based on their genetic information.
 This is because no genes are strongly conserved within all bacteriophages.
 Despite of these facts, there is taxonomical classification of phages.
 This classification was created by International Committee on Taxonomy of Viruses (ICTV) and it categorizes each phage according to its morphology and nucleic acid.
@@ -111,13 +122,15 @@ Although this taxonomy is currently in use, many biologists feel it is outdated 
 \subsection{Structure of a typical bacteriophage}
 Given the high variety of bacteriophages, they come in a lot of different sizes and shapes.
 Each bacteriophage consists of genetic information in form of DNA or RNA and capsid, a protein coat usually composited from higher number of identical protein units \cite{}.
-We will describe the most typical form of bacteriophages, which is abundantly found in nature.
+We will describe the most typical form of tailed bacteriophages, which is abundantly found in nature.
 
 \begin{figure}[h]
 \includegraphics[width=0.5\textwidth]{./images/phage.png}
 \centering
-\caption{Structure of a typical bacteriophage
-%By Adenosine [CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0) or GFDL (http://www.gnu.org/copyleft/fdl.html)], from Wikimedia Commons
+% upravene start
+\cite{phage_pic}
+\caption{Structure of a typical bacteriophage, it is composited by head, in which the genetic material is stored and tail, through which the genetic material is passed during the infection 
+% upravene end
 }
 \label{fig:phage}
 \end{figure}
@@ -147,8 +160,8 @@ This discovery is attributed to a French-Canadian microbiologist Félix d'Hérel
 Unfortunately, after the discovery of antibiotics, research in this field suffered from insufficient funding and the development was significantly slowed down.\\
 Nowadays, when humanity face the threat of multiresistant bacteria and phages could bring a new methods into the battle against pathogenic bacteria, the research in this field begins to flourish.
 We can see the potential of their use in the field of food industry as the substances that are prolonging life and improve the quality of our food \cite{}.
-In the field of pharmacy, they are used as medicines for bacterial infections \cite{}.
-Their use is significant when we encounter the need to control the lives of microbial communities.
+In the field of pharmacy, they could be used as medicines for bacterial infections \cite{}.
+Their potential of use is significant where we encounter the need to control the lives of microbial communities.
 Moreover, due to their high specificity to a particular strain of bacteria, these new practices will likely be without adverse effects on natural microbiome.
 
 % \section{Phage effectiveness}
@@ -156,13 +169,15 @@ Moreover, due to their high specificity to a particular strain of bacteria, thes
 % georgia - cocktails
 % bacterial mechanisms to prevent
 
-\subsection{Current state of knowledge}
+\subsection{Host identification}
+% how to find them biologically?
 In our work we focus on prediction of phage hosts from genomic sequence.
 We based our method on the assumption that bacteriophages with similar set of genes will infect the same bacterial host.
-In addition, the decision to pick the host as our trait of interest was made based on its straightforward use in searching for phages suitable for phage therapy.
+The decision to create host predicting models was made based on its straightforward use in searching for phages suitable for phage therapy.
+
 Attempts to classify bacteriophages from a genomic sequence were already made.
 In the study "The Phage Proteomic Tree: a Genome-Based Taxonomy for Phage"\cite{phage} from year 2002, researchers performed analysis based on genomes resulting in phylogenetic tree compatible with ICTV system.
-In their work, they proved phages indeed do not contain any universal genetic marker, which could be used as 16S rRNA sequence for classification.
+In their work, they proved phages indeed do not contain any universal genetic marker, which could be used as sequence for classification.
 They also showed that classification based on whole proteome of phage is a reasonable approach.
 In 2016 a similar tool, called HostPhinder, for predicting hosts from genomic sequences appeared \cite{hostphinder}.
 Their approach to classification was through rate of similar k-mers, short sequences of nucleotides of length $k$.
