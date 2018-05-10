@@ -1,22 +1,27 @@
 % v0.2
 \chapter{Bioinformatics methods}
+In this chapter we would like to thoroughly explain methods and algorithms used in bioinformatics.
+Firstly, we will explain details about sequence alignment.
+We used tools implementing ideas of sequence alignment in the practical part of this work, therefore it is important to clarify what it is and how it is realized.
+Secondly, we will explain data clustering.
+We will introduce the concept of it, how we can use it and we will describe algorithm we used in the work.
+  
 \section{Sequence alignment}
 In this section we would like to thoroughly explain what sequence alignment is, since it is one of the most essential tasks in bioinformatics.
 We will describe two main types of sequence alignment, with emphasizing the differences.
 We will also explain the basic algorithms used for solving these problems and we will also describe the heuristic method used in case the input is too big to be computable by standard approaches that guarantee optimal solution.
-At the end of this section we will describe, how we used the algorithms in our analysis.
 
 \subsection{Global alignment}
 \subsubsection{Usage}
 \emph{Global alignment} is commonly used for comparison between two sequences with roughly the same length.
-This comparison can help us to discover mutations in a sequence that causes a certain phenotype \cite{}, or we can use the comparison to determine highly conserved regions with a potential to carry a gene \cite{}.
-The relationships between conserved regions and mutations in certain sequences often serve as a basic assumption for construction of phylogenetic trees \cite{}.
+This comparison can help us to discover mutations in a sequence that causes a certain phenotype, or we can use the comparison to determine highly conserved regions with a potential to carry a gene.
+The relationships between conserved regions and mutations in certain sequences often serve as a basic assumption for construction of phylogenetic trees.
 Therefore, global alignment can tell us a lot about the nature of evolution.
 Global alignment is also capable of calculating a similarity score for two sequences.
 
 \subsubsection{Problem statement}
 Let the input for the problem be a set of two sequences consisting of nucleotides, for example, $ X = ATTGATGG $ and $ Y = AATTCAAC $.
-Then the output is represented as a matrix, where each row is one sequence with possible gaps between nucleotides.
+Then the output is represented as a matrix, where each row is one sequence with possible gaps between nucleotides, representing insertion or deletion of the sequence.
 We can see potential solutions in the Table (\ref{tab:potsol})
 
 \begin{table}
@@ -40,7 +45,7 @@ From this example we can see that according to our scoring scheme, alignment on 
 
 \subsubsection{Scoring schemes}
 In practice, we could use a more complex scoring scheme that better reflects reality.
-For example, substitution between purines (adenine, guanine) or substitution between pyrimidines (cytosine, thymine) occur more often, because they do not require change in the number of rings in the chemical structure of these nucleotides \cite{}.
+For example, substitution between purines (adenine, guanine) or substitution between pyrimidines (cytosine, thymine) occur more often, because they do not require change in the number of rings in the chemical structure of these nucleotides \cite{transition}.
 When we try to align two proteins, a more complex scoring scheme is inevitable.
 Amino acids differ in many parameters such as: polarity, size and structure of their side chains.
 This influences the probability of a substitution occurring between two amino acids.
@@ -48,12 +53,13 @@ Therefore, there is a higher probability that Leucine will be substituted for Is
 To solve the complexity of substitutions between amino acids, matrix BLOSUM62 (\ref{fig:blosum}) was created.
 Another layer of complexity, that does a better job of reflecting reality is the \emph{affine gap penalty function}.
 This reflects the fact that insertions and deletions do not usually occur only on one nucleotide, but often a longer region of DNA is deleted or inserted.
-Affine gap penalty solves this issue by having a higher negative score for opening a new gap in alignment and a lower negative gap for extension of an already created gap \cite{}.
+Affine gap penalty solves this issue by having a higher negative score for opening a new gap in alignment and a lower negative gap for extension of an already created gap.
 
 \begin{figure}[ht]
   \centering
 	\includegraphics[width=\textwidth]{./images/blosum62.png}
-  \caption{BLOSUM62}
+	\cite{blosum}
+  \caption[BLOSUM62]{BLOSUM62, table providing score of substitution between all pairs of amino acids, commonly used in the protein alignment}
   \label{fig:blosum}
 \end{figure}
 
@@ -70,7 +76,8 @@ Dynamic programming algorithms offer saving time on computation at the expense o
 \begin{figure}[ht]
   \centering
 	\includegraphics[width=\textwidth]{./images/needle_wunsch.png}
-  \caption{Needleman-Wunsch}
+	\cite{needleman}
+  \caption[Needleman-Wunsch]{Needleman-Wunsch, visualization of table used in dynamic programming algorithm, arrows signalizing, from which cell the maximum was calculated, optimal solution is highlighted with coloured arrows}
   \label{fig:glal}
 \end{figure}
 
@@ -81,11 +88,11 @@ The table is then initialized with a series starting from 0 and decreasing by 1 
 After initialization, the table starts to be filled from top left corner following this rule:\\
 Into each cell $A_{i,j}$ write maximum of:
 \begin{itemize}
-\item $A_{i-1, j-1} + s()$,
+\item $A_{i-1, j-1} + s(X_i, Y_j)$,
 \item $A_{i-1, j} + g()$,
 \item $A_{i, j-1} + g()$,
 \end{itemize}
-where $s(X_i, Y_j)$ returns score of match/mismatch from scoring scheme and $g$ returns a score of the gap penalty (possibly affine gap).
+where $s(X_i, Y_j)$ returns score of match/mismatch from scoring scheme and $g()$ returns a score of the gap penalty (possibly affine gap).
 The final score of the alignment can be found in the bottom right corner of the filled table.
 Specific alignments can be found by tracking all possible paths to this value.
 The time and space complexity of Needleman-Wunsch algorithm is $\mathcal{O}(nm)$, where $n$ is the length of the first sequence and $m$ is the length of the second sequence.
@@ -142,8 +149,6 @@ For this purpose, various \emph{heuristic algorithms} were developed.
 These algorithms do not guarantee finding the most optimal solution but are orders of magnitude faster and therefore usable also for searching in vast databases.
 
 \subsubsection{BLAST}
-%The basic algorithm consists of searching seeds from database on the query sequence and then extending those seeds into neighbouring bases.
-%This approach provides orders of magnitude faster alignment method than classical Smith-Waterman algorithm \cite{smith_waterman} with comparable sensitivity.
 \emph{Basic Local Alignment Search Tool} (BLAST) \cite{blast} is probably the most widely used tool in bioinformatics.
 The algorithm distinguishes between target sequences and query sequences.
 Target sequences are sequences from which we create a database of all included k-mers.
@@ -174,12 +179,11 @@ E-value is automatically produced by BLAST.
 In this section we will explain what is data clustering.
 We will describe its use in data analysis and bioinformatics and how we used it in our program.
 We will briefly define the problem and we will explain the algorithm used for solving it.
-At the end, we will present three approaches used in our pipeline.
 
 \subsection{Usage}
 \emph{Data clustering} is used to group data according to similar characteristics.
 In computational biology it can be used to cluster organisms to examine relationships between different groups or to study structure of population.
-By clustering genes, we can investigate their functions and see which regions in sequence are responsible for them.
+By clustering genes, we can investigate their relationships and then extend functional annotations of particular genes to their closely related genes.
 Clustering can also be used to distinguish different types of tissue or group drugs with similar effects according to their mechanism of action.
 
 In our work, we clustered genes with sequential similarities.
@@ -187,12 +191,16 @@ We expected, that this approach will create clusters of genes with closely relat
 
 \subsection{Definition of problem}
 Clustering is a problem where we want to determine closely related entities and put them in distinct groups, also called clusters.
-Cluster can be characterized by presence of many edges between cluster members.
+Cluster can be characterized by presence of many connections between cluster members.
 Members from different clusters have lesser probability to be connected and the distance between them is usually longer.
-Although, to intuitively understand clustering is not complicated, there exists a lot of clustering models with slightly different approaches, which makes exact general definition impossible.
+Although, to intuitively understand clustering is not complicated, there exists a lot of clustering models with slightly different approaches, which makes exact general definition difficult.
+In our case, a graph representing our dataset was created.
+Vertices of this graph were individual genes and edges were alignments of corresponding sequences.
+Weights of these edges were alignment scores.
+Proper clustering of this graph was determined using Markov Cluster Algorithm. 
 
 \subsection{Markov Cluster Algorithm}
-\emph{Markov Cluster Algorithm} \cite{} is searching for clusters by simulating random walks on the graph.
+\emph{Markov Cluster Algorithm} \cite{mcl} is searching for clusters by simulating random walks on the graph.
 It assumes that these random walks will infrequently go from one cluster to different cluster and mostly will stay in the starting cluster.
 The algorithm simulates random walks through the graph deterministically with two operations, expansion and inflation.
 \emph{Expansion} corresponds with squaring of stochastic matrix, non-negative matrix where each column sums to 1 and entry $a_{ij}$ corresponds to probability of going from node $j$ to node $i$.

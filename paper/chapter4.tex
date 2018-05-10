@@ -8,7 +8,7 @@ We will also explain how we generated our predictive models and we will reveal h
 \section{Principal component analysis}
 \emph{Principal component analysis} (PCA) is a method mostly used for visualization of high dimensional data.
 For matrix with $r$ rows and $c$ columns it creates $min(r-1, c)$ distinct principal components.
-Principal components are linearly uncorrelated variables created in such way that first principal component preserves most variance from the original dataset, with each subsequent principal component preserving less than previous one.
+Principal components are linearly uncorrelated variables created in such way that first principal component preserves most variance from the original dataset, with each subsequent principal component preserving less than previous one \cite{principal}.
 
 For principal component analysis we used python library scikit-learn \cite{sklearn}.
 Reduced representation of phages in form of a binary matrix was used as an input.
@@ -16,13 +16,14 @@ First few principal components were used to create plots in python library matpl
 In the Figure (\ref{pca}) we can see data visualized with the principal component one on the x-axis and the principal component two on the y-axis.
 Each data point represents one phage record and the color of the particular data point corresponds to genus of that phage.
 As we can see, most phage records are located around the center, with some distinct groups of Mycobacterium and Staphylococcus phages outside the center.
-Although, this could suggest difficulties with distinguishing different genera, it was not the case as first two principal components retained less than 15\% of dataset variability.
-Therefore, we proceeded with a different method of analysis.
+Although, this could suggest difficulties with distinguishing different genera, it was not the case as first two principal components retained less than 21\% of dataset variability.
+Therefore, we assumed binary representation of phages is reasonable and proceeded with a different method of analysis.
 
 \begin{figure}[htp]
 \includegraphics[width=\linewidth]{./images/pca.png}
 \centering
-\caption{PCA - first two principal components}
+\caption[Principal component analysis]{Principal component analysis - first two principal components, PC1 (11.57\% of variability) on the x-axis, PC2 (9.19\% of variability) on the y-axis}
+\label{pca}
 \end{figure}
 
 \section{Decision tree}
@@ -77,7 +78,7 @@ We can see example of this visualization in the Figure \ref{fig:tree}.
 \begin{figure}[htp]
 \includegraphics[width=\linewidth]{./images/tree.pdf}
 \centering
-\caption{Arthrobacter model}
+\caption[Arthrobacter model]{Arthrobacter model}
 \label{fig:tree}
 \end{figure}
 
@@ -101,7 +102,7 @@ This vector was passed to the decision tree model and resulting prediction was s
 \section{Evaluation of models}
 To examine accuracy of our models, we classified all bacteriophages from our test dataset.
 Test dataset contained 699 phage records.
-Resulting predictions were aggregated and number of correctly predicted, false positive and false negative was recorded.
+Resulting predictions were aggregated and number of correctly predicted (CP), false positive (FP) and false negative (FN) was recorded.
 The table was constructed from this data.
 \emph{Accuracy} was calculated as $CP/(CP+FP+FN)$, \emph{false positive} percentage as $FP/(CP+FP+FN)$ and \emph{false negative} percentage as $FN/(CP+FP+FN)$.
 We can see summary of model statistics in the Table \ref{tab:models}.

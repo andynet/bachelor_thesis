@@ -8,7 +8,7 @@ We will also provide some basic stats of the data as number of downloaded genome
 Our pipeline consists of python scripts and publicly available bioinformatics software.
 When writing the code, we have taken care of its readability, sustainability and extensibility.
 
-We implemented our pipeline in  workflow management system \emph{Snakemake} \cite{} that was primarily designed for writing reproducible bioinformatics pipelines.
+We implemented our pipeline in  workflow management system \emph{Snakemake} \cite{snakemake} that was primarily designed for writing reproducible bioinformatics pipelines.
 Snakemake is inspired by GNU make, but it uses python-like syntax with elements similar to pseudo code.
 Furthermore, it is fully portable, depending only on Python executables and libraries.
 Snakefile consists of rules, where each rule is defined by its input files, output files and commands.
@@ -33,7 +33,7 @@ This matrix is later used in classification.
 \begin{figure}[h]
 \includegraphics[height=0.9\textheight]{./images/mcl.png}
 \centering
-\caption{Workflow visualization, cells symbolizing rules in workflow, arrows create acyclic graph, where rules at the top need to be completed before executing rules at the bottom}
+\caption[Workflow visualization]{Workflow visualization, cells symbolizing rules in workflow, arrows create acyclic graph, where rules at the top need to be completed before executing rules at the bottom}
 \label{fig:dag}
 \end{figure}
 
@@ -75,8 +75,8 @@ By performing this process, we obtained 2107 records.
 
 \subsection{PhagesDB}
 \emph{PhagesDB} is a database specialized in bacteriophages infecting bacteria from phylum Actinobacteria.
-This phylum is of great importance, because of its contribution to the soil system \cite{}.
-This phylum also contains the genus Mycobacterium, which includes pathogens causing tuberculosis and leprosy in humans \cite{}.
+This phylum is of great importance, because of its contribution to the soil system in the form of decomposing of organic matter.
+This phylum also contains the genus Mycobacterium, which includes pathogens causing tuberculosis and leprosy in humans \cite{mycobacterium}.
 The database was designed to avoid the time between sequencing and data availability.
 Authors declare, at the time of their publication, there was more than 600 records of bacteriophages that were not yet in GenBank.
 Furthermore, PhagesDB stores more biologically relevant data , such as discovery details, sequencing details, characterization details, sequence file and a plaque picture.
@@ -88,16 +88,17 @@ To solve this issue, we merged datasets together and removed duplicated records.
 For merging we used the standard unix command \verb|cat|.
 For removing duplicated sequences, we created a custom Python script.
 This script made use of custom identifiers, which were assigned to every sequence that was downloaded.
-In case more identical sequences were found, their identifiers were rewritten with the identifier of the first sequence.
+In case more identical sequences were found, their custom identifiers were rewritten with the identifier of the first sequence.
 This approach preserved the relationships between one particular sequence and all data related to it.
 Thus, we were able to track phages, based on their identifiers, to their source databases and also connect them with all data that was already downloaded.
 After removing of duplicated sequences our dataset contained 6277 phage records.
+This suggests high duplication ratio between the databases and even in the GenBank alone.
 
 \section{Extraction and annotation of genes}
 Next step in the pipeline was to identify genes on genomic sequences and annotate them with their biological function.
 Although gene annotations of particular genomes are part of genomic records in used databases, we decided to annotate sequences from scratch.
 This way we ensured consistency of annotations accross our data .
-Another advantage of annotating from scratch is that annotations will always be up-to-date with current human knowledge.
+Another advantage of annotating from scratch is that annotations will be up-to-date with current human knowledge.
 
 \subsection{Prokka}
 We used publicly available pipeline called \emph{Prokka} \cite{prokka} to identify and annotate genes.
@@ -110,6 +111,7 @@ Starting with the most reliable source, which is usually the smallest, it scans 
 The databases used with their corresponding order are as follows:
 An optional user-defined database, UniProt\cite{uniprot}, RefSeq\cite{refseq}, Pfam\cite{pfam} and TIGRFAM\cite{tigrfam}.
 If no match is found across databases, protein is labelled as \verb|hypothetical protein|.
+After annotation, resulting genes were selected and saved to files in format suitable for further use in the pipeline.
 
 % end of session 2018.04.12
 % wc chapter* = 33657 letters
@@ -137,11 +139,6 @@ Pfam incorporates more than 6100 of those models.
 \subsubsection{TIGRFAM}
 TIGRFAM, similarly as Pfam, contains protein families characterized by Profile Hidden Markov Models.
 It contains more than 4200 models with comprehensive description of family structure and function.
-
-\vspace{\baselineskip}
-
-All of the aforementioned databases are regularly updated, which guarantees the most up-to-data annotations.
-After annotation, resulting genes were selected and saved to files in format suitable for further use in the pipeline.
 
 \section{Datasets used}
 At the beginning of this step, our dataset consisted of: phage genomic records, their corresponding genes, information about phage hosts and functional annotation of genes.
@@ -173,15 +170,15 @@ The resulting training set included 2787 records of bacteriophages and resulting
 \end{table}
 
 %--------deeply described parts-------------------------------------------------
-\section{Alignment in the pipeline}
+\section{Alignment of genes}
 In our pipeline, we used alignment to find similarity scores between genes in the training set.
 We needed these scores later in the pipeline at clustering step.
-Software CrocoBLAST \cite{} was used for this purpose.
+Software CrocoBLAST \cite{crocoblast} was used for this purpose.
 CrocoBLAST is a wrapper around BLAST algorithm which makes better use of parallelization than standard BLAST maintained by NCBI.
 With this software we were able to reduce the time needed for the alignment step from around four days to one day.
 Resulting file was in tab separated format, where first column was gene identifier of query sequence, second column was gene identifier of the target sequence and third column was e-value of alignment.
 
-\section{Clustering in our pipeline}
+\section{Clustering}
 \subsection{MCL}
 Firstly, we used Markov Cluster Algorithm implemented in package MCL \cite{mcl}.
 This software is popular in the bioinformatics community for its capabilities to work with big data.
@@ -191,7 +188,7 @@ We used the value 1.2 as the inflation parameter.
 This was the smallest value recommended by the developers.
 The reason for using the smallest possible inflation value was that we wanted to create clusters that are as large as possible
 This approach also reduced the number of different clusters.
-In our work, we needed as few clusters as possible, mainly due to the number of phage records in our dataset.
+In our work, we needed as few reasonable clusters as possible, mainly due to the number of phage records in our dataset.
 If we had too many clusters, we would have too many features for classifier and we would risk overfitting of our final models to the training dataset.
 We created 15017 gene clusters.
 
@@ -211,10 +208,12 @@ Although authors of this software declare quality of clusters quantified by a me
 Clusters of genes were annotated to determine their function.
 We expected proteins with similar biological function to be included in same cluster.
 For functional annotation of particular proteins we used software \emph{InterProScan} \cite{interpro}.
+The reason to use InterProScan annotations instead of Prokka annotations was because InterProScan annotation had better standardized descriptions of functions.
 This tool scans given protein sequences against the protein signatures in databases PROSITE \cite{prosite}, PRINTS \cite{prints}, Pfam \cite{pfam}, ProDom \cite{prodom} and SMART \cite{smart}.
 After acquiring of annotations for all proteins in a particular cluster, we calculated number of occurrences of each distinct biological function.
-These statistics represent our annotation of a certain cluster.
-Our expectation of clusters containing proteins with similar function was met in most cases, although the information about particular proteins were sparse with a lot of proteins without any information.
+These statistics represented our annotation of a certain cluster.
+We manually reviewed the annotations of the biggest clusters to evaluate relevancy of created clusters.
+Although a lot of proteins remained without any assigned function, our expectation of clusters containing proteins with similar function was met in most cases.
 Therefore, we assumed that reasonable clustering was achieved.
 
 \section{Reducing phage genomes}

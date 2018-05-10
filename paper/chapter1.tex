@@ -18,7 +18,7 @@ Next, we will present the central types of molecules in molecular biology, which
 \emph{Deoxyribonucleic acid} (DNA) is a long chain of nucleotides (bases) of four types - adenine, cytosine, guanine and thymine.
 These bases are connected through a phosphodiester bond, connection between the 3' carbon atom of one deoxyribose and the 5' carbon atom of the second deoxyribose.
 The structure of DNA consists of two complementary strands coiled around each other in the form of a double helix.
-In this double helix adenine is paired with thymine and cytosine with guanine through hydrogen bonds \cite{}.
+In this double helix adenine is paired with thymine and cytosine with guanine through hydrogen bonds \cite{molbio}.
 
 In bioinformatics and computational biology, we usually represent a base by its first letter - A for adenine, C for cytosine, G for guanine and T for thymine.
 Due to linear organisation of nucleotides, a DNA molecule can be represented as a word from alphabet \{A, C, G, T\}, called DNA sequence. We usually store biological sequences in simple plain text files.
@@ -32,7 +32,7 @@ There are three main differences between DNA and RNA molecules.
 Firstly, the sugar-phosphate backbone of RNA contains ribose instead of deoxyribose.
 This change in structure makes RNA less stable as it is more prone to hydrolysis.
 Another distinctive feature of RNA is that it contains uracil instead of thymine.
-Additionally, RNA appears in nature mostly as a single-stranded molecule, whereas DNA is mostly double-stranded \cite{}.
+Additionally, RNA appears in nature mostly as a single-stranded molecule, whereas DNA is mostly double-stranded \cite{molbio}.
 This characteristic allows RNA to form more complex structures and show enzymatic activity.
 In bioinformatics, sequences of RNA are usually written, similarly as with DNA, from 5' to 3', with the difference of U for uracil instead of T for thymine.
 
@@ -91,7 +91,7 @@ We based our work on the central dogma of molecular biology and on the assumptio
 \includegraphics[width=\linewidth]{./images/central_dogma.png}
 \centering
 \cite{central_dogma}
-\caption{Central dogma of molecular biology,
+\caption[Central dogma of molecular biology]{Central dogma of molecular biology,
 arrows show the flow of information between biological molecules, full lines symbolizing usual flow in living organisms and dashed line symbolizing flow of information used by some primitive organisms (viruses)}
 \end{figure}
 % upravene end
@@ -121,7 +121,7 @@ Although this taxonomy is currently in use, many biologists feel it is outdated 
 
 \subsection{Structure of a typical bacteriophage}
 Given the high variety of bacteriophages, they come in a lot of different sizes and shapes.
-Each bacteriophage consists of genetic information in form of DNA or RNA and capsid, a protein coat usually composited from higher number of identical protein units \cite{}.
+Each bacteriophage consists of genetic information in form of DNA or RNA and capsid, a protein coat usually composited from higher number of identical protein units \cite{phage_coat}.
 We will describe the most typical form of tailed bacteriophages, which is abundantly found in nature.
 
 \begin{figure}[h]
@@ -129,7 +129,7 @@ We will describe the most typical form of tailed bacteriophages, which is abunda
 \centering
 % upravene start
 \cite{phage_pic}
-\caption{Structure of a typical bacteriophage, it is composited by head, in which the genetic material is stored and tail, through which the genetic material is passed during the infection 
+\caption[Structure of a typical bacteriophage]{Structure of a typical bacteriophage, it is composited by head, in which the genetic material is stored and tail, through which the genetic material is passed during the infection 
 % upravene end
 }
 \label{fig:phage}
@@ -143,7 +143,7 @@ At the end of the tail, there are proteins, which are able to bind to specific r
 Thanks to this mechanism, bacteriophages tend to have a high specificity in selection of their prey.
 
 \subsection{Life cycle of bacteriophages}
-Generally, there are two strategies that bacteriophages use to secure their survival and replication; the \emph{lysogenic cycle} and the \emph{lytic cycle} \cite{}.
+Generally, there are two strategies that bacteriophages use to secure their survival and replication; the \emph{lysogenic cycle} and the \emph{lytic cycle} \cite{cycles}.
 Viruses tend to use these strategies in different proportions, but usually prefer to choose one of them.
 The lysogenic cycle results in incorporations of phage genetic information into host DNA or creation of a circular replicon in the bacterial cytoplasm.
 By this approach, the genetic material of a phage inside the host, called prophage, is duplicated together with the host genome and after cell division, both daughter cells contain DNA of the bacteriophage.
@@ -159,8 +159,8 @@ Humankind tried to harness the power of phages since their discovery in the year
 This discovery is attributed to a French-Canadian microbiologist Félix d'Hérelle, who experimented extensively with phages and introduced the concept of \emph{phage therapy}\cite{phages_in_nature}.
 Unfortunately, after the discovery of antibiotics, research in this field suffered from insufficient funding and the development was significantly slowed down.\\
 Nowadays, when humanity face the threat of multiresistant bacteria and phages could bring a new methods into the battle against pathogenic bacteria, the research in this field begins to flourish.
-We can see the potential of their use in the field of food industry as the substances that are prolonging life and improve the quality of our food \cite{}.
-In the field of pharmacy, they could be used as medicines for bacterial infections \cite{}.
+We can see the potential of their use in the field of food industry as the substances that are prolonging life and improve the quality of our food \cite{foodphage}.
+In the field of pharmacy, they could be used as medicines for bacterial infections \cite{drugphage}.
 Their potential of use is significant where we encounter the need to control the lives of microbial communities.
 Moreover, due to their high specificity to a particular strain of bacteria, these new practices will likely be without adverse effects on natural microbiome.
 
