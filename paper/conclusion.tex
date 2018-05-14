@@ -4,38 +4,22 @@
 \markboth{Conclusion}{Conclusion} % vyriesenie hlaviciek
 
 % TODO: 1 page
-The goal of this work was to discover relationships between functional elements of bacteriophage sequence and its host. 
-We showed, we can predict bacteriophage host with a high accuracy based on these relationships
+The importance of the bacteriophages as a research subject is raising mainly due to decreasing effectiveness of the antibiotic treatments.
+Bacteriophages could be used as novel weapons in the fight against bacteria.
+They are already used to battle bacterial infections in the former Eastern bloc.
+In the countries like Georgia, cocktails of phages are produced and used for many years to eliminate bacteria causing infection.
+Unfortunately, due to the process these cocktails are produced the exact content of these cocktails is not known.
+This prevents western countries in adopting phage therapy as a treatment for bacterial infections.
 
+The goal of this work was to examine relationships between bacteriophage genomes and its host.
+We collected publicly available data and created predictive models enabling us to assign bacterial host to bacteriophage using only information about its genome.
 
-The goal of the thesis would be to discover relationship between functional
-components of bacteriophage sequence and its potential host. Student would
-prepare a database of known bacteriophages and their hosts. He would identify
-their functional elements and cluster them according to genomic sequence
-similarities. He would propose a classification method based on components
-that are highly enriched in bacteriophages of specific hosts.
-In this work we showed how to create models for predicting hosts of bacteriophages.
-We started by introducing new biological terms as DNA, RNA and proteins.
-Next, we explained relationships between these molecules ans we also showed how they are represented inside the computer.
+In our work, we created reduced representation of each bacteriophage symbolizing genes, which were observed in phage genome.
+We showed, this representation was useful and enabled us, using principal component analysis, to roughly distinguish between different types of bacteriophages.
+To refine our prediction, we used decision tree classifier.
+This machine learning method allowed us to create models for predictions with high accuracy, which were also interpretable in the terms of genes.
 
-- to by som poriadne prepracoval, v podstate len kopirujes Introduction. V Conclusion opisujes zavery svojej prace, chces sa tu vychvalit. Cize vymysleli sme redukovanu verziu fagov, na ktorej sa pomocou jednoduchej PCA dali odlisit zhluky fagov podla hostitela. Na to sme nabalili klasifikator, ktory to vedel velmi dobre klasifikovat.
-- popis aj, ze podobny princip by sa dal pouzit na identifikaciu inych vlastnosti fagov
-- ake je potencialne vyuzitie tohto prediktora
-- ako sa da dalej rozsirit, napr. tie zmesne vzorky
-- Mozno by tu bolo vhodne prehodit aj Limitations, uvidis
+The method demonstrated in this work could be used also for other biological traits, which depend on the genes included in phage genome.
+This could bring a new insight on phages and their functions.
 
-Because bacteriophages were the central topic of this work, we dedicated second chapter to them.
-We showed that, despite of their microscopic bodies, their impact on the nature is enormous.
-The lytic and lysogenic cycle were also explained as to understand these two cycles is important in order to understand the medical potential of bacteriophages.
-We also mentioned structure of bacteriophage and taxonomical classification.
-Next, we mentioned similar works to our work and we compared them.
-
-In third chapter we described our program in details.
-We described software used with emphasis on explanation of how this software works.
-The detailed picture of our process was provided.
-For every step we mentioned reasons, why we chose right this one.
-
-Fourth chapter was about analyses performed with data and about results, which we got.
-Firstly, we described principal component analysis and showed our data on the plot.
-Secondly, decision tree classifier was presented with example of how we could visualize it.
-At the end, evaluation of our models was carry out and the results were presented.
+We think, this method has a potential to help to overcome the barrier, which prevents use of bacteriophages in western countries.

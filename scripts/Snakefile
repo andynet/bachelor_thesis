@@ -356,20 +356,6 @@ rule annotate_cluster:
         > {params.cluster_annotation_dir}/Cluster_{wildcards.i}.result
     '''
 
-# TODO:
-#rule find_cluster_dependence:
-#  input:
-#    '{data_dir}/011_matrix.tsv'
-#  output:
-#    '{data_dir}/012_cluster_dependence/Cluster_{i}.dependence'
-#  params:
-#    script_dir=SCRIPT_DIR,
-#    cluster_dependence_dir='{data_dir}/012_cluster_dependence'
-#  shell:
-#    '''
-#
-#    '''
-
 rule select_features:
   input:
     '{data_dir}/011_matrix.{cluster_method}.raw.tsv'
