@@ -6,20 +6,24 @@
 % TODO: 1 page
 The importance of the bacteriophages as a research subject is raising mainly due to decreasing effectiveness of the antibiotic treatments.
 Bacteriophages could be used as novel weapons in the fight against bacteria.
-They are already used to battle bacterial infections in the former Eastern bloc.
-In the countries like Georgia, cocktails of phages are produced and used for many years to eliminate bacteria causing infection.
-Unfortunately, due to the process these cocktails are produced the exact content of these cocktails is not known.
-This prevents western countries in adopting phage therapy as a treatment for bacterial infections.
+The goal of this work was to examine relationships between bacteriophage genomes and its bacterial host.
 
-The goal of this work was to examine relationships between bacteriophage genomes and its host.
-We collected publicly available data and created predictive models enabling us to assign bacterial host to bacteriophage using only information about its genome.
+%They are already used to battle bacterial infections in the former Eastern bloc.
+%In the countries like Georgia, cocktails of phages are produced and used for many years to eliminate bacteria causing infection.
+%Unfortunately, due to the process these cocktails are produced the exact content of these cocktails is not known.
+%This prevents western countries in adopting phage therapy as a treatment for bacterial infections.
 
-In our work, we created reduced representation of each bacteriophage symbolizing genes, which were observed in phage genome.
-We showed, this representation was useful and enabled us, using principal component analysis, to roughly distinguish between different types of bacteriophages.
-To refine our prediction, we used decision tree classifier.
-This machine learning method allowed us to create models for predictions with high accuracy, which were also interpretable in the terms of genes.
+At first, we collected publicly available data, annotated phage genomes for genes and clustered these genes according to their similarity.
+Then, we proposed reduced representation of each bacteriophage based on genes, which were observed in its genome.
+We demonstrated feasibility of this representation, using principal component analysis. 
+In representations that were transferred into lower dimensions we were able to roughly distinguish between clusters of bacteriophages with distinct bacterial host.
+Finally, we used decision tree classifier to refine our prediction.
+This machine learning method allowed us to create predictive models enabling us to assign bacterial host with high accuracy using only information about genome of bacteriophage.
+Models were also interpretable in the terms of gene clusters.
+This allowed us to highlight clusters with high potential of being important for phage specificity. 
 
 The method demonstrated in this work could be used also for other biological traits, which depend on the genes included in phage genome.
 This could bring a new insight on phages and their functions.
+% We think, this method has a potential to help to overcome the barrier, which prevents use of bacteriophages in western countries.
 
-We think, this method has a potential to help to overcome the barrier, which prevents use of bacteriophages in western countries.
+

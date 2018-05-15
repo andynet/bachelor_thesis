@@ -102,25 +102,25 @@ This vector was passed to the decision tree model and resulting prediction was s
 \section{Evaluation of models}
 To examine accuracy of our models, we classified all bacteriophages from our test dataset.
 Test dataset contained 699 phage records.
-Resulting predictions were aggregated and number of correctly predicted (CP), false positive (FP) and false negative (FN) was recorded.
+Resulting predictions were aggregated and number of correctly predicted ($TP+TN$), false positive ($FP$) and false negative ($FN$) was recorded.
 The table was constructed from this data.
-\emph{Accuracy} was calculated as $CP/(CP+FP+FN)$, \emph{false positive} percentage as $FP/(CP+FP+FN)$ and \emph{false negative} percentage as $FN/(CP+FP+FN)$.
+\emph{Accuracy} was calculated as $TP+TN/(TP+TN+FP+FN)$, \emph{false positive} percentage as $FP/(TP+TN+FP+FN)$ and \emph{false negative} percentage as $FN/(TP+TN+FP+FN)$.
 We can see summary of model statistics in the Table \ref{tab:models}.
 
 \begin{table}
   \centering
     \begin{tabular}{ r l l l l l l }
 	\hline
-	model & correct & fpos & fneg & accuracy & fposp & fnegp \\
+	model & correct & FP & FN & accuracy \\
 	\hline
-	Arthrobacter & 683 & 11 & 5  & 97.71\% & 1.57\% & 0.71\% \\
-	Escherichia & 679 & 17 & 3  & 97.13\% & 2.43\% & 0.42\% \\
-	Gordonia & 647 & 39 & 13 & 92.56\% & 5.57\% & 1.85\% \\
-	Lactococcus & 680 & 3  & 16 & 97.28\% & 0.42\% & 2.28\% \\
-	Mycobacterium & 686 & 11 & 2  & 98.14\% & 1.57\% & 0.28\% \\
-	Pseudomonas & 686 & 6  & 7  & 98.14\% & 0.85\% & 1.00\% \\
-	Staphylococcus & 685 & 0  & 14 & 97.99\% & 0.00\% & 2.00\% \\
-	Streptococcus & 686 & 2  & 11 & 98.14\% & 0.28\% & 1.57\% \\
+	Arthrobacter & 683 & 11 (1.57\%) & 5 (0.71\%) & 97.71\% \\
+	Escherichia & 679 & 17 (2.43\%) & 3 (0.42\%) & 97.13\% \\
+	Gordonia & 647 & 39 (5.57\%) & 13 (1.85\%) & 92.56\% \\
+	Lactococcus & 680 & 3 (0.42\%) & 16 (2.28\%) & 97.28\% \\
+	Mycobacterium & 686 & 11 (1.57\%) & 2 0.28\% & 98.14\% \\
+	Pseudomonas & 686 & 6 (0.85\%) & 7 (1.00\%) & 98.14\% \\
+	Staphylococcus & 685 & 0 (0.00\%) & 14 (2.00\%) & 97.99\% \\
+	Streptococcus & 686 & 2 (0.28\%) & 11 (1.57\%) & 98.14\% \\
 	\end{tabular}
 	\bigskip
     \caption{Evaluation of models}
