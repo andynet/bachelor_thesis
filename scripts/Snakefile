@@ -1,8 +1,6 @@
 
 SCRIPT_DIR = '/data/projects/kimona/scripts/bachelor_thesis/scripts'
-# DATA_DIR = '/data/projects/kimona/data_18-03-08'
 DATA_DIR = '/data/projects/kimona/data'
-NEEDLE_DIR = '{}/009_needle'.format(DATA_DIR)
 
 DATABASES = ['ncbi', 'viralzone', 'phagesdb']
 
@@ -228,27 +226,29 @@ rule blast_to_needle:
     '{data_dir}/008_crocoblast.needle.abc'
   params:
     script_dir=SCRIPT_DIR,
-    needle_dir=NEEDLE_DIR
+    data_dir=DATA_DIR
   shell:
     '''
-    rm -rf {params.needle_dir}
-    mkdir  {params.needle_dir}
+    NEEDLE_DIR={params.data_dir}/009_needle
+
+    rm -rf ${{NEEDLE_DIR}}
+    mkdir  ${{NEEDLE_DIR}}
 
     {params.script_dir}/007_parallelize_global_alignment_from_blast.py  {input[0]}                \
                                                                         {input[1]}                \
-                                                                        {params.needle_dir}
+                                                                        ${{NEEDLE_DIR}}
 
-    while [ ! -f {params.needle_dir}/qsub_completed ]; do
+    while [ ! -f ${{NEEDLE_DIR}}/qsub_completed ]; do
         sleep 20m
     done;
 
     for i in $(seq 0 1 9); do
-        cat {params.needle_dir}/tmp/${{i}}*.abc > {params.needle_dir}/tmp/${{i}}.final.abc        \
-            && echo "{params.needle_dir}/tmp/${{i}}.final.abc created."                           \
+        cat ${{NEEDLE_DIR}}/tmp/${{i}}*.abc > ${{NEEDLE_DIR}}/tmp/${{i}}.final.abc        \
+            && echo "${{NEEDLE_DIR}}/tmp/${{i}}.final.abc created."                           \
             || echo "There are no files to merge into ${{i}}.final.abc."
     done;
 
-    cat {params.needle_dir}/tmp/*.final.abc > {output[0]}
+    cat ${{NEEDLE_DIR}}/tmp/*.final.abc > {output[0]}
     '''
 
 rule cluster_spectral:
