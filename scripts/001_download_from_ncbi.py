@@ -31,9 +31,14 @@ genes_conversion_file = '{}/001_ncbi.genes.conversion'.format(sys.argv[1])
 genes_output = open(genes_output_file, 'w')
 genes_conversion = open(genes_conversion_file, 'w')
 
-query = 'phage[Title] AND (complete genome[Title] OR complete sequence[Title]) AND (viruses[filter] ' \
-        'AND biomol_genomic[PROP] AND ("10000"[SLEN] : "100000000"[SLEN]))'
+# query = 'phage[Title] AND (complete genome[Title] OR complete sequence[Title]) AND (viruses[filter] ' \
+#         'AND biomol_genomic[PROP] AND ("10000"[SLEN] : "100000000"[SLEN]))'
 
+query = '''
+        (phage[Title] OR bacteriophage[Title]) 
+        AND (complete sequence[Title] OR complete genome[Title]) 
+        AND (viruses[filter] AND biomol_genomic[PROP] AND ddbj_embl_genbank[filter])
+        '''
 Entrez.email = 'andrejbalaz001@gmail.com'
 
 handle = Entrez.esearch(db="nucleotide", term=query, idtype='acc', retmax=100000, usehistory='y')

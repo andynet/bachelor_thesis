@@ -30,9 +30,15 @@ genes_conversion_file = '{}/001_viralzone.genes.conversion'.format(sys.argv[1])
 genes_output = open(genes_output_file, 'w')
 genes_conversion = open(genes_conversion_file, 'w')
 
-query = '"Viruses"[Organism] AND srcdb_refseq[PROP] NOT wgs[PROP] NOT "cellular organisms"[Organism] ' \
-        'NOT AC_000001[PACC] : AC_999999[PACC] AND "vhost bacteria"[Filter] AND (viruses[filter] ' \
-        'AND biomol_genomic[PROP] AND ("10000"[SLEN] : "100000000"[SLEN]))'
+# query = '"Viruses"[Organism] AND srcdb_refseq[PROP] NOT wgs[PROP] NOT "cellular organisms"[Organism] ' \
+#         'NOT AC_000001[PACC] : AC_999999[PACC] AND "vhost bacteria"[Filter] AND (viruses[filter] ' \
+#         'AND biomol_genomic[PROP] AND ("10000"[SLEN] : "100000000"[SLEN]))'
+
+query = '''
+        (phage[Title] OR bacteriophage[Title]) 
+        AND (complete sequence[Title] OR complete genome[Title]) 
+        AND (viruses[filter] AND biomol_genomic[PROP] AND refseq[filter])
+        '''
 
 Entrez.email = 'andrejbalaz001@gmail.com'
 
