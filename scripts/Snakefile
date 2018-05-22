@@ -1,6 +1,6 @@
 
 SCRIPT_DIR = '/data/projects/kimona/scripts/bachelor_thesis/scripts'
-DATA_DIR = '/data/projects/kimona/data'
+DATA_DIR = '/data/projects/kimona/data_18-05-22'
 
 DATABASES = ['ncbi', 'viralzone', 'phagesdb']
 
